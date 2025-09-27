@@ -12,6 +12,6 @@ class CompositeFunctionTest {
         var f3 = new CompositeFunction(f1, f2);
         assertEquals(16, f3.apply(4));
         assertEquals(36, new CompositeFunction(f2, f1).apply(6));
-        assertEquals(216, new CompositeFunction(new CompositeFunction (new IdentityFunction(), new SqrFunction()), new SqrFunction()).apply(6));
+        assertEquals(1296, new CompositeFunction(new CompositeFunction (new IdentityFunction(), new SqrFunction()), new SqrFunction()).apply(6));
     }
 }

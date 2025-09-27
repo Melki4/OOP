@@ -9,5 +9,7 @@ class SqrFunctionTest {
     void EqualsToSqr(){
         var sqr = new SqrFunction();
         assertEquals(16.0, sqr.apply(4.0));
+        assertEquals(25.0, sqr.apply(5.0));
+        assertEquals(42.25, sqr.apply(6.5));
     }
 }
