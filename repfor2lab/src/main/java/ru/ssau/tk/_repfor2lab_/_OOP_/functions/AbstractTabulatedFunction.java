@@ -24,6 +24,5 @@ abstract class AbstractTabulatedFunction implements TabulatedFunction {
         else if (indexOfX(x) != -1) return getY(indexOfX(x));
 
         else return interpolate(x, floorIndexOfX(x));
-
     }
 }
