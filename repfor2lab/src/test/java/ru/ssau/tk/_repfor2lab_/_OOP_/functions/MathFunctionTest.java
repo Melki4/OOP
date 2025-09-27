@@ -17,5 +17,4 @@ class MathFunctionTest {
         assertEquals(625.0, new SqrFunction().andThen(new SqrFunction().andThen(new ConstantFunction(5.0))).apply(3));
         assertEquals(6.0, new IdentityFunction().andThen(new ConstantFunction(6.0)).apply(-45.0));
     }
-
 }
