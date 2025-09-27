@@ -1,6 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-public class CompositeFunction implements MathFunction {
+public class CompositeFunction implements MathFunction {//конструктор CF(f(x), d(x))
+    //выполнит d(f(x))
 
     private  MathFunction firstFunction, secondFunction;
 

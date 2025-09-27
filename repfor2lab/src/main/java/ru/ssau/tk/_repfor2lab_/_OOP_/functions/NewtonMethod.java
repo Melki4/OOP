@@ -17,11 +17,17 @@ public class NewtonMethod implements MathFunction{
 
     public double apply(double e) {
         ACCURACY = e;
-        double side = interval[0];
-        while (side < interval[1]) {
-            if (function.apply(side) * derivative2.apply(side) > 0.0)  break;
-            side+=0.1;
+
+        double side = interval[0];;
+        double step = interval[1]-interval[0];
+
+        for (int i=0;i<5;++i) {
+            side = interval[0];
+            while (side<interval[1] && function.apply(side) * derivative2.apply(side) < 0.0) side+=step;
+            if (side<interval[1] && function.apply(side) * derivative2.apply(side) > 0.0) break;
+            step/=10;
         }
+
         if (side > interval[1]) return -1;
 
         double f_x = side;
@@ -33,6 +39,7 @@ public class NewtonMethod implements MathFunction{
             if (Math.abs(derivative1.apply(f_x)) < 1e-12) {
                 return -1;
             }
+
             x1 = f_x - function.apply(f_x) / derivative1.apply(f_x);
 
         } while (Math.abs(x1 - f_x) > ACCURACY);
