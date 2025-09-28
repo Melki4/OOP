@@ -2,6 +2,11 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
 
+    @Override
+    public void insert(double x, double y) {
+
+    }
+
     Node head = null;
 
     private void addNode(double x, double y){

@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-abstract class AbstractTabulatedFunction implements TabulatedFunction {
+abstract class AbstractTabulatedFunction implements TabulatedFunction, Insertable {
 
     protected int count;// отвечает за количество строк в таблице и должно быть возвращено соответствующим методом
 

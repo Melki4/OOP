@@ -4,6 +4,91 @@ import java.util.Arrays;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
 
+    @Override
+    public void insert(double x, double y) {
+        if (count == 0){
+            xValues = new double[1];
+            yValues = new double[1];
+
+            xValues[0] = x;
+            yValues[0] = y;
+
+            count++;
+            return;
+        }
+        else if (indexOfX(x)!= -1) {
+            setY(indexOfX(x), y);
+            return;
+        }
+        else if (x < leftBound()){
+             var xValuesNew = Arrays.copyOfRange(xValues, 0, xValues.length+1);
+             var yValuesNew = Arrays.copyOfRange(yValues, 0, yValues.length+1);
+
+             double tmp;
+             for (int i = 0; i < xValues.length; i++) {
+                 tmp = xValuesNew[i + 1];
+                 xValuesNew[i + 1] = xValuesNew[0];
+                 xValuesNew[0] = tmp;
+
+                 tmp = yValuesNew[i + 1];
+                 yValuesNew[i + 1] = yValuesNew[0];
+                 yValuesNew[0] = tmp;
+             }
+
+             xValuesNew[0] = x;
+             yValuesNew[0] = y;
+
+             xValues = new double[count+1];
+             yValues = new double[count+1];
+             xValues = xValuesNew;
+             yValues = yValuesNew;
+             count+=1;
+             return;
+        }
+        else if (x > rightBound()){
+            var xValuesNew = Arrays.copyOfRange(xValues, 0, xValues.length+1);
+            var yValuesNew = Arrays.copyOfRange(yValues, 0, yValues.length+1);
+
+            xValuesNew[xValues.length] = x;
+            yValuesNew[xValues.length] = y;
+
+            xValues = new double[count+1];
+            yValues = new double[count+1];
+            xValues = xValuesNew;
+            yValues = yValuesNew;
+            count+=1;
+            return;
+        }
+        else {
+            int index = floorIndexOfX(x);
+
+            var leftPartX = Arrays.copyOfRange(xValues, 0, index+1);
+            var rightPartX = Arrays.copyOfRange(xValues, index+1, xValues.length);
+
+            var leftPartY = Arrays.copyOfRange(yValues, 0, index+1);
+            var rightPartY = Arrays.copyOfRange(yValues, index+1, xValues.length);
+
+            xValues = new double[count+1];
+            yValues = new double[count+1];
+
+            for(int i=0;i<index+1;++i){
+                xValues[i] = leftPartX[i];
+                yValues[i] = leftPartY[i];
+            }
+
+            xValues[index+1] = x;
+            yValues[index+1] = y;
+
+            for(int i=index+2;i<count+1;++i){
+                xValues[i] = rightPartX[i-(index+2)];
+                yValues[i] = rightPartY[i-(index+2)];
+            }
+
+            count+=1;
+            return;
+        }
+    }
+
     private double[] xValues;
     private double[] yValues;
 
