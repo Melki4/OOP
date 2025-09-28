@@ -4,6 +4,10 @@ import java.util.Arrays;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
 
+    private double[] xValues;
+    private double[] yValues;
+    int count = 0;
+
     @Override
     public void insert(double x, double y) {
         if (count == 0){
@@ -89,8 +93,52 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
         }
     }
 
-    private double[] xValues;
-    private double[] yValues;
+    @Override
+    public void remove(int indexDelX) {
+        if (count == 0 || indexDelX <0 || indexDelX >= count){
+            return;
+        }
+        else if (count == 1) {
+            xValues = new double[0];
+            yValues = new double[0];
+            count = 0;
+        }
+        else if (indexDelX == 0){
+            xValues = Arrays.copyOfRange(xValues, 1, count);
+            yValues = Arrays.copyOfRange(yValues, 1, count);
+            count--;
+        }
+        else if (indexDelX == count-1){
+            xValues = Arrays.copyOfRange(xValues, 0, count-1);
+            yValues = Arrays.copyOfRange(yValues, 0, count-1);
+            count--;
+        }
+        else {
+            int index = indexDelX-1;
+
+            var leftPartX = Arrays.copyOfRange(xValues, 0, index+1);
+            var rightPartX = Arrays.copyOfRange(xValues, index+2, xValues.length);
+
+            var leftPartY = Arrays.copyOfRange(yValues, 0, index+1);
+            var rightPartY = Arrays.copyOfRange(yValues, index+2, xValues.length);
+
+            xValues = new double[count-1];
+            yValues = new double[count-1];
+
+            for(int i=0;i<index+1;++i){
+                xValues[i] = leftPartX[i];
+                yValues[i] = leftPartY[i];
+            }
+
+            for(int i=index+1;i<count-1;++i){
+                xValues[i] = rightPartX[i-(index+1)];
+                yValues[i] = rightPartY[i-(index+1)];
+            }
+
+            count--;
+            return;
+        }
+    }
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues){//xValues не повторяются и упорядочены изначально, длины массивов совпадают
 

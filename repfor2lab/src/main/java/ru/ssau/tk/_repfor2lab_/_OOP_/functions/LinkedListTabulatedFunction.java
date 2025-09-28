@@ -3,6 +3,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
 
     Node head = null;
+    int count = 0;
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
         for (int i=0;i<xValues.length;++i){
@@ -80,6 +81,11 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
 
             count++;
         }
+
+    }
+
+    @Override
+    public void remove(int index) {
 
     }
 
