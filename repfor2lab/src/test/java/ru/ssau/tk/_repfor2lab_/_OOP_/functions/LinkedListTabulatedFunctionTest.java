@@ -489,3 +489,291 @@ class ComplexFunctionCombinationsTest {
         }
     }
 }
+
+class LinkedListTabulatedFunctionTest2 {
+
+    // Вспомогательный метод для создания тестовой функции
+    private LinkedListTabulatedFunction createTestFunction() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+        return new LinkedListTabulatedFunction(xValues, yValues);
+    }
+
+    // Тест 1: Вставка в пустой список
+    @Test
+    public void testInsertIntoEmptyList() {
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(new double[0], new double[0]);
+
+        function.insert(1.0, 10.0);
+
+        assertEquals(1, function.getCount());
+        assertEquals(1.0, function.getX(0));
+        assertEquals(10.0, function.getY(0));
+    }
+
+    // Тест 2: Обновление существующего X (должен обновить Y)
+    @Test
+    public void testInsertExistingX() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        // Проверяем начальное состояние
+        assertEquals(20.0, function.getY(1)); // y при x=2.0
+
+        // Вставляем новое значение для существующего x
+        function.insert(2.0, 25.0);
+
+        // Проверяем, что значение обновилось
+        assertEquals(25.0, function.getY(1));
+        // Проверяем, что размер не изменился
+        assertEquals(3, function.getCount());
+    }
+
+    // Тест 3: Вставка в начало (x < leftBound())
+    @Test
+    public void testInsertAtBeginning() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(0.5, 5.0);
+
+        // Проверяем размер
+        assertEquals(4, function.getCount());
+        // Проверяем, что новый элемент в начале
+        assertEquals(0.5, function.getX(0));
+        assertEquals(5.0, function.getY(0));
+        // Проверяем, что голова списка обновилась
+        assertEquals(0.5, function.leftBound());
+        // Проверяем порядок остальных элементов
+        assertEquals(1.0, function.getX(1));
+        assertEquals(2.0, function.getX(2));
+        assertEquals(3.0, function.getX(3));
+    }
+
+    // Тест 4: Вставка в конец (x > rightBound())
+    @Test
+    public void testInsertAtEnd() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(4.0, 40.0);
+
+        // Проверяем размер
+        assertEquals(4, function.getCount());
+        // Проверяем, что новый элемент в конце
+        assertEquals(4.0, function.getX(3));
+        assertEquals(40.0, function.getY(3));
+        // Проверяем порядок остальных элементов
+        assertEquals(1.0, function.getX(0));
+        assertEquals(2.0, function.getX(1));
+        assertEquals(3.0, function.getX(2));
+    }
+
+    // Тест 5: Вставка в середину
+    @Test
+    public void testInsertInMiddle() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(1.5, 15.0);
+
+        // Проверяем размер
+        assertEquals(4, function.getCount());
+        // Проверяем порядок элементов
+        assertEquals(1.0, function.getX(0));
+        assertEquals(1.5, function.getX(1));
+        assertEquals(2.0, function.getX(2));
+        assertEquals(3.0, function.getX(3));
+        // Проверяем соответствующие Y значения
+        assertEquals(15.0, function.getY(1));
+    }
+
+    // Тест 6: Вставка между вторым и третьим элементом
+    @Test
+    public void testInsertBetweenSecondAndThird() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(2.5, 25.0);
+
+        assertEquals(4, function.getCount());
+        assertEquals(2.5, function.getX(2));
+        assertEquals(25.0, function.getY(2));
+        assertEquals(3.0, function.getX(3));
+    }
+
+    // Тест 7: Вставка нескольких элементов подряд
+    @Test
+    public void testInsertMultipleElements() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(0.5, 5.0);  // в начало
+        function.insert(2.5, 25.0); // в середину
+        function.insert(4.0, 40.0); // в конец
+
+        assertEquals(6, function.getCount());
+
+        // Проверяем правильный порядок
+        double[] expectedX = {0.5, 1.0, 2.0, 2.5, 3.0, 4.0};
+        double[] expectedY = {5.0, 10.0, 20.0, 25.0, 30.0, 40.0};
+
+        for (int i = 0; i < expectedX.length; i++) {
+            assertEquals(expectedX[i], function.getX(i), 0.0001);
+            assertEquals(expectedY[i], function.getY(i), 0.0001);
+        }
+    }
+
+    // Тест 8: Вставка элемента с тем же X после вставки других элементов
+    @Test
+    public void testUpdateAfterInsert() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        // Вставляем новый элемент
+        function.insert(2.5, 25.0);
+        assertEquals(25.0, function.getY(2)); // проверяем вставку
+
+        // Обновляем значение для того же X
+        function.insert(2.5, 30.0);
+        assertEquals(30.0, function.getY(2)); // проверяем обновление
+        assertEquals(4, function.getCount()); // размер не должен измениться
+    }
+
+    // Тест 9: Вставка элемента с граничным значением
+    @Test
+    public void testInsertBoundaryValue() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        // Вставляем элемент, равный leftBound (должен обновиться)
+        function.insert(1.0, 15.0);
+        assertEquals(15.0, function.getY(0));
+        assertEquals(3, function.getCount());
+
+        // Вставляем элемент, равный rightBound (должен обновиться)
+        function.insert(3.0, 35.0);
+        assertEquals(35.0, function.getY(2));
+        assertEquals(3, function.getCount());
+    }
+
+    // Тест 10: Проверка целостности связей после вставки в начало
+    @Test
+    public void testLinksIntegrityAfterInsertAtBeginning() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(0.5, 5.0);
+
+        // Проверяем, что связи установлены правильно
+        assertEquals(0.5, function.leftBound());
+        assertEquals(3.0, function.rightBound());
+
+        // Проверяем, что можно пройти по всем элементам
+        for (int i = 0; i < function.getCount(); i++) {
+            assertNotNull(function.getNode(i));
+        }
+    }
+
+    // Тест 11: Проверка целостности связей после вставки в середину
+    @Test
+    public void testLinksIntegrityAfterInsertInMiddle() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(1.5, 15.0);
+
+        // Проверяем связи через индексы
+        assertEquals(1.0, function.getX(0));
+        assertEquals(1.5, function.getX(1));
+        assertEquals(2.0, function.getX(2));
+        assertEquals(3.0, function.getX(3));
+
+        // Проверяем, что count корректно увеличился
+        assertEquals(4, function.getCount());
+    }
+
+    // Тест 12: Вставка отрицательных значений
+    @Test
+    public void testInsertNegativeValues() {
+        double[] xValues = {-2.0, -1.0, 0.0};
+        double[] yValues = {4.0, 1.0, 0.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        function.insert(-3.0, 9.0); // до начала
+        function.insert(-1.5, 2.25); // в середину
+
+        assertEquals(5, function.getCount());
+        assertEquals(-3.0, function.getX(0));
+        assertEquals(-1.5, function.getX(2));
+    }
+
+    // Тест 13: Вставка с одинаковыми Y значениями
+    @Test
+    public void testInsertWithSameY() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        function.insert(1.5, 10.0); // тот же Y, что и у первого элемента
+
+        assertEquals(4, function.getCount());
+        assertEquals(10.0, function.getY(1));
+    }
+
+    // Тест 14: Проверка индексов после вставки
+    @Test
+    public void testIndexConsistencyAfterInsert() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        int initialIndex = function.indexOfX(2.0);
+        function.insert(1.5, 15.0);
+        int newIndex = function.indexOfX(2.0);
+
+        // Индекс элемента x=2.0 должен измениться после вставки перед ним
+        assertEquals(1, initialIndex);
+        assertEquals(2, newIndex);
+    }
+
+    // Тест 15: Множественные операции вставки и обновления
+    @Test
+    public void testMultipleOperationsConsistency() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        // Выполняем различные операции вставки
+        function.insert(0.0, 0.0);   // начало
+        function.insert(1.5, 15.0);  // середина
+        function.insert(2.0, 22.0);  // существующий - обновление
+        function.insert(4.0, 40.0);  // конец
+
+        // Проверяем конечное состояние
+        assertEquals(6, function.getCount());
+
+        // Проверяем, что все X значения упорядочены
+        for (int i = 0; i < function.getCount() - 1; i++) {
+            assertTrue(function.getX(i) < function.getX(i + 1),
+                    "X values should be in ascending order");
+        }
+
+        // Проверяем конкретные значения
+        assertEquals(22.0, function.getY(3)); // обновленное значение для x=2.0
+    }
+    // Тест 16: Проверка круговых связей после вставки в начало
+    @Test
+    public void testCircularLinksAfterInsertAtBeginning() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        Node oldHead = function.getNode(0);
+        function.insert(0.5, 5.0);
+
+        Node newHead = function.getNode(0);
+        Node lastNode = function.getNode(function.getCount() - 1);
+
+        // Проверяем круговые связи
+        assertEquals(newHead, lastNode.next);
+        assertEquals(lastNode, newHead.prev);
+    }
+
+    // Тест 17: Проверка связей после вставки в конец
+    @Test
+    public void testLinksAfterInsertAtEnd() {
+        LinkedListTabulatedFunction function = createTestFunction();
+
+        Node oldLast = function.getNode(function.getCount() - 1);
+        function.insert(4.0, 40.0);
+
+        Node newLast = function.getNode(function.getCount() - 1);
+
+        // Проверяем связи
+        assertEquals(oldLast, newLast.prev);
+        assertEquals(function.getNode(0), newLast.next); // circular link
+    }
+}

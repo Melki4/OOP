@@ -2,14 +2,88 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
 
+    Node head = null;
+
+    public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
+        for (int i=0;i<xValues.length;++i){
+            addNode(xValues[i], yValues[i]);
+        }
+        count = xValues.length;
+    }
+
+    public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
+        if (xFrom > xTo) {
+            double boof = xFrom;
+            xFrom = xTo;
+            xTo = boof;
+        }
+
+        if (xFrom!=xTo){//count ==1 - ошибка
+            //double curX = xFrom;
+
+            int UpLim = count-1;
+            double step = (xTo-xFrom)/(UpLim);
+
+            for (int i =0; i<UpLim;++i){
+                addNode(xFrom, source.apply(xFrom));
+                xFrom+=step;
+            }
+            addNode(xTo, source.apply(xTo));
+        }
+
+        else {
+            for (int i =0; i<count;++i){
+                addNode(xFrom, source.apply(xFrom));
+            }
+        }
+        this.count = count;
+    }
+
     @Override
     public void insert(double x, double y) {
+        if (count == 0) addNode(x, y);
+        else if (indexOfX(x)!= -1) {
+            setY(indexOfX(x), y);
+        }
+        else if (x < leftBound()) {
+
+            Node boof = new Node();
+
+            boof.y = y;
+            boof.x = x;
+
+            boof.prev = head.prev;
+            boof.next = head;
+
+            head.prev.next = boof;
+            head.prev = boof;
+
+            head = boof;
+
+            count++;
+
+        }
+        else {
+
+            int index = floorIndexOfX(x);
+
+            Node boof = new Node();
+
+            boof.y = y;
+            boof.x = x;
+
+            boof.prev = getNode(index);
+            boof.next = getNode(index+1);
+
+            getNode(index+1).prev = boof;
+            getNode(index).next = boof;
+
+            count++;
+        }
 
     }
 
-    Node head = null;
-
-    private void addNode(double x, double y){
+    private void addNode(double x, double y) {
         if (head == null){
             head = new Node();
 
@@ -46,45 +120,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
         }
     }
 
-    private Node getNode(int index){
+    protected Node getNode(int index){
         Node toReturn = head;
         for (int i =0; i<index; ++i){
             toReturn = toReturn.next;
         }
         return toReturn;
-    }
-
-    public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
-        for (int i=0;i<xValues.length;++i){
-            addNode(xValues[i], yValues[i]);
-        }
-    }
-
-    public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
-        if (xFrom > xTo) {
-            double boof = xFrom;
-            xFrom = xTo;
-            xTo = boof;
-        }
-
-        if (xFrom!=xTo){//count ==1 - ошибка
-            //double curX = xFrom;
-
-            int UpLim = count-1;
-            double step = (xTo-xFrom)/(UpLim);
-
-            for (int i =0; i<UpLim;++i){
-                addNode(xFrom, source.apply(xFrom));
-                xFrom+=step;
-            }
-            addNode(xTo, source.apply(xTo));
-        }
-
-        else {
-            for (int i =0; i<count;++i){
-                addNode(xFrom, source.apply(xFrom));
-            }
-        }
     }
 
     @Override
