@@ -121,7 +121,16 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
     }
 
     @Override
-    protected double interpolate(double x, int floorIndex) {//индекс левого икса
+    protected double interpolate(double x, int floorIndex) {
+        double leftX = getX(floorIndex);
+        double leftY = getY(floorIndex);
+        double rightX = getX(floorIndex+1);
+        double rightY = getY(floorIndex+1);
+
+        return interpolate(x, leftX, rightX, leftY, rightY);
+    }
+
+    protected double clever_interpolate(double x, int floorIndex) {//индекс левого икса
         if (count == 1) return yValues[0];
 
         double leftX = xValues[floorIndex];
@@ -202,6 +211,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
 
             return interpolate(x, floorIndexOfX(x));
         }
+    }
+
+    public double clever_interpolate(double x){
+        return clever_interpolate(x, floorIndexOfX(x));
     }
 
     public double interpolate(double x){
