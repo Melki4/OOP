@@ -1,6 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
+import java.util.Arrays;
+
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//нет реализации отрицательный индекс - начинаем с хвоста
 
     Node head = null;
     int count = 0;
@@ -85,8 +87,33 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
     }
 
     @Override
-    public void remove(int index) {
+    public void remove(int indexDelX) {//нет реализации отрицательный индекс - начинаем с хвоста
+        if (count == 0 || indexDelX < 0 || indexDelX >= count){
+            return;
+        }
+        else if (count == 1) {
+            head.prev=head.next=head=null;
+            count = 0;
+        }
+        else if (indexDelX == 0){
+            head.prev.next=head.next;
+            head.next.prev = head.prev;
+            head = head.next;
+            count--;
+        }
+        else if (indexDelX == count-1){
+            head.prev.prev.next=head;
+            head.prev = head.prev.prev;
 
+            count--;
+        }
+        else{
+//            System.out.println(getNode(indexDelX).x);
+            getNode(indexDelX-1).next = getNode(indexDelX+1);
+            getNode(indexDelX+1).prev = getNode(indexDelX-1);
+//            System.out.println(getNode(indexDelX).x);
+            count--;
+        }
     }
 
     private void addNode(double x, double y) {

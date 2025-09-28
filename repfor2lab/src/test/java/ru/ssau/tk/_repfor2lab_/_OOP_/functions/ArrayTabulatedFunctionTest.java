@@ -723,4 +723,43 @@ class ArrayTabulatedFunctionTestRemove {
         assertEquals(1, function.floorIndexOfX(2.5)); // теперь элементов меньше
         assertEquals(2, function.floorIndexOfX(4.5));
     }
+    // Тест 15: Удаление с минимальным размером массива
+    @Test
+    public void testRemoveWithMinimalArray() {
+        double[] xValues = {1.0, 2.0};
+        double[] yValues = {10.0, 20.0};
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
+
+        function.remove(0);
+
+        assertEquals(1, function.getCount());
+        assertEquals(2.0, function.getX(0));
+        assertEquals(20.0, function.getY(0));
+    }
+
+
+    // Тест 16: Последовательное удаление из разных позиций
+    @Test
+    public void testSequentialRemoveFromDifferentPositions() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {10.0, 20.0, 30.0, 40.0};
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
+
+        // Удаляем из середины
+        function.remove(1);
+        assertEquals(3, function.getCount());
+        assertArrayEquals(new double[]{1.0, 3.0, 4.0},
+                new double[]{function.getX(0), function.getX(1), function.getX(2)}, 0.0001);
+
+        // Удаляем последний
+        function.remove(2);
+        assertEquals(2, function.getCount());
+        assertArrayEquals(new double[]{1.0, 3.0},
+                new double[]{function.getX(0), function.getX(1)}, 0.0001);
+
+        // Удаляем первый
+        function.remove(0);
+        assertEquals(1, function.getCount());
+        assertEquals(3.0, function.getX(0));
+    }
 }

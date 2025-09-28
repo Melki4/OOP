@@ -2,6 +2,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LinkedListTabulatedFunctionTest {
 
@@ -775,5 +776,254 @@ class LinkedListTabulatedFunctionTest2 {
         // Проверяем связи
         assertEquals(oldLast, newLast.prev);
         assertEquals(function.getNode(0), newLast.next); // circular link
+    }
+}
+
+class LinkedListTabulatedFunctionTestRemove {
+
+    private LinkedListTabulatedFunction function;
+
+    public LinkedListTabulatedFunctionTestRemove() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0, 5.0};
+        double[] yValues = {10.0, 20.0, 30.0, 40.0, 50.0};
+        function = new LinkedListTabulatedFunction(xValues, yValues);
+    }
+
+    // Тест 1: Удаление из пустого списка
+    @Test
+    public void testRemoveFromEmptyList() {
+        LinkedListTabulatedFunction emptyFunction = new LinkedListTabulatedFunction(new double[0], new double[0]);
+
+        emptyFunction.remove(0);
+
+        assertEquals(0, emptyFunction.getCount());
+    }
+
+    // Тест 2: Удаление с некорректным индексом (отрицательный)
+    @Test
+    public void testRemoveWithNegativeIndex() {
+        int initialCount = function.getCount();
+
+        function.remove(-1);
+
+        // Список не должен измениться
+        assertEquals(initialCount, function.getCount());
+    }
+
+    // Тест 3: Удаление с некорректным индексом (больше или равен размеру)
+    @Test
+    public void testRemoveWithIndexOutOfBounds() {
+        int initialCount = function.getCount();
+
+        function.remove(5); // index >= count
+        function.remove(10); // index далеко за границами
+
+        // Список не должен измениться
+        assertEquals(initialCount, function.getCount());
+    }
+
+    // Тест 4: Удаление первого элемента (index = 0)
+    @Test
+    public void testRemoveFirstElement() {
+        function.remove(0);
+
+        assertEquals(4, function.getCount());
+        // Проверяем, что первый элемент теперь второй из исходного списка
+        assertEquals(2.0, function.getX(0));
+        assertEquals(20.0, function.getY(0));
+        // Проверяем порядок остальных элементов
+        assertEquals(3.0, function.getX(1));
+        assertEquals(4.0, function.getX(2));
+        assertEquals(5.0, function.getX(3));
+        // Проверяем, что голова списка обновилась
+        assertEquals(2.0, function.leftBound());
+    }
+
+    // Тест 5: Удаление последнего элемента (index = count-1)
+    @Test
+    public void testRemoveLastElement() {
+        function.remove(4); // последний элемент
+
+        assertEquals(4, function.getCount());
+        // Проверяем, что последний элемент теперь предпоследний из исходного списка
+        assertEquals(4.0, function.getX(3));
+        assertEquals(40.0, function.getY(3));
+        // Проверяем, что первые элементы остались без изменений
+        assertEquals(1.0, function.getX(0));
+        assertEquals(2.0, function.getX(1));
+        assertEquals(3.0, function.getX(2));
+        // Проверяем правую границу
+        assertEquals(4.0, function.rightBound());
+    }
+
+    // Тест 6: Удаление элемента из середины
+    @Test
+    public void testRemoveMiddleElement() {
+        function.remove(2); // удаляем элемент с x=3.0, y=30.0
+
+        assertEquals(4, function.getCount());
+        // Проверяем порядок элементов
+        assertEquals(1.0, function.getX(0));
+        assertEquals(2.0, function.getX(1));
+        assertEquals(4.0, function.getX(2)); // этот элемент был на позиции 3
+        assertEquals(5.0, function.getX(3)); // этот элемент был на позиции 4
+        // Проверяем соответствующие Y значения
+        assertEquals(40.0, function.getY(2));
+        assertEquals(50.0, function.getY(3));
+    }
+
+    // Тест 7: Удаление второго элемента (не первого и не последнего)
+    @Test
+    public void testRemoveSecondElement() {
+        function.remove(1); // удаляем элемент с x=2.0
+
+        assertEquals(4, function.getCount());
+        assertEquals(1.0, function.getX(0));
+        assertEquals(3.0, function.getX(1)); // теперь на позиции 1 элемент с x=3.0
+        assertEquals(4.0, function.getX(2));
+        assertEquals(5.0, function.getX(3));
+    }
+
+    // Тест 8: Удаление предпоследнего элемента
+    @Test
+    public void testRemoveSecondLastElement() {
+        function.remove(3); // удаляем элемент с x=4.0 (предпоследний)
+
+        assertEquals(4, function.getCount());
+        assertEquals(1.0, function.getX(0));
+        assertEquals(2.0, function.getX(1));
+        assertEquals(3.0, function.getX(2));
+        assertEquals(5.0, function.getX(3)); // последний остался
+    }
+
+    // Тест 9: Удаление единственного элемента
+    @Test
+    public void testRemoveSingleElement() {
+        double[] xValues = {1.0};
+        double[] yValues = {10.0};
+        LinkedListTabulatedFunction singleElementFunction = new LinkedListTabulatedFunction(xValues, yValues);
+
+        singleElementFunction.remove(0);
+
+        assertEquals(0, singleElementFunction.getCount());
+    }
+
+    // Тест 10: Удаление нескольких элементов подряд
+    @Test
+    public void testRemoveMultipleElements() {
+        // Удаляем второй элемент (index = 1)
+        function.remove(1);
+        assertEquals(4, function.getCount());
+        assertEquals(3.0, function.getX(1)); // теперь на позиции 1 элемент с x=3.0
+
+        // Удаляем первый элемент
+        function.remove(0);
+        assertEquals(3, function.getCount());
+        assertEquals(3.0, function.getX(0)); // теперь на позиции 0 элемент с x=3.0
+
+        // Удаляем последний элемент
+        function.remove(2);
+        assertEquals(2, function.getCount());
+        assertEquals(3.0, function.getX(0));
+        assertEquals(4.0, function.getX(1));
+    }
+
+    // Тест 11: Проверка целостности связей после удаления первого элемента
+    @Test
+    public void testLinksIntegrityAfterRemoveFirst() {
+        Node oldSecond = function.getNode(1);
+
+        function.remove(0);
+
+        Node newFirst = function.getNode(0);
+        // Проверяем, что новый первый элемент - это старый второй
+        assertEquals(oldSecond, newFirst);
+        // Проверяем круговые связи
+        assertEquals(newFirst, function.getNode(3).next);
+        assertEquals(function.getNode(3), newFirst.prev);
+    }
+
+    // Тест 12: Проверка целостности связей после удаления последнего элемента
+    @Test
+    public void testLinksIntegrityAfterRemoveLast() {
+        Node oldLast = function.getNode(4);
+        Node newLastExpected = function.getNode(3);
+
+        function.remove(4);
+
+        Node newLast = function.getNode(3);
+        // Проверяем, что новый последний элемент - это старый предпоследний
+        assertEquals(newLastExpected, newLast);
+        // Проверяем круговые связи
+        assertEquals(function.getNode(0), newLast.next);
+        assertEquals(newLast, function.getNode(0).prev);
+    }
+
+    // Тест 13: Удаление и проверка границ функции
+    @Test
+    public void testBoundsAfterRemove() {
+        // Проверяем начальные границы
+        assertEquals(1.0, function.leftBound());
+        assertEquals(5.0, function.rightBound());
+
+        // Удаляем первый элемент
+        function.remove(0);
+        assertEquals(2.0, function.leftBound());
+        assertEquals(5.0, function.rightBound());
+
+        // Удаляем последний элемент
+        function.remove(3); // теперь count = 4, последний элемент имеет индекс 3
+        assertEquals(2.0, function.leftBound());
+        assertEquals(4.0, function.rightBound());
+    }
+
+    // Тест 14: Удаление элемента и проверка метода indexOfX
+    @Test
+    public void testIndexOfXAfterRemove() {
+        // Проверяем индексы до удаления
+        assertEquals(2, function.indexOfX(3.0));
+
+        // Удаляем элемент с x=2.0 (index = 1)
+        function.remove(1);
+
+        // Проверяем индексы после удаления
+        assertEquals(-1, function.indexOfX(2.0)); // удаленный элемент
+        assertEquals(1, function.indexOfX(3.0)); // сместился на позицию влево
+        assertEquals(2, function.indexOfX(4.0)); // сместился на позицию влево
+    }
+
+    // Тест 15: Последовательное удаление всех элементов
+    @Test
+    public void testRemoveAllElementsSequentially() {
+        double[] xValues = {1.0, 2.0};
+        double[] yValues = {10.0, 20.0};
+        LinkedListTabulatedFunction smallFunction = new LinkedListTabulatedFunction(xValues, yValues);
+
+        smallFunction.remove(0);
+        assertEquals(1, smallFunction.getCount());
+        assertEquals(2.0, smallFunction.getX(0));
+
+        smallFunction.remove(0);
+        assertEquals(0, smallFunction.getCount());
+
+        //список пуст
+        assertEquals(null, smallFunction.head);
+    }
+
+    // Тест 16: Удаление с последующими операциями вставки
+    @Test
+    public void testInsertAfterRemove() {
+        function.remove(2); // удаляем элемент с x=3.0
+
+        // Вставляем новый элемент
+        function.insert(2.5, 25.0);
+
+        assertEquals(5, function.getCount());
+        // Проверяем порядок
+        assertEquals(1.0, function.getX(0));
+        assertEquals(2.0, function.getX(1));
+        assertEquals(2.5, function.getX(2));
+        assertEquals(4.0, function.getX(3));
+        assertEquals(5.0, function.getX(4));
     }
 }
