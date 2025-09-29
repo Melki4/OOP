@@ -32,6 +32,11 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(4.0, function.getX(4));
         assertEquals(0.0, function.getY(0));
         assertEquals(16.0, function.getY(4));
+
+        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(square, 3.0, 4.0, 1);
+        assertEquals(3.0, function1.getX(0));
+        assertEquals(9.0, function1.getY(0));
+        assertEquals(1, function1.getCount());
     }
 
     @Test

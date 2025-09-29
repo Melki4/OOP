@@ -27,13 +27,13 @@ class NewtonMethodTest {
             }
         }
 
-        double otrez[] = {0.0, 2.0};
+        double startDot = 0.0;
 
         MathFunction f_f = new CubFunc();
         MathFunction s_f = new CubFuncDerrivative1();
         MathFunction ff_f = new CubFuncDerrivative2();
 
-        var Tested_m = new NewtonMethod(otrez, f_f, s_f, ff_f);
+        var Tested_m = new NewtonMethod(startDot, f_f, s_f, ff_f);
 
         assertEquals(1.2442, Tested_m.apply(0.01), 0.01);
     }
@@ -59,21 +59,53 @@ class NewtonMethodTest {
             }
         }
 
-        double otrez[] = {0.4, 2.0};
+        double startDot = 0.4;
 
         MathFunction f_f = new Func();
         MathFunction s_f = new Derrivative1();
         MathFunction ff_f = new Derrivative2();
 
-        var Tested_m = new NewtonMethod(otrez, f_f, s_f, ff_f);
-
-        assertEquals(0.8767, Tested_m.apply(0.0001), 0.01);
-
-        double otrez1[] = {-1.0, 2.0};
-
-        Tested_m = new NewtonMethod(otrez1, f_f, s_f, ff_f);
+        var Tested_m = new NewtonMethod(startDot, f_f, s_f, ff_f);
 
         assertEquals(0.0, Tested_m.apply(0.0001), 0.01);
+
+        double startDot1= -1;
+
+        Tested_m = new NewtonMethod(startDot1, f_f, s_f, ff_f);
+
+        assertEquals(0.0, Tested_m.apply(0.0001), 0.01);
+    }
+
+    @Test
+    void NewtonMTest3() {
+        class Func implements MathFunction {
+            @Override
+            public double apply(double x) {
+                return Math.pow(x, 2)-Math.sin(x);
+            }
+        }
+        class Derrivative1 implements MathFunction {
+            @Override
+            public double apply(double x) {
+                return 2*x-Math.cos(x);
+            }
+        }
+        class Derrivative2 implements MathFunction {
+            @Override
+            public double apply(double x) {
+                return 2+Math.sin(x);
+            }
+        }
+
+        double startDot = 3;
+
+        MathFunction f_f = x->Math.pow(x, 2)+1;
+        MathFunction s_f = x->2*x;
+        MathFunction ff_f = x->2;
+
+        var Tested_m = new NewtonMethod(startDot, f_f, s_f, ff_f);
+
+        assertEquals(-1.0, Tested_m.apply(0.0001), 0.01);
     }
 }
 
