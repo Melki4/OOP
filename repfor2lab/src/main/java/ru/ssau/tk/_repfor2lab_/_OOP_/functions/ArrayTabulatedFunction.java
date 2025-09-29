@@ -6,7 +6,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
 
     private double[] xValues;
     private double[] yValues;
-    int count = 0;
+    private int count;
 
     @Override
     public void insert(double x, double y) {
@@ -42,8 +42,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
              xValuesNew[0] = x;
              yValuesNew[0] = y;
 
-             xValues = new double[count+1];
-             yValues = new double[count+1];
              xValues = xValuesNew;
              yValues = yValuesNew;
              count+=1;
@@ -56,8 +54,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
             xValuesNew[xValues.length] = x;
             yValuesNew[xValues.length] = y;
 
-            xValues = new double[count+1];
-            yValues = new double[count+1];
             xValues = xValuesNew;
             yValues = yValuesNew;
             count+=1;
@@ -253,6 +249,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
         return ind;
     }
 
+    protected double interpolate(double x){
+        return interpolate(x, floorIndexOfX(x));
+    }
+
     @Override
     protected double interpolate(double x, int floorIndex) {
         double leftX = getX(floorIndex);
@@ -263,99 +263,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
         return interpolate(x, leftX, rightX, leftY, rightY);
     }
 
-    protected double clever_interpolate(double x, int floorIndex) {//индекс левого икса
-        if (count == 1) return yValues[0];
-
-        double leftX = xValues[floorIndex];
-        double leftY = yValues[floorIndex];
-        if(x==rightBound()||x==leftBound()) return yValues[indexOfX(x)];
-
-        if (x < rightBound() && x>leftBound()){
-
-            double rightX = xValues[floorIndex+1];
-            double rightY = yValues[floorIndex+1];
-
-            return(interpolate(x, leftX, rightX,leftY,rightY));
-        }
-
-        else if (x>rightBound()){
-            int UpLim = count-1;
-            double step = (rightBound()-leftBound())/(UpLim);
-
-            double newX;
-            double newY;
-
-            while (x > rightBound()){
-
-                newX = rightBound()+step;
-                newY = extrapolateRight(newX);
-
-                var xValuesNew = Arrays.copyOfRange(xValues, 0, xValues.length+1);
-                xValuesNew[count] = newX;
-                var yValuesNew = Arrays.copyOfRange(yValues, 0, yValues.length+1);
-                yValuesNew[count] = newY;
-
-                xValues = new double[count+1];
-                yValues = new double[count+1];
-                xValues = xValuesNew;
-                yValues = yValuesNew;
-
-                count+=1;
-            }
-            return interpolate(x, floorIndexOfX(x));
-        }
-
-        else{
-            int UpLim = count-1;
-            double step = (rightBound()-leftBound())/(UpLim);
-
-            double newX;
-            double newY;
-
-            while (x < leftBound()){
-
-                newX = leftBound()-step;
-                newY = extrapolateLeft(newX);
-
-                var xValuesNew = Arrays.copyOfRange(xValues, 0, xValues.length+1);
-
-                double tmp;
-                for (int i = 0; i < xValues.length; i++) {
-                    tmp = xValuesNew[i + 1];
-                    xValuesNew[i + 1] = xValuesNew[0];
-                    xValuesNew[0] = tmp;
-                }
-                xValuesNew[0] = newX;
-
-                var yValuesNew = Arrays.copyOfRange(yValues, 0, yValues.length+1);
-                for (int i = 0; i < yValues.length; i++) {
-                    tmp = yValuesNew[i + 1];
-                    yValuesNew[i + 1] = yValuesNew[0];
-                    yValuesNew[0] = tmp;
-                }
-                yValuesNew[0] = newY;
-
-                xValues = new double[count+1];
-                yValues = new double[count+1];
-                xValues = xValuesNew;
-                yValues = yValuesNew;
-                count+=1;
-            }
-
-            return interpolate(x, floorIndexOfX(x));
-        }
-    }
-
-    public double clever_interpolate(double x){
-        return clever_interpolate(x, floorIndexOfX(x));
-    }
-
-    public double interpolate(double x){
-        return interpolate(x, floorIndexOfX(x));
-    }
-
     @Override
-    double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
+    protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
         if (count == 1) return yValues[0];
         return super.interpolate(x, leftX, rightX, leftY, rightY);
     }

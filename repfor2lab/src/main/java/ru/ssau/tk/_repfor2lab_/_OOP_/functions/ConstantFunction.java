@@ -1,10 +1,10 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-public class ConstantFunction implements MathFunction{
+public class ConstantFunction implements MathFunction{//всегда возвращает какую-то константу
 
     private final double CONSTANT;
 
-    public ConstantFunction(double arg){
+    public ConstantFunction(double arg){//задать константу
         CONSTANT = arg;
     }
 

@@ -194,7 +194,7 @@ class LinkedListTabulatedFunctionTest {
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
         // Автоматическое определение индекса для интерполяции
-        double result = function.interpolate(2.5);
+        double result = function.apply(2.5);
         double expected = 4.0 + (2.5 - 2.0) / (3.0 - 2.0) * (9.0 - 4.0);
         assertEquals(expected, result, 1e-10);
     }

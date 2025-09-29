@@ -68,6 +68,12 @@ class NewtonMethodTest {
         var Tested_m = new NewtonMethod(otrez, f_f, s_f, ff_f);
 
         assertEquals(0.8767, Tested_m.apply(0.0001), 0.01);
+
+        double otrez1[] = {-1.0, 2.0};
+
+        Tested_m = new NewtonMethod(otrez1, f_f, s_f, ff_f);
+
+        assertEquals(0.0, Tested_m.apply(0.0001), 0.01);
     }
 }
 

@@ -19,7 +19,7 @@ class MathFunctionTest {
     }
     @Test
     void testAndThenChain() {
-        MathFunction f = x -> x + 1;  // f(x) = x + 1
+        MathFunction f = x -> x + 1;  // f(x) = x + 1 лямбда выражение
         MathFunction g = x -> x * 2;  // g(x) = 2x
         MathFunction h = x -> x * x;  // h(x) = x²
 
@@ -34,5 +34,14 @@ class MathFunctionTest {
 
         MathFunction fgh = fg.andThen(h); // f(g(h(x)))
         assertEquals(9.0, fgh.apply(2.0), 1e-9); // как выше
+
+        /**
+         MathFunction f = new MathFunction() { // анонимный класс
+            @Override
+            public int execute(int x) {
+            return x + 1;
+            }
+        };
+         */
     }
 }

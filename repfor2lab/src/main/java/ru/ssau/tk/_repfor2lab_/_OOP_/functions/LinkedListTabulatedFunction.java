@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//нет реализации отрицательный индекс - начинаем с хвоста
 
     Node head = null;
-    int count = 0;
+    private int count;
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
         for (int i=0;i<xValues.length;++i){
@@ -15,23 +15,28 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
     }
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
+
         if (xFrom > xTo) {
             double boof = xFrom;
             xFrom = xTo;
             xTo = boof;
         }
 
-        if (xFrom!=xTo){//count ==1 - ошибка
+        if (xFrom!=xTo){
             //double curX = xFrom;
-
-            int UpLim = count-1;
-            double step = (xTo-xFrom)/(UpLim);
-
-            for (int i =0; i<UpLim;++i){
+            if (count == 1){
                 addNode(xFrom, source.apply(xFrom));
-                xFrom+=step;
             }
-            addNode(xTo, source.apply(xTo));
+            else {
+                int UpLim = count - 1;
+                double step = (xTo - xFrom) / (UpLim);
+
+                for (int i = 0; i < UpLim; ++i) {
+                    addNode(xFrom, source.apply(xFrom));
+                    xFrom += step;
+                }
+                addNode(xTo, source.apply(xTo));
+            }
         }
 
         else {
@@ -39,6 +44,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
                 addNode(xFrom, source.apply(xFrom));
             }
         }
+
         this.count = count;
     }
 
@@ -153,7 +159,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
         }
     }
 
-    protected Node getNode(int index){
+    protected Node getNode(int index){//индекс больше count - ошибка
         Node toReturn = head;
         for (int i =0; i<index; ++i){
             toReturn = toReturn.next;
@@ -195,12 +201,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
         return interpolate(x, leftX, rightX, leftY, rightY);
     }
 
-    public double interpolate(double x){
+    protected double interpolate(double x){
         return interpolate(x, floorIndexOfX(x));
     }
 
     @Override
-    double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
+    protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
         if (count == 1) return head.y;
         return super.interpolate(x, leftX, rightX, leftY, rightY);
     }
