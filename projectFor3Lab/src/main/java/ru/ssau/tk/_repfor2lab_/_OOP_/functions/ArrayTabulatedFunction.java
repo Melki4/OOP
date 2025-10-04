@@ -1,0 +1,217 @@
+package ru.ssau.tk._repfor2lab_._OOP_.functions;
+
+import java.util.Arrays;
+
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
+
+    private double[] xValues;
+    private double[] yValues;
+    private int count;
+
+    @Override
+    public void insert(double x, double y) {
+        for (int i = 0; i < count; i++) { //поиск х
+            if (xValues[i] == x) {
+                yValues[i] = y; //замена значения
+                return;
+            }
+        }
+        int insertIndex = 0; //поиск позиции для вставки
+        while (insertIndex < count && xValues[insertIndex] < x) {
+            insertIndex++;
+        }
+        double[] newXValues = new double[count + 1]; //создание увеличенных массивов
+        double[] newYValues = new double[count + 1];
+
+        System.arraycopy(xValues, 0, newXValues, 0, insertIndex); //копирование эл-тов до позиции вставки
+        System.arraycopy(yValues, 0, newYValues, 0, insertIndex);
+
+        newXValues[insertIndex] = x; //вставка нового элемента
+        newYValues[insertIndex] = y;
+
+        System.arraycopy(xValues, insertIndex, newXValues, insertIndex + 1, count - insertIndex); //копирование эл-тов после позиции вставки
+        System.arraycopy(yValues, insertIndex, newYValues, insertIndex + 1, count - insertIndex);
+
+        xValues = newXValues; //замена старых массивов
+        yValues = newYValues;
+        count++;
+    }
+    @Override
+    public void remove(int index) {
+
+        if (count == 0 || index <0 || index >= count) return;
+
+        //новые массивы уменьшенного размера
+        double[] newXArray = new double[count - 1];
+        double[] newYArray = new double[count - 1];
+
+        //копирует левую часть до удаляемого элемента
+        System.arraycopy(xValues, 0, newXArray, 0, index);
+        System.arraycopy(yValues, 0, newYArray, 0, index);
+
+        //копирует правую часть до удаляемого элемента
+        System.arraycopy(xValues, index + 1, newXArray, index, count - index - 1);
+        System.arraycopy(yValues, index + 1, newYArray, index, count - index - 1);
+        this.xValues = newXArray; //заменяет старые массивы на новые
+        this.yValues = newYArray;
+        this.count--;
+    }
+
+    public ArrayTabulatedFunction(double[] xValues, double[] yValues){//xValues не повторяются и упорядочены изначально, длины массивов совпадают
+
+        this.xValues = Arrays.copyOf(xValues, xValues.length);
+        this.yValues = Arrays.copyOf(yValues, xValues.length);
+        count = xValues.length;
+    }
+
+    public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){//если count <1
+
+        if (xFrom > xTo) {
+            double boof = xFrom;
+            xFrom = xTo;
+            xTo = boof;
+        }
+
+        this.count = count;
+
+        xValues = new double[count];
+        yValues = new double[count];
+
+        if (xFrom!=xTo){
+            //double curX = xFrom;
+
+            int UpLim = count-1;
+            double step = (xTo-xFrom)/(UpLim);
+
+            for (int i =0; i<UpLim;++i){
+                xValues[i] = xFrom;
+                yValues[i] = source.apply(xFrom);
+                xFrom+=step;
+            }
+
+            xValues[UpLim] = xTo;
+            yValues[UpLim] = source.apply(xTo);
+        }
+
+        else {
+            for (int i =0; i<count;++i){
+                xValues[i] = xFrom;
+                yValues[i] = source.apply(xFrom);
+            }
+        }
+
+    }
+
+    @Override
+    public int getCount() {
+        return count;
+    }
+
+    @Override
+    public double getX(int index) {
+        if (index >= count || index < 0) return -1.0;
+        return xValues[index];
+    }
+
+    @Override
+    public double getY(int index) {
+        if (index >= count || index < 0) return -1.0;
+        return yValues[index];
+    }
+
+    @Override
+    public void setY(int index, double value) {
+        if (index >= count || index < 0) return;//имеется ошибочка
+        yValues[index] = value;
+    }
+
+    @Override
+    public double leftBound() {
+        return xValues[0];
+    }
+
+    @Override
+    public double rightBound() {
+        return xValues[count-1];
+    }
+
+    @Override
+    public int indexOfX(double x) {
+        for (int i=0; i<count;++i){
+            if (xValues[i] == x) return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public int indexOfY(double y) {
+        for (int i=0; i<count;++i){
+            if (yValues[i] == y) return i;
+        }
+        return -1;
+    }
+
+    @Override
+    protected int floorIndexOfX(double x) {
+
+        for (int i=0; i<count;++i){
+            if (xValues[i] == x) return i;
+        }
+
+        int ind = 0;
+        double max = xValues[0];
+
+        for (int i=0; i<count;++i) {
+            if (max < xValues[i] && xValues[i] < x) {
+                max = xValues[i];
+                ind = i;
+            }
+        }
+        return ind;
+    }
+
+    protected double interpolate(double x){
+        return interpolate(x, floorIndexOfX(x));
+    }
+
+    @Override
+    protected double interpolate(double x, int floorIndex) {
+        double leftX = getX(floorIndex);
+        double leftY = getY(floorIndex);
+        double rightX = getX(floorIndex+1);
+        double rightY = getY(floorIndex+1);
+
+        return interpolate(x, leftX, rightX, leftY, rightY);
+    }
+
+    @Override
+    protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
+        if (count == 1) return yValues[0];
+        return super.interpolate(x, leftX, rightX, leftY, rightY);
+    }
+
+    @Override
+    protected double extrapolateLeft(double x) {
+        if (count == 1) return yValues[0];
+        double leftX = leftBound();
+        double leftY = getY(indexOfX(leftX));
+
+        double rightX = getX(indexOfX(leftX)+1);
+        double rightY = getY(indexOfX(rightX));
+
+        return leftY + (x - leftX)/(rightX- leftX)*(rightY- leftY);
+    }
+
+    @Override
+    protected double extrapolateRight(double newX) {
+
+        if (count == 1) return yValues[0];
+        double x = rightBound();
+        double y = getY(indexOfX(x));
+
+        double lowerX = getX(indexOfX(x)-1);
+        double lowerY = getY(indexOfX(lowerX));
+
+        return lowerY + (newX - lowerX)/(x-lowerX)*(y-lowerY);
+    }
+}
