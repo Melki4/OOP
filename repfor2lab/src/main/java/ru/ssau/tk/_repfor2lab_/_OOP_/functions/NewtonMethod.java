@@ -5,7 +5,6 @@ public class NewtonMethod implements MathFunction{
     public double startDot;//начальная точка, которую надо задать
     public MathFunction function;
     public MathFunction derivative1;
-    public MathFunction derivative2;
     public double ACCURACY;//точность
 
     public  NewtonMethod(double i, MathFunction f, MathFunction d1, MathFunction d2){
@@ -16,7 +15,6 @@ public class NewtonMethod implements MathFunction{
         startDot = i;
         function = f;
         derivative1 = d1;
-        derivative2 =d2;
     }
 
     public double apply(double e) {//вычислить корень с заданной точностью
