@@ -1,4 +1,5 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.*;
 
 abstract class AbstractTabulatedFunction implements TabulatedFunction, Insertable, Removable {
 
@@ -24,5 +25,18 @@ abstract class AbstractTabulatedFunction implements TabulatedFunction, Insertabl
         else if (indexOfX(x) != -1) return getY(indexOfX(x));
 
         else return interpolate(x, floorIndexOfX(x));
+    }
+
+    static void checkLengthIsTheSame(double[] xValues, double[] yValues) throws DifferentLengthOfArraysException{
+        if (xValues.length != yValues.length) throw new DifferentLengthOfArraysException();
+    }
+
+    static void checkSorted(double[] xValues) throws ArrayIsNotSortedException{
+
+        int j=1;
+
+        while (j<xValues.length && xValues[j-1] <= xValues[j] ) j++;
+
+        if (j == xValues.length) throw new ArrayIsNotSortedException();
     }
 }
