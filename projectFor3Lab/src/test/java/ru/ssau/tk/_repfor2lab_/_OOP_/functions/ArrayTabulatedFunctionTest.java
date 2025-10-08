@@ -259,6 +259,42 @@ class ArrayTabulatedFunctionTest1 {
     }
 
     @Test
+    void testExtrapolateLeftWithFractions() {
+        // Тест 1: Простые дроби
+        double result1 = function.extrapolateLeft(0.5);
+        double expected1 = 2.0 + (0.5 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
+        assertEquals(expected1, result1, 1e-9);
+
+        // Тест 2: Отрицательное значение x
+        double result2 = function.extrapolateLeft(-1.5);
+        double expected2 = 2.0 + (-1.5 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
+        assertEquals(expected2, result2, 1e-9);
+
+        // Тест 3: Дробные значения между узлами
+        double result3 = function.extrapolateLeft(0.75);
+        double expected3 = 2.0 + (0.75 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
+        assertEquals(expected3, result3, 1e-9);
+    }
+
+    @Test
+    void testExtrapolateRightWithFractions() {
+        // Тест 1: Простые дроби
+        double result1 = function.extrapolateRight(5.5);
+        double expected1 = 8.0 + (5.5 - 4.0) / (5.0 - 4.0) * (10.0 - 8.0);
+        assertEquals(expected1, result1, 1e-9);
+
+        // Тест 2: Большое значение x
+        double result2 = function.extrapolateRight(7.25);
+        double expected2 = 8.0 + (7.25 - 4.0) / (5.0 - 4.0) * (10.0 - 8.0);
+        assertEquals(expected2, result2, 1e-9);
+
+        // Тест 3: Значение близко к правой границе
+        double result3 = function.extrapolateRight(5.1);
+        double expected3 = 8.0 + (5.1 - 4.0) / (5.0 - 4.0) * (10.0 - 8.0);
+        assertEquals(expected3, result3, 1e-9);
+    }
+
+    @Test
     void testExtrapolateRight() {
         // Экстраполяция справа
         double result = function.extrapolateRight(6.0);
@@ -271,7 +307,28 @@ class ArrayTabulatedFunctionTest1 {
         ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
         assertEquals(4.0, singleFunc.extrapolateRight(3.0), 1e-9);
     }
+    @Test
+    void testInterpolateWithFractions() {
+        // Тест 1: Интерполяция в середине между узлами
+        double result1 = function.interpolate(1.5, 0);
+        double expected1 = 2.0 + (1.5 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
+        assertEquals(expected1, result1, 1e-9);
 
+        // Тест 2: Интерполяция ближе к левому узлу
+        double result2 = function.interpolate(1.25, 0);
+        double expected2 = 2.0 + (1.25 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
+        assertEquals(expected2, result2, 1e-9);
+
+        // Тест 3: Интерполяция ближе к правому узлу
+        double result3 = function.interpolate(1.75, 0);
+        double expected3 = 2.0 + (1.75 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
+        assertEquals(expected3, result3, 1e-9);
+
+        // Дополнительный тест для другого интервала
+        double result4 = function.interpolate(3.5, 2);
+        double expected4 = 6.0 + (3.5 - 3.0) / (4.0 - 3.0) * (8.0 - 6.0);
+        assertEquals(expected4, result4, 1e-9);
+    }
     @Test
     void testInterpolateWithFourParameters() {
         // Интерполяция между двумя точками
