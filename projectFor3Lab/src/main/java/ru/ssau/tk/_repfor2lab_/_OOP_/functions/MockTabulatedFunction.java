@@ -2,7 +2,13 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
+import java.util.Iterator;
+
 public class MockTabulatedFunction extends AbstractTabulatedFunction{
+
+    public Iterator<Point> iterator(){
+        throw new UnsupportedOperationException();
+    }
 
     private double x0 = 0.1;
     private double x1 = 0.5;
