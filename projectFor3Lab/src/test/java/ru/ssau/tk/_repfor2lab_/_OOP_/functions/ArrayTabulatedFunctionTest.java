@@ -68,6 +68,7 @@ class ArrayTabulatedFunctionTest {
         Assertions.assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
 
     }
+
     @Test
     void ArrayTest9(){
         double[] xValues = {1.0, 2.0, 3.0, 4.0, 5.0};
@@ -93,6 +94,76 @@ class ArrayTabulatedFunctionTest {
         MathFunction f = x -> -2*x+1;
         var TestedVar = new ArrayTabulatedFunction(f, -5, 3, 100);
         assertEquals(-152.08, TestedVar.apply(76.54), 0.1);
+    }
+    @Test
+    void ArrayTest13() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues);
+        });
+        Assertions.assertEquals("Икс меньше левой границы", exception.getMessage());
+    }
+    @Test
+    void ArrayTest14() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues).getX(-1);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());
+    }
+    @Test
+    void ArrayTest15() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues).getX(3);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());
+    }
+    @Test
+    void ArrayTest16() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues).getY(-1);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());
+    }
+    @Test
+    void ArrayTest17() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues).getY(5);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());
+    }
+    @Test
+    void ArrayTest18() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues).setY(10, 10.0);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());
+    }
+    @Test
+    void ArrayTest19() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues).setY(-1, 10.0);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());
     }
 }
 
@@ -299,6 +370,8 @@ class ArrayTabulatedFunctionTest1 {
         assertEquals(4.0, function.interpolate(2.0), 1e-9);
         assertEquals(6.0, function.interpolate(3.0), 1e-9);
     }
+
+
 }
 
 class ArrayTabulatedFunctionTestInsert {

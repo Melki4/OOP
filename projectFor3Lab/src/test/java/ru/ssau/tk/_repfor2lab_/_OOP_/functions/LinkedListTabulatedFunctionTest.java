@@ -159,6 +159,60 @@ class LinkedListTabulatedFunctionTest {
 
         assertEquals(3, function.floorIndexOfX(6.0));  // Правее правой границы
     }
+    @Test
+    void testConstructorWithSmallArrays() {
+        double[] xValues = {1.0};
+        double[] yValues = {1.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(xValues, yValues);
+        });
+        assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
+    }
+    @Test
+    void testSetYWithNegativeIndex() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(xValues, yValues).setY(-1, 10.0);
+        });
+        assertEquals("Неверный индекс", exception.getMessage());
+    }
+
+    @Test
+    void testSetYWithIndexOutOfBounds() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(xValues, yValues).setY(5, 10.0);
+        });
+        assertEquals("Неверный индекс", exception.getMessage());
+    }
+
+    @Test
+    void testGetYWithNegativeIndex() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(xValues, yValues).getY(-1);
+        });
+        assertEquals("Неверный индекс", exception.getMessage());
+    }
+
+    @Test
+    void testGetXWithNegativeIndex() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(xValues, yValues).getX(-1);
+        });
+        assertEquals("Неверный индекс", exception.getMessage());
+    }
+
 
     @Test
     void testExtrapolateLeft() {

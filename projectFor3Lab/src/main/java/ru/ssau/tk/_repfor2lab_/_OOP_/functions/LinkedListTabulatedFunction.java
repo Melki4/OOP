@@ -18,7 +18,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     Node head;
     private int count;
-
     {
         head = null;
     }
@@ -45,19 +44,14 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         if (xFrom!=xTo){
             //double curX = xFrom;
-            if (count == 1){
-                addNode(xFrom, source.apply(xFrom));
-            }
-            else {
-                int UpLim = count - 1;
-                double step = (xTo - xFrom) / (UpLim);
+            int UpLim = count - 1;
+            double step = (xTo - xFrom) / (UpLim);
 
-                for (int i = 0; i < UpLim; ++i) {
-                    addNode(xFrom, source.apply(xFrom));
-                    xFrom += step;
-                }
-                addNode(xTo, source.apply(xTo));
+            for (int i = 0; i < UpLim; ++i) {
+                addNode(xFrom, source.apply(xFrom));
+                xFrom += step;
             }
+            addNode(xTo, source.apply(xTo));
         }
 
         else {
@@ -170,7 +164,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс для получения узла");
         }
-        if(index == 0) return head;
+        if (index == 0) return head;
         Node toReturn = head;
         for (int i =0; i<index-1; ++i){
             toReturn = toReturn.next;
@@ -181,7 +175,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateRight(double newX) {
-        if (count == 1) return head.y;
+        if (count == 1) return getY(0);
         double x = rightBound();
         double y = getY(indexOfX(x));
 
@@ -193,7 +187,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return head.y;
+        if (count == 1) return getY(0);
         double leftX = leftBound();
         double leftY = getY(indexOfX(leftX));
 

@@ -1,7 +1,5 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
-
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -70,6 +68,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         }
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);
+
         this.xValues = Arrays.copyOf(xValues, xValues.length);
         this.yValues = Arrays.copyOf(yValues, xValues.length);
         count = xValues.length;
@@ -120,19 +119,19 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     public double getX(int index) {
-        if (index >= count || index < 0) return -1.0;
+        if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
         return xValues[index];
     }
 
     @Override
     public double getY(int index) {
-        if (index >= count || index < 0) return -1.0;
+        if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
         return yValues[index];
     }
 
     @Override
     public void setY(int index, double value) {
-        if (index >= count || index < 0) return;//имеется ошибочка
+        if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
         yValues[index] = value;
     }
 
@@ -164,6 +163,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected int floorIndexOfX(double x) {
+
         if (x < xValues[0]) throw new IllegalArgumentException("Икс меньше левой границы");
         for (int i=0; i<count;++i){
             if (xValues[i] == x) return i;
@@ -182,23 +182,15 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     protected double interpolate(double x){
-
         return interpolate(x, floorIndexOfX(x));
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
-
-        if (indexOfX(x) != -1) return getY(indexOfX(x));
-
         double leftX = getX(floorIndex);
         double leftY = getY(floorIndex);
         double rightX = getX(floorIndex+1);
         double rightY = getY(floorIndex+1);
-
-        if (x > rightX || x < leftX){
-            throw new InterpolationException();
-        }
 
         return interpolate(x, leftX, rightX, leftY, rightY);
     }
