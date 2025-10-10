@@ -99,9 +99,10 @@ class ArrayTabulatedFunctionTest {
     void ArrayTest13() {
         double[] xValues = {1.0, 2.0, 3.0};
         double[] yValues = {1.0, 4.0, 9.0};
+        var TestedVar = new ArrayTabulatedFunction(xValues, yValues);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new ArrayTabulatedFunction(xValues, yValues);
+           TestedVar.floorIndexOfX(0.0);
         });
         Assertions.assertEquals("Икс меньше левой границы", exception.getMessage());
     }
@@ -213,8 +214,14 @@ class ArrayTabulatedFunctionTest1 {
         assertEquals(5.0, function.getX(4), 1e-9);
 
         // Тест граничных случаев
-        assertEquals(-1.0, function.getX(-1), 1e-9); // Индекс < 0
-        assertEquals(-1.0, function.getX(10), 1e-9); // Индекс >= count
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.getX(-1);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());// Индекс < 0
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
+            function.getX(10);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception2.getMessage());// Индекс >= count
     }
 
     @Test
@@ -224,8 +231,14 @@ class ArrayTabulatedFunctionTest1 {
         assertEquals(10.0, function.getY(4), 1e-9);
 
         // Тест граничных случаев
-        assertEquals(-1.0, function.getY(-1), 1e-9); // Индекс < 0
-        assertEquals(-1.0, function.getY(10), 1e-9); // Индекс >= count
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.getX(-1);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());// Индекс < 0
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
+            function.getY(10);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception2.getMessage());// Индекс >= count
     }
 
     @Test
@@ -238,9 +251,15 @@ class ArrayTabulatedFunctionTest1 {
         assertEquals(2.0, function.getY(0), 1e-9);
         assertEquals(4.0, function.getY(1), 1e-9);
 
-        // Тест с некорректными индексами (не должно быть исключений)
-        function.setY(-1, 100.0); // Индекс < 0
-        function.setY(10, 100.0); // Индекс >= count
+        // Тест с некорректными индексами
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.setY(-1, 100.0);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception.getMessage());// Индекс < 0
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
+            function.setY(10, 100.0);
+        });
+        Assertions.assertEquals("Индекс выходит за пределы", exception2.getMessage()); // Индекс >= count
 
         // Проверяем, что массив не изменился
         assertEquals(15.0, function.getY(2), 1e-9);
@@ -681,8 +700,11 @@ class ArrayTabulatedFunctionTestRemove {
         function.remove(0);
         assertEquals(0, function.getCount());
 
-        // Попытка получить элемент из пустого массива должна вернуть -1
-        assertEquals(-1.0, function.getX(0));
+        // Попытка получить элемент из пустого массива должна выдать ошибку
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            function.getX(0);
+        });
+        Assertions.assertEquals("Обращение к пустому массиву", exception.getMessage());
     }
 
     // Тест 11: Удаление элемента и проверка границ функции

@@ -9,5 +9,4 @@ public class InterpolationException extends RuntimeException {
     public InterpolationException() {
         super();
     }
-
 }

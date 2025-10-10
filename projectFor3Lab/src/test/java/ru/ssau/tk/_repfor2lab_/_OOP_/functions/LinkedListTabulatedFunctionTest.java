@@ -1,6 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -265,9 +266,6 @@ class LinkedListTabulatedFunctionTest {
 
     @Test
     public void testIteratorWithSingleElement() {
-        double[] xValues = {1.0};
-        double[] yValues = {1.0};
-
         double[] xValuesTemp = {1.0, 2.0};
         double[] yValuesTemp = {1.0, 4.0};
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValuesTemp, yValuesTemp);
@@ -434,9 +432,9 @@ class ComplexFunctionCombinationsTest {
         LinkedListTabulatedFunction compositeLinkedList = new LinkedListTabulatedFunction(xValues, yValues);
 
         // Проверяем значения композитной функции
-        assertEquals(1.0, compositeArray.interpolate(0.0), 1e-9);   // (2*0+1)² = 1
-        assertEquals(9.0, compositeArray.interpolate(1.0), 1e-9);   // (2*1+1)² = 9
-        assertEquals(25.0, compositeArray.interpolate(2.0), 1e-9);  // (2*2+1)² = 25
+        assertEquals(1.0, compositeArray.apply(0.0), 1e-9);   // (2*0+1)² = 1
+        assertEquals(9.0, compositeArray.apply(1.0), 1e-9);   // (2*1+1)² = 9
+        assertEquals(25.0, compositeArray.apply(2.0), 1e-9);  // (2*2+1)² = 25
 
         // Проверяем согласованность между реализациями
         assertEquals(compositeArray.interpolate(0.5), compositeLinkedList.interpolate(0.5), 1e-9);
@@ -550,8 +548,8 @@ class ComplexFunctionCombinationsTest {
     }
 
 
-
-class LinkedListTabulatedFunctionTest2 {
+    @Nested
+    class LinkedListTabulatedFunctionTest2 {
 
     // Вспомогательный метод для создания тестовой функции
     private LinkedListTabulatedFunction createTestFunction() {
@@ -836,7 +834,8 @@ class LinkedListTabulatedFunctionTest2 {
     }
 }
 
-class LinkedListTabulatedFunctionTestRemove {
+    @Nested
+    class LinkedListTabulatedFunctionTestRemove {
 
     private LinkedListTabulatedFunction function;
 
@@ -1089,4 +1088,5 @@ class LinkedListTabulatedFunctionTestRemove {
         assertEquals(4.0, function.getX(3));
         assertEquals(5.0, function.getX(4));
     }
+}
 }

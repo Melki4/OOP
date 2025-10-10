@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{//нет реализации отрицательный индекс - начинаем с хвоста
+
     public Iterator<Point> iterator(){
         return new Iterator<Point>() {
             private Node node = head;
@@ -28,6 +29,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             }
         };
     }
+
     static class Node {
         public Node next;
         public Node prev;
@@ -54,7 +56,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
+
         if (count < 2) throw new IllegalArgumentException("Количество элементов меньше минимума");
+
         if (xFrom > xTo) {
             double boof = xFrom;
             xFrom = xTo;
@@ -293,7 +297,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void setY(int index, double value) {
-        if (index < 0 || index >= count){
+        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому списку");
+        else if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс");
         }
         getNode(index).y = value;
@@ -306,7 +311,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public double getY(int index) {
-        if (index < 0 || index >= count){
+        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому списку");
+        else
+            if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс");
         }
         return getNode(index).y;
@@ -314,7 +321,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public double getX(int index) {
-        if (index < 0 || index >= count){
+        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому списку");
+        else if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс");
         }
         return getNode(index).x;

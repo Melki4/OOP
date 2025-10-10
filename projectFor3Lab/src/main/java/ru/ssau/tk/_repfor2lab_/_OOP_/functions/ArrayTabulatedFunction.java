@@ -2,11 +2,29 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
 
     public Iterator<Point> iterator(){
-        throw new UnsupportedOperationException();
+        return new Iterator<Point>() {
+
+            private int i =0;
+
+            @Override
+            public boolean hasNext() {
+                return i<count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()){
+                    throw new NoSuchElementException("Элементов не осталось");}
+                Point point = new Point(xValues[i], yValues[i]);
+                ++i;
+                return point;
+            }
+        };
     }
 
     private double[] xValues;
@@ -119,19 +137,22 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     public double getX(int index) {
-        if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
+        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому массиву");
+        else if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
         return xValues[index];
     }
 
     @Override
     public double getY(int index) {
-        if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
+        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому массиву");
+        else if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
         return yValues[index];
     }
 
     @Override
     public void setY(int index, double value) {
-        if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
+        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому массиву");
+        else if (index >= count || index < 0) throw new IllegalArgumentException("Индекс выходит за пределы");
         yValues[index] = value;
     }
 
