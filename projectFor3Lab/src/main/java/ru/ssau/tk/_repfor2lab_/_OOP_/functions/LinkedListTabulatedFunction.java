@@ -4,10 +4,29 @@ import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{//нет реализации отрицательный индекс - начинаем с хвоста
     public Iterator<Point> iterator(){
-        throw new UnsupportedOperationException();
+        return new Iterator<Point>() {
+            private Node node = head;
+            private int currentIndex = 0;
+            @Override
+            public boolean hasNext() {
+                return currentIndex < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!(hasNext())) {
+                    throw new NoSuchElementException("Элементов не осталось");
+                }
+                Point point = new Point(node.x, node.y);
+                node = node.next;
+                currentIndex++;
+                return point;
+            }
+        };
     }
     static class Node {
         public Node next;

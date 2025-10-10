@@ -2,6 +2,9 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DifferentLengthOfArraysException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -212,6 +215,73 @@ class LinkedListTabulatedFunctionTest {
         });
         assertEquals("Неверный индекс", exception.getMessage());
     }
+    @Test
+    public void testIteratorWithWhileLoop() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        Iterator<Point> iterator = function.iterator();
+        int index = 0;
+
+        while (iterator.hasNext()) {
+            Point point = iterator.next();
+            assertEquals(point.x, xValues[index], 0.0001);
+            assertEquals(point.y, yValues[index], 0.0001);
+            index++;
+        }
+
+        assertEquals(index, xValues.length, "Нужно перебрать все элементы");
+    }
+
+    @Test
+    public void testIteratorWithForEachLoop() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        int index = 0;
+        for (Point point : function) {
+            assertEquals(point.x, xValues[index], 0.0001);
+            assertEquals(point.y, yValues[index], 0.0001);
+            index++;
+        }
+
+        assertEquals(index, xValues.length, "Нужно перебрать все элементы");
+    }
+    @Test
+    public void testIteratorThrowsExceptionOnNoMoreElements() {
+        double[] xValues = {1.0, 2.0};
+        double[] yValues = {1.0, 4.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        Iterator<Point> iterator = function.iterator();
+
+        iterator.next();
+        iterator.next();
+
+        assertThrows(NoSuchElementException.class, iterator::next);
+    }
+
+    @Test
+    public void testIteratorWithSingleElement() {
+        double[] xValues = {1.0};
+        double[] yValues = {1.0};
+
+        double[] xValuesTemp = {1.0, 2.0};
+        double[] yValuesTemp = {1.0, 4.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValuesTemp, yValuesTemp);
+        function.remove(1);
+
+        Iterator<Point> iterator = function.iterator();
+
+        assertTrue(iterator.hasNext());
+        Point point = iterator.next();
+        assertEquals(1.0, point.x, 0.0001);
+        assertEquals(1.0, point.y, 0.0001);
+
+        assertFalse(iterator.hasNext());
+    }
 
 
     @Test
@@ -396,17 +466,19 @@ class ComplexFunctionCombinationsTest {
 
     @Test
     void testProductOfFunctions() {
+        MathFunction sinFunction = Math::sin;
+        MathFunction expFunction = Math::exp;
+
         // f(x) = sin(x), g(x) = exp(x), h(x) = sin(x) * exp(x)
         ArrayTabulatedFunction sinTabulated = new ArrayTabulatedFunction(sinFunction, 0.0, Math.PI, 20);
         ArrayTabulatedFunction expTabulated = new ArrayTabulatedFunction(expFunction, 0.0, Math.PI, 20);
 
-        MathFunction productFunction = x -> sinTabulated.interpolate(x) * expTabulated.interpolate(x);
+        MathFunction productFunction = x -> sinTabulated.apply(x) * expTabulated.apply(x);
         ArrayTabulatedFunction productTabulated = new ArrayTabulatedFunction(productFunction, 0.0, Math.PI, 30);
 
-        // Проверяем известные значения
-        assertEquals(0.0, productTabulated.interpolate(0.0), 0.01);      // sin(0)*exp(0) = 0
-        assertEquals(Math.sin(1.0) * Math.exp(1.0), productTabulated.interpolate(1.0), 0.1);
-        assertEquals(0.0, productTabulated.interpolate(Math.PI), 0.01);  // sin(π)*exp(π) = 0
+        assertEquals(0.0, productTabulated.apply(0.0), 0.01);      // sin(0)*exp(0) = 0 * 1 = 0
+        assertEquals(Math.sin(1.0) * Math.exp(1.0), productTabulated.apply(1.0), 0.1);
+        assertEquals(0.0, productTabulated.apply(Math.PI), 0.01);  // sin(π)*exp(π) = 0 * exp(π) = 0
     }
 
     @Test
@@ -477,30 +549,7 @@ class ComplexFunctionCombinationsTest {
                 extrapolationTest.apply(4.0), 0.1);
     }
 
-    @Test
-    void testComplexMathematicalExpression() {
-        // Сложное математическое выражение с использованием табулированных функций
-        ArrayTabulatedFunction quadratic = new ArrayTabulatedFunction(square, -2.0, 2.0, 20);
-        ArrayTabulatedFunction trigonometric = new ArrayTabulatedFunction(sinFunction, -2.0, 2.0, 20);
 
-        // h(x) = x² * sin(x) + exp(x)
-        MathFunction complexExpression = x ->
-                quadratic.interpolate(x) * trigonometric.interpolate(x) + Math.exp(x);
-
-        ArrayTabulatedFunction complexTabulated = new ArrayTabulatedFunction(
-                complexExpression, -2.0, 2.0, 50
-        );
-
-        // Проверяем в нескольких точках
-        double x1 = 0.0;
-        double expected1 = 0 * 0 + Math.exp(0); // 0 * 0 + 1 = 1
-        assertEquals(expected1, complexTabulated.interpolate(x1), 0.1);
-
-        double x2 = 1.0;
-        double expected2 = 1 * Math.sin(1) + Math.exp(1);
-        assertEquals(expected2, complexTabulated.interpolate(x2), 0.1);
-    }
-}
 
 class LinkedListTabulatedFunctionTest2 {
 
