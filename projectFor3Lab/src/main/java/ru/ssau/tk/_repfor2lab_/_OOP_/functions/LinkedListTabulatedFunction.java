@@ -1,9 +1,13 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-import java.util.Arrays;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//нет реализации отрицательный индекс - начинаем с хвоста
-
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {//нет реализации отрицательный индекс - начинаем с хвоста
+    private static class Node {
+        public Node next;
+        public Node prev;
+        public double x;
+        public double y;
+    }
     Node head = null;
     private int count;
 
@@ -159,7 +163,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
         }
     }
 
-    protected Node getNode(int index){//индекс больше count - ошибка
+    private Node getNode(int index){//индекс больше count - ошибка
         Node toReturn = head;
         for (int i =0; i<index; ++i){
             toReturn = toReturn.next;
@@ -169,7 +173,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
 
     @Override
     protected double extrapolateRight(double newX) {
-        if (count == 1) return head.y;
+        if (count == 1) return getY(0);
         double x = rightBound();
         double y = getY(indexOfX(x));
 
@@ -181,7 +185,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return head.y;
+        if (count == 1) return getY(0);
         double leftX = leftBound();
         double leftY = getY(indexOfX(leftX));
 
@@ -274,4 +278,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{//н�
     public double getX(int index) {
         return getNode(index).x;
     }
+
+
 }
