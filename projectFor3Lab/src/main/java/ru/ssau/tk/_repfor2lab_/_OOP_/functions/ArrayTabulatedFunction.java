@@ -3,8 +3,13 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
+
+    public Iterator<Point> iterator(){
+        throw new UnsupportedOperationException();
+    }
 
     private double[] xValues;
     private double[] yValues;

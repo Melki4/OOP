@@ -3,9 +3,12 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{//нет реализации отрицательный индекс - начинаем с хвоста
-
+    public Iterator<Point> iterator(){
+        throw new UnsupportedOperationException();
+    }
     static class Node {
         public Node next;
         public Node prev;
