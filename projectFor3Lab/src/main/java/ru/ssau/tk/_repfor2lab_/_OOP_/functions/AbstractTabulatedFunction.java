@@ -1,7 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.*;
 
-abstract class AbstractTabulatedFunction implements TabulatedFunction, Insertable, Removable {
+abstract class AbstractTabulatedFunction implements TabulatedFunction {
 
     protected int count;// отвечает за количество строк в таблице и должно быть возвращено соответствующим методом
 
@@ -28,7 +28,7 @@ abstract class AbstractTabulatedFunction implements TabulatedFunction, Insertabl
     }
 
     static void checkLengthIsTheSame(double[] xValues, double[] yValues) throws DifferentLengthOfArraysException{
-        if (xValues.length != yValues.length) throw new DifferentLengthOfArraysException();
+        if (xValues.length != yValues.length) throw new DifferentLengthOfArraysException("Массивы разной длины");
     }
 
     static void checkSorted(double[] xValues) throws ArrayIsNotSortedException{
@@ -37,6 +37,6 @@ abstract class AbstractTabulatedFunction implements TabulatedFunction, Insertabl
 
         while (j<xValues.length && xValues[j-1] <= xValues[j] ) j++;
 
-        if (j == xValues.length) throw new ArrayIsNotSortedException();
+        if (j != xValues.length) throw new ArrayIsNotSortedException("Массив не отсортирован");
     }
 }

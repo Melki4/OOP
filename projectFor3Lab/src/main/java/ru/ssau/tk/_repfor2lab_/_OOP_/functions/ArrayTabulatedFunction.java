@@ -2,7 +2,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import java.util.Arrays;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
 
     private double[] xValues;
     private double[] yValues;
@@ -199,7 +199,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
         double rightX = getX(indexOfX(leftX)+1);
         double rightY = getY(indexOfX(rightX));
 
-        return leftY + (x - leftX)/(rightX- leftX)*(rightY- leftY);
+        return (leftY*(rightX-x)-rightY*(leftX-x))/(rightX-leftX);
     }
 
     @Override
