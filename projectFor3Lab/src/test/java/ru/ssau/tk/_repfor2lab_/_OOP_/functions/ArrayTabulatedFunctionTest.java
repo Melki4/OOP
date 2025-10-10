@@ -1,6 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DifferentLengthOfArraysException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,8 +61,12 @@ class ArrayTabulatedFunctionTest {
     void ArrayTest8(){
         double[] xValues = {1.0};
         double[] yValues = {5.0};
-        var TestedVar = new ArrayTabulatedFunction(xValues, yValues);
-        assertEquals(5.0, TestedVar.apply(2.0), 0.1);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues);
+        });
+        Assertions.assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
+
     }
     @Test
     void ArrayTest9(){
@@ -130,17 +136,6 @@ class ArrayTabulatedFunctionTest1 {
     }
 
     @Test
-    void testGetCount() {
-        assertEquals(5, function.getCount());
-
-        // Тест с функцией из одного узла
-        double[] singleX = {1.0};
-        double[] singleY = {2.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(1, singleFunc.getCount());
-    }
-
-    @Test
     void testGetX() {
         assertEquals(1.0, function.getX(0), 1e-9);
         assertEquals(3.0, function.getX(2), 1e-9);
@@ -181,28 +176,6 @@ class ArrayTabulatedFunctionTest1 {
     }
 
     @Test
-    void testLeftBound() {
-        assertEquals(1.0, function.leftBound(), 1e-9);
-
-        // Тест с одним узлом
-        double[] singleX = {5.0};
-        double[] singleY = {10.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(5.0, singleFunc.leftBound(), 1e-9);
-    }
-
-    @Test
-    void testRightBound() {
-        assertEquals(5.0, function.rightBound(), 1e-9);
-
-        // Тест с одним узлом
-        double[] singleX = {5.0};
-        double[] singleY = {10.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(5.0, singleFunc.rightBound(), 1e-9);
-    }
-
-    @Test
     void testIndexOfX() {
         assertEquals(0, function.indexOfX(1.0));
         assertEquals(2, function.indexOfX(3.0));
@@ -231,17 +204,7 @@ class ArrayTabulatedFunctionTest1 {
         assertEquals(1, function.floorIndexOfX(2.5)); // Между 2.0 и 3.0
         assertEquals(3, function.floorIndexOfX(4.5)); // Между 4.0 и 5.0
 
-        // Граничные случаи
-        assertEquals(0, function.floorIndexOfX(0.5));  // Меньше минимального
         assertEquals(4, function.floorIndexOfX(5.5));  // Больше максимального
-
-        // Тест с одним узлом
-        double[] singleX = {2.0};
-        double[] singleY = {4.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(0, singleFunc.floorIndexOfX(1.0));
-        assertEquals(0, singleFunc.floorIndexOfX(2.0));
-        assertEquals(0, singleFunc.floorIndexOfX(3.0));
     }
 
     @Test
@@ -250,12 +213,6 @@ class ArrayTabulatedFunctionTest1 {
         double result = function.extrapolateLeft(0.0);
         double expected = 2.0 + (0.0 - 1.0) / (2.0 - 1.0) * (4.0 - 2.0);
         assertEquals(expected, result, 1e-9);
-
-        // Тест с одним узлом
-        double[] singleX = {2.0};
-        double[] singleY = {4.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(4.0, singleFunc.extrapolateLeft(1.0), 1e-9);
     }
 
     @Test
@@ -300,12 +257,6 @@ class ArrayTabulatedFunctionTest1 {
         double result = function.extrapolateRight(6.0);
         double expected = 8.0 + (6.0 - 4.0) / (5.0 - 4.0) * (10.0 - 8.0);
         assertEquals(expected, result, 1e-9);
-
-        // Тест с одним узлом
-        double[] singleX = {2.0};
-        double[] singleY = {4.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(4.0, singleFunc.extrapolateRight(3.0), 1e-9);
     }
     @Test
     void testInterpolateWithFractions() {
@@ -335,12 +286,6 @@ class ArrayTabulatedFunctionTest1 {
         double result = function.interpolate(2.5, 2.0, 3.0, 4.0, 6.0);
         double expected = 4.0 + (2.5 - 2.0) / (3.0 - 2.0) * (6.0 - 4.0);
         assertEquals(expected, result, 1e-9);
-
-        // Тест с одним узлом в функции (но 4 параметра переданы)
-        double[] singleX = {2.0};
-        double[] singleY = {4.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(4.0, singleFunc.interpolate(2.5, 2.0, 3.0, 4.0, 6.0), 1e-9);
     }
 
     @Test
@@ -353,13 +298,6 @@ class ArrayTabulatedFunctionTest1 {
         // Интерполяция в существующей точке
         assertEquals(4.0, function.interpolate(2.0), 1e-9);
         assertEquals(6.0, function.interpolate(3.0), 1e-9);
-
-        // Тест с одним узлом
-        double[] singleX = {2.0};
-        double[] singleY = {4.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(4.0, singleFunc.interpolate(2.0), 1e-9);
-        assertEquals(4.0, singleFunc.interpolate(2.5), 1e-9);
     }
 }
 
@@ -449,13 +387,10 @@ class ArrayTabulatedFunctionTestInsert {
     public void testInsertIntoEmptyFunction() {
         double[] xValues = {};
         double[] yValues = {};
-        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
-
-        function.insert(1.0, 10.0);
-
-        assertEquals(1, function.getCount());
-        assertEquals(1.0, function.getX(0));
-        assertEquals(10.0, function.getY(0));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(xValues, yValues);
+        });
+        Assertions.assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
     }
 
     // Тест 6: Вставка нескольких элементов подряд
@@ -514,25 +449,20 @@ class ArrayTabulatedFunctionTestInsert {
     @Test
     public void testMultipleOperationsConsistency() {
         ArrayTabulatedFunction function = createTestFunction();
-        //for(int i =0; i< 4;++i) System.out.println(function.getX(i));
+
         // Выполняем различные операции вставки
         function.insert(0.0, 0.0);   // начало
         function.insert(1.5, 15.0);  // середина
         function.insert(2.0, 22.0);  // существующий - обновление
         function.insert(4.0, 40.0);  // конец
-        for(int i =0; i< 6;++i) System.out.println(function.getX(i) + " " + function.getY(i));
-        /*
-        double[] xValues = {1.0, 2.0, 3.0};
-        double[] yValues = {10.0, 20.0, 30.0};
-        */
+
 
         // Проверяем конечное состояние
         assertEquals(6, function.getCount());
 
         // Проверяем, что все X значения упорядочены
         for (int i = 0; i < function.getCount() - 1; i++) {
-            assertTrue(function.getX(i) < function.getX(i + 1),
-                    "X values should be in ascending order");
+            assertTrue(function.getX(i) < function.getX(i + 1));
         }
 
         // Проверяем конкретные значения
@@ -547,18 +477,6 @@ class ArrayTabulatedFunctionTestRemove {
         double[] xValues = {1.0, 2.0, 3.0, 4.0, 5.0};
         double[] yValues = {10.0, 20.0, 30.0, 40.0, 50.0};
         return new ArrayTabulatedFunction(xValues, yValues);
-    }
-
-    // Тест 1: Удаление из пустого массива
-    @Test
-    public void testRemoveFromEmptyArray() {
-        double[] xValues = {};
-        double[] yValues = {};
-        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
-
-        function.remove(0);
-
-        assertEquals(0, function.getCount());
     }
 
     // Тест 2: Удаление с некорректным индексом (отрицательный)
@@ -635,20 +553,6 @@ class ArrayTabulatedFunctionTestRemove {
         // Проверяем соответствующие Y значения
         assertEquals(40.0, function.getY(2));
         assertEquals(50.0, function.getY(3));
-    }
-
-    // Тест 7: Удаление единственного элемента
-    @Test
-    public void testRemoveSingleElement() {
-        double[] xValues = {1.0};
-        double[] yValues = {10.0};
-        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
-
-        function.remove(0);
-
-        assertEquals(0, function.getCount());
-        // Проверяем, что массивы пустые
-        assertEquals(-1.0, function.getX(0));
     }
 
     // Тест 8: Удаление нескольких элементов подряд

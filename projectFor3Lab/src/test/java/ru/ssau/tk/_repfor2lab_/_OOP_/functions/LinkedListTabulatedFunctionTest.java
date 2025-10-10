@@ -1,6 +1,9 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DifferentLengthOfArraysException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,6 +21,8 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(1.0, function.getX(0));
         assertEquals(16.0, function.getY(3));
         assertEquals(1.0, function.leftBound());
+
+
         assertEquals(4.0, function.rightBound());
     }
 
@@ -32,11 +37,6 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(4.0, function.getX(4));
         assertEquals(0.0, function.getY(0));
         assertEquals(16.0, function.getY(4));
-
-        LinkedListTabulatedFunction function1 = new LinkedListTabulatedFunction(square, 3.0, 4.0, 1);
-        assertEquals(3.0, function1.getX(0));
-        assertEquals(9.0, function1.getY(0));
-        assertEquals(1, function1.getCount());
     }
 
     @Test
@@ -152,7 +152,11 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(2, function.floorIndexOfX(4.5));
 
         // За границами
-        assertEquals(0, function.floorIndexOfX(0.5)); // Левее левой границы
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            assertEquals(0, function.floorIndexOfX(0.5));
+        });
+        Assertions.assertEquals("Икс меньше левой границы", exception.getMessage());
+
         assertEquals(3, function.floorIndexOfX(6.0));  // Правее правой границы
     }
 
@@ -205,24 +209,6 @@ class LinkedListTabulatedFunctionTest {
     }
 
     @Test
-    void testSingleNodeFunction() {
-        // Тест функции с одной точкой
-        double[] xValues = {5.0};
-        double[] yValues = {10.0};
-        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
-
-        assertEquals(1, function.getCount());
-        assertEquals(5.0, function.leftBound());
-        assertEquals(5.0, function.rightBound());
-        assertEquals(10.0, function.getY(0));
-
-        // Экстраполяция для функции с одной точкой
-        assertEquals(10.0, function.extrapolateLeft(0.0));
-        assertEquals(10.0, function.extrapolateRight(10.0));
-        assertEquals(10.0, function.interpolate(5.0));
-    }
-
-    @Test
     void testTwoNodeFunction() {
         // Тест функции с двумя точками
         double[] xValues = {1.0, 2.0};
@@ -254,21 +240,6 @@ class LinkedListTabulatedFunctionTest {
 
         // И обратно к началу
         assertEquals(1.0, function.getX(3 % function.getCount()));
-    }
-
-    @Test
-    void testEdgeCases() {
-        // Граничные случаи
-        double[] xValues = {0.0};
-        double[] yValues = {0.0};
-        LinkedListTabulatedFunction singlePoint = new LinkedListTabulatedFunction(xValues, yValues);
-
-        assertEquals(0.0, singlePoint.interpolate(100.0)); // Всегда возвращает одно значение
-
-        // Функция с одинаковыми x
-        MathFunction constant = x -> 7.0;
-        LinkedListTabulatedFunction constantFunc = new LinkedListTabulatedFunction(constant, 5.0, 5.0, 10);
-        assertEquals(7.0, constantFunc.getY(9));
     }
 }
 
@@ -358,15 +329,15 @@ class ComplexFunctionCombinationsTest {
         LinkedListTabulatedFunction func2 = new LinkedListTabulatedFunction(xValues, yValues2);
 
         // Создаем функцию суммы через MathFunction
-        MathFunction sumFunction = x -> func1.interpolate(x) + func2.interpolate(x);
+        MathFunction sumFunction = x -> func1.apply(x) + func2.apply(x);
 
         ArrayTabulatedFunction sumTabulated = new ArrayTabulatedFunction(sumFunction, 0.0, 3.0, 10);
 
         // Проверяем значения суммы
-        assertEquals(1.0, sumTabulated.interpolate(0.0), 0.1);  // 0 + 1 = 1
-        assertEquals(4.0, sumTabulated.interpolate(1.0), 0.1);  // 1 + 3 = 4
-        assertEquals(9.0, sumTabulated.interpolate(2.0), 0.1);  // 4 + 5 = 9
-        assertEquals(16.0, sumTabulated.interpolate(3.0), 0.1); // 9 + 7 = 16
+        assertEquals(1.0, sumTabulated.apply(0.0), 0.1);  // 0 + 1 = 1
+        assertEquals(4.0, sumTabulated.apply(1.0), 0.1);  // 1 + 3 = 4
+        assertEquals(9.0, sumTabulated.apply(2.0), 0.1);  // 4 + 5 = 9
+        assertEquals(16.0, sumTabulated.apply(3.0), 0.1); // 9 + 7 = 16
     }
 
     @Test
@@ -398,16 +369,16 @@ class ComplexFunctionCombinationsTest {
 
         // Композиция: h(x) = f(g(x))
         MathFunction composition = x -> {
-            double gx = g_linkedList.interpolate(x);
-            return f_array.interpolate(gx);
+            double gx = g_linkedList.apply(x);
+            return f_array.apply(gx);
         };
 
         ArrayTabulatedFunction composed = new ArrayTabulatedFunction(composition, -1.0, 3.0, 20);
 
         // Проверяем значения композиции
-        assertEquals(-1.0, composed.interpolate(-1.0), 0.1);  // f(g(-1)) = f(-1) = -1.0 (экстраполяция)
-        assertEquals(1.6, composed.interpolate(0.1), 0.1);    // f(g(0)) = f(1) = 1
-        assertEquals(10.4, composed.interpolate(1.1), 0.1);    // f(g(1)) = f(3) = 9
+        assertEquals(-1.0, composed.apply(-1.0), 0.1);  // f(g(-1)) = f(-1) = -1.0 (экстраполяция)
+        assertEquals(1.6, composed.apply(0.1), 0.1);    // f(g(0)) = f(1) = 1
+        assertEquals(10.4, composed.apply(1.1), 0.1);    // f(g(1)) = f(3) = 9
     }
 
     @Test
@@ -417,13 +388,13 @@ class ComplexFunctionCombinationsTest {
         LinkedListTabulatedFunction linearLinkedList = new LinkedListTabulatedFunction(linear, 0.0, 5.0, 10);
 
         // Сумма постоянной и линейной функции
-        MathFunction sumWithConstant = x -> constantArray.interpolate(x) + linearLinkedList.interpolate(x);
+        MathFunction sumWithConstant = x -> constantArray.apply(x) + linearLinkedList.apply(x);
         ArrayTabulatedFunction sumTabulated = new ArrayTabulatedFunction(sumWithConstant, 0.0, 5.0, 15);
 
         // Проверяем: 5 + (2x + 1) = 2x + 6
-        assertEquals(6.0, sumTabulated.interpolate(0.0), 0.1);  // 2*0 + 6 = 6
-        assertEquals(8.0, sumTabulated.interpolate(1.0), 0.1);  // 2*1 + 6 = 8
-        assertEquals(16.0, sumTabulated.interpolate(5.0), 0.1); // 2*5 + 6 = 16
+        assertEquals(6.0, sumTabulated.apply(0.0), 0.1);  // 2*0 + 6 = 6
+        assertEquals(8.0, sumTabulated.apply(1.0), 0.1);  // 2*1 + 6 = 8
+        assertEquals(16.0, sumTabulated.apply(5.0), 0.1); // 2*5 + 6 = 16
     }
 
     @Test
@@ -437,17 +408,17 @@ class ComplexFunctionCombinationsTest {
 
         // Функция, использующая экстраполяцию обеих реализаций
         MathFunction extrapolationTest = x ->
-                arrayFunc.interpolate(x) * linkedFunc.interpolate(x);
+                arrayFunc.apply(x) * linkedFunc.apply(x);
 
         // Проверяем экстраполяцию слева
-        double leftExtrapolationArray = arrayFunc.interpolate(0.0);
-        double leftExtrapolationLinked = linkedFunc.interpolate(0.0);
+        double leftExtrapolationArray = arrayFunc.extrapolateLeft(0.0);
+        double leftExtrapolationLinked = linkedFunc.extrapolateLeft(0.0);
         assertEquals(leftExtrapolationArray * leftExtrapolationLinked,
                 extrapolationTest.apply(0.0), 0.1);
 
         // Проверяем экстраполяцию справа
-        double rightExtrapolationArray = arrayFunc.interpolate(4.0);
-        double rightExtrapolationLinked = linkedFunc.interpolate(4.0);
+        double rightExtrapolationArray = arrayFunc.apply(4.0);
+        double rightExtrapolationLinked = linkedFunc.apply(4.0);
         assertEquals(rightExtrapolationArray * rightExtrapolationLinked,
                 extrapolationTest.apply(4.0), 0.1);
     }
@@ -475,25 +446,6 @@ class ComplexFunctionCombinationsTest {
         double expected2 = 1 * Math.sin(1) + Math.exp(1);
         assertEquals(expected2, complexTabulated.interpolate(x2), 0.1);
     }
-
-    @Test
-    void testEdgeCaseCombinations() {
-        // Тестируем граничные случаи в комбинациях
-        double[] singlePointX = {0.0};
-        double[] singlePointY = {1.0};
-
-        ArrayTabulatedFunction singleArray = new ArrayTabulatedFunction(singlePointX, singlePointY);
-        LinkedListTabulatedFunction singleLinkedList = new LinkedListTabulatedFunction(singlePointX, singlePointY);
-
-        // Комбинация двух функций с одной точкой
-        MathFunction singleCombo = x -> singleArray.interpolate(x) + singleLinkedList.interpolate(x);
-        ArrayTabulatedFunction singleComboTabulated = new ArrayTabulatedFunction(singleCombo, -1.0, 1.0, 5);
-
-        // Все значения должны быть 2.0 (1 + 1)
-        for (int i = 0; i < singleComboTabulated.getCount(); i++) {
-            assertEquals(2.0, singleComboTabulated.getY(i), 1e-9);
-        }
-    }
 }
 
 class LinkedListTabulatedFunctionTest2 {
@@ -508,13 +460,10 @@ class LinkedListTabulatedFunctionTest2 {
     // Тест 1: Вставка в пустой список
     @Test
     public void testInsertIntoEmptyList() {
-        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(new double[0], new double[0]);
-
-        function.insert(1.0, 10.0);
-
-        assertEquals(1, function.getCount());
-        assertEquals(1.0, function.getX(0));
-        assertEquals(10.0, function.getY(0));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(new double[0], new double[0]);
+        });
+        Assertions.assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
     }
 
     // Тест 2: Обновление существующего X (должен обновить Y)
@@ -757,11 +706,11 @@ class LinkedListTabulatedFunctionTest2 {
     public void testCircularLinksAfterInsertAtBeginning() {
         LinkedListTabulatedFunction function = createTestFunction();
 
-        Node oldHead = function.getNode(0);
+        LinkedListTabulatedFunction.Node oldHead = function.getNode(0);
         function.insert(0.5, 5.0);
 
-        Node newHead = function.getNode(0);
-        Node lastNode = function.getNode(function.getCount() - 1);
+        LinkedListTabulatedFunction.Node newHead = function.getNode(0);
+        LinkedListTabulatedFunction.Node lastNode = function.getNode(function.getCount() - 1);
 
         // Проверяем круговые связи
         assertEquals(newHead, lastNode.next);
@@ -773,10 +722,10 @@ class LinkedListTabulatedFunctionTest2 {
     public void testLinksAfterInsertAtEnd() {
         LinkedListTabulatedFunction function = createTestFunction();
 
-        Node oldLast = function.getNode(function.getCount() - 1);
+        LinkedListTabulatedFunction.Node oldLast = function.getNode(function.getCount() - 1);
         function.insert(4.0, 40.0);
 
-        Node newLast = function.getNode(function.getCount() - 1);
+        LinkedListTabulatedFunction.Node newLast = function.getNode(function.getCount() - 1);
 
         // Проверяем связи
         assertEquals(oldLast, newLast.prev);
@@ -797,11 +746,12 @@ class LinkedListTabulatedFunctionTestRemove {
     // Тест 1: Удаление из пустого списка
     @Test
     public void testRemoveFromEmptyList() {
-        LinkedListTabulatedFunction emptyFunction = new LinkedListTabulatedFunction(new double[0], new double[0]);
 
-        emptyFunction.remove(0);
 
-        assertEquals(0, emptyFunction.getCount());
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(new double[0], new double[0]);;
+        });
+        Assertions.assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
     }
 
     // Тест 2: Удаление с некорректным индексом (отрицательный)
@@ -809,10 +759,10 @@ class LinkedListTabulatedFunctionTestRemove {
     public void testRemoveWithNegativeIndex() {
         int initialCount = function.getCount();
 
-        function.remove(-1);
-
-        // Список не должен измениться
-        assertEquals(initialCount, function.getCount());
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.remove(-1);;
+        });
+        Assertions.assertEquals("Неверный индекс для удаления", exception.getMessage());
     }
 
     // Тест 3: Удаление с некорректным индексом (больше или равен размеру)
@@ -820,11 +770,16 @@ class LinkedListTabulatedFunctionTestRemove {
     public void testRemoveWithIndexOutOfBounds() {
         int initialCount = function.getCount();
 
-        function.remove(5); // index >= count
-        function.remove(10); // index далеко за границами
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.remove(5);
+        });
+        Assertions.assertEquals("Неверный индекс для удаления", exception.getMessage());
 
-        // Список не должен измениться
-        assertEquals(initialCount, function.getCount());
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
+            function.remove(10);
+        });
+        Assertions.assertEquals("Неверный индекс для удаления", exception2.getMessage());
+
     }
 
     // Тест 4: Удаление первого элемента (index = 0)
@@ -906,11 +861,11 @@ class LinkedListTabulatedFunctionTestRemove {
     public void testRemoveSingleElement() {
         double[] xValues = {1.0};
         double[] yValues = {10.0};
-        LinkedListTabulatedFunction singleElementFunction = new LinkedListTabulatedFunction(xValues, yValues);
 
-        singleElementFunction.remove(0);
-
-        assertEquals(0, singleElementFunction.getCount());
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(xValues, yValues);
+        });
+        Assertions.assertEquals("Длина массивов меньше минимальной возможной", exception.getMessage());
     }
 
     // Тест 10: Удаление нескольких элементов подряд
@@ -936,11 +891,11 @@ class LinkedListTabulatedFunctionTestRemove {
     // Тест 11: Проверка целостности связей после удаления первого элемента
     @Test
     public void testLinksIntegrityAfterRemoveFirst() {
-        Node oldSecond = function.getNode(1);
+        LinkedListTabulatedFunction.Node oldSecond = function.getNode(1);
 
         function.remove(0);
 
-        Node newFirst = function.getNode(0);
+        LinkedListTabulatedFunction.Node newFirst = function.getNode(0);
         // Проверяем, что новый первый элемент - это старый второй
         assertEquals(oldSecond, newFirst);
         // Проверяем круговые связи
@@ -951,12 +906,12 @@ class LinkedListTabulatedFunctionTestRemove {
     // Тест 12: Проверка целостности связей после удаления последнего элемента
     @Test
     public void testLinksIntegrityAfterRemoveLast() {
-        Node oldLast = function.getNode(4);
-        Node newLastExpected = function.getNode(3);
+        LinkedListTabulatedFunction.Node oldLast = function.getNode(4);
+        LinkedListTabulatedFunction.Node newLastExpected = function.getNode(3);
 
         function.remove(4);
 
-        Node newLast = function.getNode(3);
+        LinkedListTabulatedFunction.Node newLast = function.getNode(3);
         // Проверяем, что новый последний элемент - это старый предпоследний
         assertEquals(newLastExpected, newLast);
         // Проверяем круговые связи

@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
+
 import java.util.Arrays;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
@@ -58,14 +60,18 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues){//xValues не повторяются и упорядочены изначально, длины массивов совпадают
-
+        if (xValues.length < 2 || yValues.length < 2) {
+            throw new IllegalArgumentException("Длина массивов меньше минимальной возможной");
+        }
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
         this.xValues = Arrays.copyOf(xValues, xValues.length);
         this.yValues = Arrays.copyOf(yValues, xValues.length);
         count = xValues.length;
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){//если count <1
-
+        if (count < 2) throw new IllegalArgumentException("Количество элементов меньше минимума");
         if (xFrom > xTo) {
             double boof = xFrom;
             xFrom = xTo;
@@ -153,7 +159,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected int floorIndexOfX(double x) {
-
+        if (x < xValues[0]) throw new IllegalArgumentException("Икс меньше левой границы");
         for (int i=0; i<count;++i){
             if (xValues[i] == x) return i;
         }
@@ -171,15 +177,23 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     protected double interpolate(double x){
+
         return interpolate(x, floorIndexOfX(x));
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
+
+        if (indexOfX(x) != -1) return getY(indexOfX(x));
+
         double leftX = getX(floorIndex);
         double leftY = getY(floorIndex);
         double rightX = getX(floorIndex+1);
         double rightY = getY(floorIndex+1);
+
+        if (x > rightX || x < leftX){
+            throw new InterpolationException();
+        }
 
         return interpolate(x, leftX, rightX, leftY, rightY);
     }

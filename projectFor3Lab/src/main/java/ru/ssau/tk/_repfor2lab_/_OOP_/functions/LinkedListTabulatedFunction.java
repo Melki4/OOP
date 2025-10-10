@@ -1,18 +1,31 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
+
 import java.util.Arrays;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{//нет реализации отрицательный индекс - начинаем с хвоста
-    private static class Node {
+
+    static class Node {
         public Node next;
         public Node prev;
         public double x;
         public double y;
     }
-    Node head = null;
+
+    Node head;
     private int count;
 
+    {
+        head = null;
+    }
+
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
+        if (xValues.length < 2 || yValues.length < 2) {
+            throw new IllegalArgumentException("Длина массивов меньше минимальной возможной");
+        }
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
         for (int i=0;i<xValues.length;++i){
             addNode(xValues[i], yValues[i]);
         }
@@ -20,7 +33,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
-
+        if (count < 2) throw new IllegalArgumentException("Количество элементов меньше минимума");
         if (xFrom > xTo) {
             double boof = xFrom;
             xFrom = xTo;
@@ -60,62 +73,32 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             setY(indexOfX(x), y);
         }
         else if (x < leftBound()) {
-
-            Node boof = new Node();
-
-            boof.y = y;
-            boof.x = x;
-
-            boof.prev = head.prev;
-            boof.next = head;
-
-            head.prev.next = boof;
-            head.prev = boof;
-
-            head = boof;
-
-            count++;
-
+            addNode(x,y);
+            head = head.prev;
         }
         else {
-
-            int index = floorIndexOfX(x);
-
-            Node boof = new Node();
-
-            boof.y = y;
-            boof.x = x;
-
-            boof.prev = getNode(index);
-            boof.next = getNode(index+1);
-
-            getNode(index+1).prev = boof;
-            getNode(index).next = boof;
-
-            count++;
+            addNode(getNode(floorIndexOfX(x)), x, y);
         }
-
     }
 
     @Override
     public void remove(int indexDelX) {//нет реализации отрицательный индекс - начинаем с хвоста
         if (count == 0 || indexDelX < 0 || indexDelX >= count){
-            return;
+            throw new IllegalArgumentException("Неверный индекс для удаления");
         }
         else if (count == 1) {
             head.prev=head.next=head=null;
             count = 0;
         }
         else if (indexDelX == 0){
-            head.prev.next=head.next;
-            head.next.prev = head.prev;
+            getNode(count-1).next = head.next;
+            getNode(1).prev = head.prev;
             head = head.next;
             count--;
         }
         else if (indexDelX == count-1){
-            head.prev.prev.next=head;
-            head.prev = head.prev.prev;
-
+            getNode(count-2).next=head;
+            head.prev = getNode(count-2);
             count--;
         }
         else{
@@ -138,18 +121,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             head.x = x;
             count = 1;
         }
-        else if (count == 1) {
-            Node boof = new Node();
 
-            boof.y = y;
-            boof.x = x;
-
-            boof.prev = head;
-            boof.next = head;
-            head.prev = boof;
-            head.next= boof;
-            count+=1;
-        }
         else {
             Node boof = new Node();
 
@@ -162,14 +134,46 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             head.prev = boof;
             count+=1;
         }
+    }//вставка в конец
+
+    private void addNode(Node node, double x, double y) {//Вставка за элементом node
+        if (node == null){
+
+            head = new Node();
+
+            head.next = head;
+            head.prev = head;
+            head.y = y;
+
+            head.x = x;
+            count = 1;
+        }
+        else {
+            Node boof = new Node();
+
+            boof.y = y;
+            boof.x = x;
+
+            boof.prev = node;
+            boof.next = node.next;
+
+            node.next.prev = boof;
+            node.next = boof;
+            count+=1;
+        }
     }
 
     protected Node getNode(int index){//индекс больше count - ошибка
+        if (index < 0 || index >= count){
+            throw new IllegalArgumentException("Неверный индекс для получения узла");
+        }
+        if(index == 0) return head;
         Node toReturn = head;
-        for (int i =0; i<index; ++i){
+        for (int i =0; i<index-1; ++i){
             toReturn = toReturn.next;
         }
-        return toReturn;
+
+        return toReturn.next;
     }
 
     @Override
@@ -193,15 +197,24 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         double rightX = getX(indexOfX(leftX)+1);
         double rightY = getY(indexOfX(rightX));
 
-        return leftY + (x - leftX)/(rightX- leftX)*(rightY- leftY);
+        return (leftY*(rightX-x)-rightY*(leftX-x))/(rightX-leftX);
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
+
+        if(floorIndex < 0 || floorIndex >= count){
+            throw new IllegalArgumentException("Неверный индекс для интерполяции");
+        }
+
         double leftX = getX(floorIndex);
         double leftY = getY(floorIndex);
         double rightX = getX(floorIndex+1);
         double rightY = getY(floorIndex+1);
+
+        if (x > rightX || x < leftX){
+            throw new InterpolationException();
+        }
 
         return interpolate(x, leftX, rightX, leftY, rightY);
     }
@@ -212,7 +225,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
-        if (count == 1) return head.y;
+        if (count == 1)  {
+            throw new RuntimeException("Что-то пошло не так");
+        }
         return super.interpolate(x, leftX, rightX, leftY, rightY);
     }
 
@@ -244,10 +259,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected int floorIndexOfX(double x) {
+        if (x < head.x) throw new IllegalArgumentException("Икс меньше левой границы");
         for (int i=0; i<count;++i){
             if (getX(i) == x) return i;
         }
-
         int ind = 0;
         double max = head.x;
 
@@ -262,6 +277,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void setY(int index, double value) {
+        if (index < 0 || index >= count){
+            throw new IllegalArgumentException("Неверный индекс");
+        }
         getNode(index).y = value;
     }
 
@@ -272,11 +290,17 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public double getY(int index) {
+        if (index < 0 || index >= count){
+            throw new IllegalArgumentException("Неверный индекс");
+        }
         return getNode(index).y;
     }
 
     @Override
     public double getX(int index) {
+        if (index < 0 || index >= count){
+            throw new IllegalArgumentException("Неверный индекс");
+        }
         return getNode(index).x;
     }
 }
