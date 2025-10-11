@@ -6,7 +6,7 @@ public class UnmodifiableTabulatedFunction implements TabulatedFunction
 {
     private TabulatedFunction function;
 
-    UnmodifiableTabulatedFunction(TabulatedFunction function){
+    public UnmodifiableTabulatedFunction(TabulatedFunction function){
         this.function = function;
     }
 
