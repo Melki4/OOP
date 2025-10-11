@@ -242,4 +242,114 @@ class TabulatedFunctionOperationServiceTest1 {
         assertEquals(-3.0, subtractionResult.getY(1));
         assertEquals(-3.0, subtractionResult.getY(2));
     }
+    @Test
+    public void testMultiplicationWithNegativeValues() {
+        TabulatedFunctionOperationService service = new TabulatedFunctionOperationService();
+
+        double[] xValues1 = {1.0, 2.0, 3.0};
+        double[] yValues1 = {-1.0, -2.0, -3.0};
+        TabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+        double[] xValues2 = {1.0, 2.0, 3.0};
+        double[] yValues2 = {2.0, 1.0, 0.0};
+        TabulatedFunction function2 = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        TabulatedFunction multiplicationResult = service.multiplication(function1, function2);
+        assertEquals(-2.0, multiplicationResult.getY(0));
+        assertEquals(-2.0, multiplicationResult.getY(1));
+        assertEquals(-0.0, multiplicationResult.getY(2));
+    }
+
+    @Test
+    public void testDivisionWithNegativeValues() {
+        TabulatedFunctionOperationService service = new TabulatedFunctionOperationService();
+
+        double[] xValues1 = {1.0, 2.0, 3.0};
+        double[] yValues1 = {-4.0, -6.0, -8.0};
+        TabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+        double[] xValues2 = {1.0, 2.0, 3.0};
+        double[] yValues2 = {2.0, 3.0, 4.0};
+        TabulatedFunction function2 = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        TabulatedFunction divisionResult = service.division(function1, function2);
+        assertEquals(-2.0, divisionResult.getY(0));
+        assertEquals(-2.0, divisionResult.getY(1));
+        assertEquals(-2.0, divisionResult.getY(2));
+    }
+
+    @Test
+    public void testMultiplicationWithMixedTypes() {
+        TabulatedFunctionOperationService service = new TabulatedFunctionOperationService();
+
+        double[] xValues1 = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues1 = {2.0, 3.0, 4.0, 5.0};
+        TabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+        double[] xValues2 = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues2 = {-1.0, -2.0, -3.0, -4.0};
+        TabulatedFunction function2 = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        TabulatedFunction multiplicationResult = service.multiplication(function1, function2);
+        assertEquals(-2.0, multiplicationResult.getY(0));
+        assertEquals(-6.0, multiplicationResult.getY(1));
+        assertEquals(-12.0, multiplicationResult.getY(2));
+        assertEquals(-20.0, multiplicationResult.getY(3));
+    }
+
+    @Test
+    public void testDivisionWithMixedTypes() {
+        TabulatedFunctionOperationService service = new TabulatedFunctionOperationService();
+
+        double[] xValues1 = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues1 = {6.0, 8.0, 10.0, 12.0};
+        TabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+        double[] xValues2 = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues2 = {2.0, 4.0, 5.0, 6.0};
+        TabulatedFunction function2 = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        TabulatedFunction divisionResult = service.division(function1, function2);
+        assertEquals(3.0, divisionResult.getY(0));
+        assertEquals(2.0, divisionResult.getY(1));
+        assertEquals(2.0, divisionResult.getY(2));
+        assertEquals(2.0, divisionResult.getY(3));
+    }
+
+    @Test
+    public void testMultiplicationWithZero() {
+        TabulatedFunctionOperationService service = new TabulatedFunctionOperationService();
+
+        double[] xValues1 = {1.0, 2.0, 3.0};
+        double[] yValues1 = {5.0, 10.0, 15.0};
+        TabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+        double[] xValues2 = {1.0, 2.0, 3.0};
+        double[] yValues2 = {0.0, 0.0, 0.0};
+        TabulatedFunction function2 = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        TabulatedFunction multiplicationResult = service.multiplication(function1, function2);
+        assertEquals(0.0, multiplicationResult.getY(0));
+        assertEquals(0.0, multiplicationResult.getY(1));
+        assertEquals(0.0, multiplicationResult.getY(2));
+    }
+
+    @Test
+    public void testDivisionByOne() {
+        TabulatedFunctionOperationService service = new TabulatedFunctionOperationService();
+
+        double[] xValues1 = {1.0, 2.0, 3.0};
+        double[] yValues1 = {-3.0, -6.0, -9.0};
+        TabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+        double[] xValues2 = {1.0, 2.0, 3.0};
+        double[] yValues2 = {1.0, 1.0, 1.0};
+        TabulatedFunction function2 = new LinkedListTabulatedFunction(xValues2, yValues2);
+
+        TabulatedFunction divisionResult = service.division(function1, function2);
+        assertEquals(-3.0, divisionResult.getY(0));
+        assertEquals(-6.0, divisionResult.getY(1));
+        assertEquals(-9.0, divisionResult.getY(2));
+    }
+
 }
