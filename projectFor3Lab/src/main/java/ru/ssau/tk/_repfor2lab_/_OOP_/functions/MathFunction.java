@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-interface MathFunction {//автоматически публичный и абстрактный, модификаторы будут лишними
+public interface MathFunction {//автоматически публичный и абстрактный, модификаторы будут лишними
 
     double apply(double x);
 

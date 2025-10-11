@@ -5,6 +5,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.LinkedListTabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -126,6 +127,18 @@ class TabulatedDifferentialOperatorTest {
         assertEquals(1.0, derivative.getY(2), 0.0001);   // ~2*(1.5) - 2 = 1.0
         assertEquals(3.0, derivative.getY(3), 0.0001);   // ~2*(2.5) - 2 = 3.0
         assertEquals(3.0, derivative.getY(4), 0.0001);   // последнее равно предпоследнему
+    }
+
+    @Test
+    public void testGetSetFactory() {
+        TabulatedDifferentialOperator operator = new TabulatedDifferentialOperator();
+        TabulatedFunctionFactory originalFactory = operator.getFactory();
+
+        TabulatedFunctionFactory newFactory = new LinkedListTabulatedFunctionFactory();
+        operator.setFactory(newFactory);
+
+        assertSame(operator.getFactory(), newFactory);
+        assertNotSame(operator.getFactory(), originalFactory);
     }
 
     @Test
