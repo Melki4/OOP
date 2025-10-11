@@ -1,8 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InconsistentFunctionsException;
-import ru.ssau.tk._repfor2lab_._OOP_.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.factory.TabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.*;
 
 public class TabulatedFunctionOperationService {

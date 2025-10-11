@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DifferentLengthOfArraysException;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InconsistentFunctionsException;
-import ru.ssau.tk._repfor2lab_._OOP_.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.factory.LinkedListTabulatedFunctionFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.factory.TabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.LinkedListTabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
