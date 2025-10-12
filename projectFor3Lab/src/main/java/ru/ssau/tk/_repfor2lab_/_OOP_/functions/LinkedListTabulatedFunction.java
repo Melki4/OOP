@@ -2,11 +2,15 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{//нет реализации отрицательный индекс - начинаем с хвоста
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable{//нет реализации отрицательный индекс - начинаем с хвоста
+    @Serial
+    private static final long serialVersionUID = -1612741369740171735L;
 
     public Iterator<Point> iterator(){
         return new Iterator<Point>() {
@@ -30,7 +34,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         };
     }
 
-    static class Node {
+    static class Node implements Serializable{
+        @Serial
+        private static final long serialVersionUID = -7834994689110174879L;
         public Node next;
         public Node prev;
         public double x;
