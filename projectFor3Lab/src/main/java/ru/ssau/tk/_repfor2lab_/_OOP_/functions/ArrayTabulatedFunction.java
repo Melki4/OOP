@@ -1,10 +1,14 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Serializable, Insertable, Removable {
+
+    private static final long serialVersionUID = -7260590353279522614L;
 
     public Iterator<Point> iterator(){
         return new Iterator<Point>() {
@@ -59,6 +63,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yValues = newYValues;
         count++;
     }
+
     @Override
     public void remove(int index) {
 
