@@ -5,9 +5,6 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 
 import java.io.*;
-import javax.swing.text.NumberFormatter;
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -16,6 +13,16 @@ final class FunctionsIO {
 
     private FunctionsIO(){
         throw new UnsupportedOperationException();
+    }
+
+    static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction function) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        dataOutputStream.writeInt(function.getCount());
+        for (Point point : function) {
+            dataOutputStream.writeDouble(point.x);
+            dataOutputStream.writeDouble(point.y);
+        }
+        dataOutputStream.flush();
     }
 
     static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction function){
@@ -29,16 +36,6 @@ final class FunctionsIO {
         }
 
         boof.flush();
-    }
-
-    static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction function) throws IOException {
-        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-        dataOutputStream.writeInt(function.getCount());
-        for (Point point : function) {
-            dataOutputStream.writeDouble(point.x);
-            dataOutputStream.writeDouble(point.y);
-        }
-        dataOutputStream.flush();
     }
 
     static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory) throws IOException{
@@ -59,5 +56,12 @@ final class FunctionsIO {
         catch (ParseException e){
             throw new IOException(e);
         }
+    }
+
+    static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
+
+        ObjectOutputStream boof = new ObjectOutputStream(stream);
+        boof.writeObject(function);
+        boof.flush();
     }
 }
