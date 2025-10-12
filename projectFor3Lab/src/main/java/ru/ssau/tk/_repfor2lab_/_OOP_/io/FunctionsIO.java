@@ -1,12 +1,12 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
+import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 
+import java.io.*;
 import javax.swing.text.NumberFormatter;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -29,6 +29,16 @@ final class FunctionsIO {
         }
 
         boof.flush();
+    }
+
+    static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction function) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        dataOutputStream.writeInt(function.getCount());
+        for (Point point : function) {
+            dataOutputStream.writeDouble(point.x);
+            dataOutputStream.writeDouble(point.y);
+        }
+        dataOutputStream.flush();
     }
 
     static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory) throws IOException{
