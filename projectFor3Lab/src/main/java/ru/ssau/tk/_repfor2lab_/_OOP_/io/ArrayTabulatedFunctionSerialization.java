@@ -1,10 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.LinkedListTabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedDifferentialOperator;
 
 import java.io.*;
