@@ -39,4 +39,19 @@ abstract class AbstractTabulatedFunction implements TabulatedFunction {
 
         if (j != xValues.length) throw new ArrayIsNotSortedException("Массив не отсортирован");
     }
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(getClass().getSimpleName());
+        stringBuilder.append(" size = ");
+        stringBuilder.append(getCount());
+
+        for (int i = 0; i < getCount(); i++){
+            stringBuilder.append("\n[");
+            stringBuilder.append(getX(i));
+            stringBuilder.append("; ");
+            stringBuilder.append(getY(i));
+            stringBuilder.append("]");
+        }
+        return stringBuilder.toString();
+    }
 }
