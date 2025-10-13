@@ -65,7 +65,7 @@ class UnmodifiableTabulatedFunctionTest {
         double[] yValues1 = {1.0, 4.0, 9.4};
         TabulatedFunction arrayFunc = new ArrayTabulatedFunction(xValues1, yValues1);
         UnmodifiableTabulatedFunction strictArrayFunc = new UnmodifiableTabulatedFunction(arrayFunc);
-        assertEquals(1, strictArrayFunc.indexOfX(2.0));
+        assertEquals(-1, strictArrayFunc.indexOfY(2.0));
     }
 
     @Test

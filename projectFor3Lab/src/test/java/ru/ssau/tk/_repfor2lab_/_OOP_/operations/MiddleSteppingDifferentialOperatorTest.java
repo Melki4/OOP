@@ -10,7 +10,7 @@ class MiddleSteppingDifferentialOperatorTest {
     @Test
     void derive() {
         MathFunction functions = (double x) -> (x*x*x + 2*x*x +x);
-        LeftSteppingDifferentialOperator der = new LeftSteppingDifferentialOperator(0.00001);
+        MiddleSteppingDifferentialOperator der = new MiddleSteppingDifferentialOperator(0.00001);
         MathFunction someNewFunc = der.derive(functions);
         assertEquals(8.0, someNewFunc.apply(1.0), 0.001);
         assertEquals(0.0, someNewFunc.apply(-1.0), 0.001);

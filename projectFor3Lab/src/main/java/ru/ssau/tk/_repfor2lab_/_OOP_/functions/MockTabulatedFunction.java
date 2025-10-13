@@ -59,7 +59,6 @@ public class MockTabulatedFunction extends AbstractTabulatedFunction{
         return y0+(y1-y0)/(x1-x0)*(x-x0);
     }
 
-
     @Override
     public int getCount() {
         return count;
@@ -67,21 +66,21 @@ public class MockTabulatedFunction extends AbstractTabulatedFunction{
 
     @Override
     public double getX(int index) throws RuntimeException{
-        if (index>2||index<0) throw new RuntimeException();
+        if (index>=2||index<0) throw new RuntimeException();
         if (index == 0) return x0;
         else return x1;
     }
 
     @Override
     public double getY(int index) throws RuntimeException {
-        if (index > 2 || index < 0) throw new RuntimeException();
+        if (index >= 2 || index < 0) throw new RuntimeException();
         if (index == 0) return y0;
         else return y1;
     }
 
     @Override
     public void setY(int index, double value) throws RuntimeException {
-        if (index > 2 || index < 0) throw new RuntimeException();
+        if (index >= 2 || index < 0) throw new RuntimeException();
         //А как????? =)
     }
 

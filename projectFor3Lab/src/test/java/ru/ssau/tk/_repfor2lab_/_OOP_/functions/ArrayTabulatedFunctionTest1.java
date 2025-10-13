@@ -229,6 +229,4 @@ class ArrayTabulatedFunctionTest1 {
         assertEquals(4.0, function.interpolate(2.0), 1e-9);
         assertEquals(6.0, function.interpolate(3.0), 1e-9);
     }
-
-
 }
