@@ -19,7 +19,6 @@ class ArrayTabulatedFunctionFactoryTest {
     @Test
     public void testCreateReturnsCorrectType() {
         TabulatedFunction function = factory.create(xValues, yValues);
-
         assertTrue(function instanceof ArrayTabulatedFunction,
                 "Created function should be instance of ArrayTabulatedFunction");
     }

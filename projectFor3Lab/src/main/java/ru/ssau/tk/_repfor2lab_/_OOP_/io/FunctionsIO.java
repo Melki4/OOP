@@ -64,6 +64,7 @@ final class FunctionsIO {
         boof.writeObject(function);
         boof.flush();
     }
+
     static TabulatedFunction readTabulatedFunction(BufferedInputStream inputStream, TabulatedFunctionFactory factory) throws IOException {
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         int count = dataInputStream.readInt();

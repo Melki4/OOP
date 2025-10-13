@@ -243,7 +243,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected double extrapolateRight(double newX) {
-
         if (count <= 1) throw new InterpolationException("Мало аргументов для экстраполяции");
         double x = rightBound();
         double y = getY(indexOfX(x));
