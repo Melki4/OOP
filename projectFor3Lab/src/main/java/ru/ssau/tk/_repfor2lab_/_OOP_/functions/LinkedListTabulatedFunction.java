@@ -4,7 +4,6 @@ import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -72,7 +71,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         }
 
         if (xFrom!=xTo){
-            //double curX = xFrom;
             int UpLim = count - 1;
             double step = (xTo - xFrom) / (UpLim);
 
@@ -109,7 +107,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void remove(int indexDelX) {//нет реализации отрицательный индекс - начинаем с хвоста
-        if (count == 0 || indexDelX < 0 || indexDelX >= count){
+        if (indexDelX < 0 || indexDelX >= count){
             throw new IllegalArgumentException("Неверный индекс для удаления");
         }
         else if (count == 1) {
@@ -128,7 +126,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             count--;
         }
         else{
-
             getNode(indexDelX-1).next = getNode(indexDelX+1);
             getNode(indexDelX+1).prev = getNode(indexDelX-1);
             count--;
@@ -179,7 +176,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс для получения узла");
         }
-        if (index == 0) return head;
+        else if (index == 0) return head;
         Node toReturn = head;
         for (int i =0; i<index-1; ++i){
             toReturn = toReturn.next;
@@ -285,7 +282,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void setY(int index, double value) {
-        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому списку");
+        if (count == 0) throw new NullPointerException("Обращение к пустому списку");
         else if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс");
         }
@@ -299,7 +296,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public double getY(int index) {
-        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому списку");
+        if (count == 0) throw new NullPointerException("Обращение к пустому списку");
         else
             if (index < 0 || index >= count){
             throw new IllegalArgumentException("Неверный индекс");

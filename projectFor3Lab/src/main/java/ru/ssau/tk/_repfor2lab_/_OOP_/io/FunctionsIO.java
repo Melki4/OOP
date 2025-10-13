@@ -2,7 +2,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
@@ -89,26 +88,17 @@ final class FunctionsIO {
 
     static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
         XStream stream = new XStream();
-        stream.allowTypesByWildcard(new String[]{
-                "ru.ssau.tk.**",
-                "java.util.**",
-                "[D",
-                "[Ljava.lang.Double;"
-        });
+        stream.allowTypesByWildcard(new String[]{"ru.ssau.tk.**"});
         writer.write(stream.toXML(function));
         writer.flush();
     }
 
     static ArrayTabulatedFunction deserializeXml(BufferedReader reader) throws IOException {
         XStream stream = new XStream();
-        stream.allowTypesByWildcard(new String[]{
-                "ru.ssau.tk.**",
-                "java.util.**",
-                "[D",
-                "[Ljava.lang.Double;"
-        });
+        stream.allowTypesByWildcard(new String[]{"ru.ssau.tk.**"});
         return (ArrayTabulatedFunction) stream.fromXML(reader);
     }
+
     static void serializeJson(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         writer.write(objectMapper.writeValueAsString(function));

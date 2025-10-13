@@ -2,7 +2,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MathFunctionTest {

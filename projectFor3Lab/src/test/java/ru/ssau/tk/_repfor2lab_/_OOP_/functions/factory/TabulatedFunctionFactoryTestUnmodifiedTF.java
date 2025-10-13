@@ -17,7 +17,7 @@ class TabulatedFunctionFactoryTestUnmodifiedTF {
         TabulatedFunction unmodifiableFunction = factory.createUnmodifiable(xValues, yValues);
 
         // Проверяем, что возвращается UnmodifiableTabulatedFunction
-        assertTrue(unmodifiableFunction instanceof UnmodifiableTabulatedFunction);
+        assertInstanceOf(UnmodifiableTabulatedFunction.class, unmodifiableFunction);
 
         // Проверяем, что значения можно читать
         assertEquals(2.0, unmodifiableFunction.apply(1.0));

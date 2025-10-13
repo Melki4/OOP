@@ -1,9 +1,9 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
-import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -12,16 +12,15 @@ import java.util.NoSuchElementException;
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Serializable, Insertable, Removable {
 
     private static final long serialVersionUID = -7260590353279522614L;
+
     @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] xValues;
 
     @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] yValues;
 
-
     public Iterator<Point> iterator(){
         return new Iterator<Point>() {
-
             private int i =0;
 
             @Override
@@ -84,28 +83,37 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         System.arraycopy(xValues, 0, newXArray, 0, index);
         System.arraycopy(yValues, 0, newYArray, 0, index);
 
-        //копирует правую часть до удаляемого элемента
+        //копирует правую часть после удаляемого элемента
         System.arraycopy(xValues, index + 1, newXArray, index, count - index - 1);
         System.arraycopy(yValues, index + 1, newYArray, index, count - index - 1);
+
         this.xValues = newXArray; //заменяет старые массивы на новые
         this.yValues = newYArray;
+
         this.count--;
     }
 
-    public ArrayTabulatedFunction(double[] xValues, double[] yValues){//xValues не повторяются и упорядочены изначально, длины массивов совпадают
+    @JsonCreator
+    public ArrayTabulatedFunction(@JsonProperty(value = "xValues") double[] xValues,
+                                  @JsonProperty(value = "yValues") double[] yValues){//xValues не повторяются и упорядочены изначально, длины массивов совпадают
         if (xValues.length < 2 || yValues.length < 2) {
             throw new IllegalArgumentException("Длина массивов меньше минимальной возможной");
         }
+
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);
+
         this.xValues = Arrays.copyOf(xValues, xValues.length);
         this.yValues = Arrays.copyOf(yValues, xValues.length);
+
         count = xValues.length;
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){//если count <1
+
         if (count < 2) throw new IllegalArgumentException("Количество элементов меньше минимума");
-        if (xFrom > xTo) {
+
+        else if (xFrom > xTo) {
             double boof = xFrom;
             xFrom = xTo;
             xTo = boof;
@@ -117,8 +125,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yValues = new double[count];
 
         if (xFrom!=xTo){
-            //double curX = xFrom;
-
             int UpLim = count-1;
             double step = (xTo-xFrom)/(UpLim);
 
@@ -138,7 +144,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
                 yValues[i] = source.apply(xFrom);
             }
         }
-
     }
 
     @Override
@@ -197,6 +202,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     protected int floorIndexOfX(double x) {
 
         if (x < xValues[0]) throw new IllegalArgumentException("Икс меньше левой границы");
+
         for (int i=0; i<count;++i){
             if (xValues[i] == x) return i;
         }

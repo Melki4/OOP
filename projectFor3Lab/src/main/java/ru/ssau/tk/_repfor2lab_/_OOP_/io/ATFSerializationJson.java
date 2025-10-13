@@ -1,9 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedDifferentialOperator;
 
 import java.io.*;
 
@@ -24,8 +21,8 @@ public class ATFSerializationJson {
 
             ArrayTabulatedFunction f = FunctionsIO.deserializeJson(fileReader1);
 
-            System.out.println(function1.toString());
-            System.out.println(f.toString());
+            System.out.println(function1);
+            System.out.println(f);
 
             fileReader1.close();
         }

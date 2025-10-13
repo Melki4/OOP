@@ -1,7 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DifferentLengthOfArraysException;
 
 import java.util.Iterator;
 

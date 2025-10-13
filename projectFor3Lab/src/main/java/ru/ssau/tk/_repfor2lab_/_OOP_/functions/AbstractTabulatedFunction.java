@@ -32,13 +32,11 @@ abstract class AbstractTabulatedFunction implements TabulatedFunction {
     }
 
     static void checkSorted(double[] xValues) throws ArrayIsNotSortedException{
-
         int j=1;
-
-        while (j<xValues.length && xValues[j-1] < xValues[j] ) j++;
-
+        while (j<xValues.length && xValues[j-1] < xValues[j]) j++;
         if (j != xValues.length) throw new ArrayIsNotSortedException("Массив не отсортирован");
     }
+
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getClass().getSimpleName());

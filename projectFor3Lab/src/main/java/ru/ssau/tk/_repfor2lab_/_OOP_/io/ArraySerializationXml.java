@@ -21,8 +21,8 @@ public class ArraySerializationXml {
 
             ArrayTabulatedFunction f = FunctionsIO.deserializeXml(fileReader1);
 
-            System.out.println(function1.toString());
-            System.out.println(f.toString());
+            System.out.println(function1);
+            System.out.println(f);
 
             fileReader1.close();
         }

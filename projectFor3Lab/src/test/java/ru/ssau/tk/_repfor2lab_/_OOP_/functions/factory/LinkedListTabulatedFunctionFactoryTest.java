@@ -1,4 +1,5 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions.factory;
+
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
@@ -35,8 +36,8 @@ class LinkedListTabulatedFunctionFactoryTest {
         TabulatedFunction smallFunction = factory.create(smallXValues, smallYValues);
         TabulatedFunction largeFunction = factory.create(largeXValues, largeYValues);
 
-        assertTrue(smallFunction instanceof LinkedListTabulatedFunction);
-        assertTrue(largeFunction instanceof LinkedListTabulatedFunction);
+        assertInstanceOf(LinkedListTabulatedFunction.class, smallFunction);
+        assertInstanceOf(LinkedListTabulatedFunction.class, largeFunction);
     }
 
     @Test

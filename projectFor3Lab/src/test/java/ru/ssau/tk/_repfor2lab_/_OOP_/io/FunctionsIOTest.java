@@ -1,6 +1,5 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
-import org.junit.AfterClass;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;

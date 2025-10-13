@@ -81,7 +81,6 @@ public class MockTabulatedFunction extends AbstractTabulatedFunction{
     @Override
     public void setY(int index, double value) throws RuntimeException {
         if (index >= 2 || index < 0) throw new RuntimeException();
-        //А как????? =)
     }
 
     @Override
