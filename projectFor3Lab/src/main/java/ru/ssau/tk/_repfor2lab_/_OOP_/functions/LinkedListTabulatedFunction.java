@@ -128,10 +128,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             count--;
         }
         else{
-//            System.out.println(getNode(indexDelX).x);
+
             getNode(indexDelX-1).next = getNode(indexDelX+1);
             getNode(indexDelX+1).prev = getNode(indexDelX-1);
-//            System.out.println(getNode(indexDelX).x);
             count--;
         }
     }
@@ -163,30 +162,17 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }//вставка в конец
 
     private void addNode(Node node, double x, double y) {//Вставка за элементом node
-        if (node == null){
+        Node boof = new Node();
 
-            head = new Node();
+        boof.y = y;
+        boof.x = x;
 
-            head.next = head;
-            head.prev = head;
-            head.y = y;
+        boof.prev = node;
+        boof.next = node.next;
 
-            head.x = x;
-            count = 1;
-        }
-        else {
-            Node boof = new Node();
-
-            boof.y = y;
-            boof.x = x;
-
-            boof.prev = node;
-            boof.next = node.next;
-
-            node.next.prev = boof;
-            node.next = boof;
-            count+=1;
-        }
+        node.next.prev = boof;
+        node.next = boof;
+        count+=1;
     }
 
     protected Node getNode(int index){//индекс больше count - ошибка
@@ -204,7 +190,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateRight(double newX) {
-        if (count == 1) return getY(0);
+        if (count == 1) throw new InterpolationException("Мало аргументов для экстраполяции");
         double x = rightBound();
         double y = getY(indexOfX(x));
 
@@ -216,7 +202,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return getY(0);
+        if (count == 1) throw new InterpolationException("Мало аргументов для экстраполяции");
         double leftX = leftBound();
         double leftY = getY(indexOfX(leftX));
 
@@ -229,9 +215,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     protected double interpolate(double x, int floorIndex) {
 
-        if(floorIndex < 0 || floorIndex >= count){
-            throw new IllegalArgumentException("Неверный индекс для интерполяции");
-        }
+        if (count <= 1) throw new InterpolationException("Мало аргументов для интерполяции");
 
         double leftX = getX(floorIndex);
         double leftY = getY(floorIndex);
@@ -251,9 +235,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
-        if (count == 1)  {
-            throw new RuntimeException("Что-то пошло не так");
-        }
+        if (count <= 1) throw new InterpolationException("Мало аргументов для интерполяции");
         return super.interpolate(x, leftX, rightX, leftY, rightY);
     }
 

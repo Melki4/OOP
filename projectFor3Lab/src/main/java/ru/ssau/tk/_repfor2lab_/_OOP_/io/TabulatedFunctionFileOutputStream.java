@@ -6,7 +6,6 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 
 public class TabulatedFunctionFileOutputStream {

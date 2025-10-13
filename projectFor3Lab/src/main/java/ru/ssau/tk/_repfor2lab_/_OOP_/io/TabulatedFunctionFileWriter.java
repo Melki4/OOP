@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class TabulatedFunctionFileWriter {
-    public static void main1(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         try (BufferedWriter fileWriter1 = new BufferedWriter(new FileWriter("output/array function.txt"));
              BufferedWriter fileWriter2 = new BufferedWriter(new FileWriter("output/linked list function.txt"))) {
 

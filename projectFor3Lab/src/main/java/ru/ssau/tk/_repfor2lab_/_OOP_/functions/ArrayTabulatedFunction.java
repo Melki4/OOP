@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -67,7 +69,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     public void remove(int index) {
 
-        if (count == 0 || index <0 || index >= count) return;
+        if (count == 0 || index <0 || index >= count) throw new IllegalArgumentException("Неверный индекс для удаления");
 
         //новые массивы уменьшенного размера
         double[] newXArray = new double[count - 1];
@@ -207,11 +209,13 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     protected double interpolate(double x){
+        if (count <= 1) throw new InterpolationException("Мало аргументов для интерполяции");
         return interpolate(x, floorIndexOfX(x));
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
+        if (count <= 1) throw new InterpolationException("Мало аргументов для интерполяции");
         double leftX = getX(floorIndex);
         double leftY = getY(floorIndex);
         double rightX = getX(floorIndex+1);
@@ -222,13 +226,12 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
-        if (count == 1) return yValues[0];
         return super.interpolate(x, leftX, rightX, leftY, rightY);
     }
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return yValues[0];
+        if (count <= 1) throw new InterpolationException("Мало аргументов для экстраполяции");
         double leftX = leftBound();
         double leftY = getY(indexOfX(leftX));
 
@@ -241,7 +244,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     protected double extrapolateRight(double newX) {
 
-        if (count == 1) return yValues[0];
+        if (count <= 1) throw new InterpolationException("Мало аргументов для экстраполяции");
         double x = rightBound();
         double y = getY(indexOfX(x));
 

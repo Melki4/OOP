@@ -20,7 +20,10 @@ class ArrayTabulatedFunctionTestRemove {
         ArrayTabulatedFunction function = createTestFunction();
         int initialCount = function.getCount();
 
-        function.remove(-1);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.remove(-1);
+        });
+        Assertions.assertEquals("Неверный индекс для удаления", exception.getMessage());
 
         // Массив не должен измениться
         assertEquals(initialCount, function.getCount());
@@ -32,7 +35,10 @@ class ArrayTabulatedFunctionTestRemove {
         ArrayTabulatedFunction function = createTestFunction();
         int initialCount = function.getCount();
 
-        function.remove(10);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            function.remove(10);
+        });
+        Assertions.assertEquals("Неверный индекс для удаления", exception.getMessage());
 
         // Массив не должен измениться
         assertEquals(initialCount, function.getCount());
