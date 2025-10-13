@@ -1,5 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
@@ -58,13 +61,6 @@ final class FunctionsIO {
         }
     }
 
-    static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
-
-        ObjectOutputStream boof = new ObjectOutputStream(stream);
-        boof.writeObject(function);
-        boof.flush();
-    }
-
     static TabulatedFunction readTabulatedFunction(BufferedInputStream inputStream, TabulatedFunctionFactory factory) throws IOException {
         DataInputStream dataInputStream = new DataInputStream(inputStream);
         int count = dataInputStream.readInt();
@@ -78,9 +74,38 @@ final class FunctionsIO {
         }
         return factory.create(xValues, yValues);
     }
+
+    static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
+        ObjectOutputStream boof = new ObjectOutputStream(stream);
+        boof.writeObject(function);
+        boof.flush();
+    }
+
     static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
         ObjectInputStream stream1 = new ObjectInputStream(stream);
         return (TabulatedFunction) stream1.readObject();
     }
 
+    static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+        XStream stream = new XStream();
+        stream.allowTypesByWildcard(new String[]{
+                "ru.ssau.tk.**",
+                "java.util.**",
+                "[D",
+                "[Ljava.lang.Double;"
+        });
+        writer.write(stream.toXML(function));
+        writer.flush();
+    }
+
+    static ArrayTabulatedFunction deserializeXml(BufferedReader reader) throws IOException {
+        XStream stream = new XStream();
+        stream.allowTypesByWildcard(new String[]{
+                "ru.ssau.tk.**",
+                "java.util.**",
+                "[D",
+                "[Ljava.lang.Double;"
+        });
+        return (ArrayTabulatedFunction) stream.fromXML(reader);
+    }
 }

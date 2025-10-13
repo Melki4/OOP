@@ -1,6 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
 import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
@@ -17,7 +18,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FunctionsIOTest {
-    @AfterClass
+    @AfterAll
     public static void cleaning(){
          Path path = Paths.get("путь/к/папке"); // Замените на ваш путь
          try {
@@ -132,5 +133,30 @@ class FunctionsIOTest {
         catch (IOException e) {
             e.printStackTrace();
         };
+    }
+    @Test
+    void test4(){
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter("temp/serialized array functions.xml"))) {
+
+            double[] xValues1 = {0.00, 0.20, 0.40, 0.60, 0.80};
+            double[] yValues1 = {1.00, 1.179, 1.310, 1.390, 1.414};
+
+            ArrayTabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+            FunctionsIO.serializeXml(fileWriter, function1);
+
+            fileWriter.close();
+
+            BufferedReader fileReader1 = new BufferedReader(new FileReader("temp/serialized array functions.xml"));
+
+            ArrayTabulatedFunction f = FunctionsIO.deserializeXml(fileReader1);
+
+            assertEquals(function1.toString(), f.toString());
+
+            fileReader1.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }

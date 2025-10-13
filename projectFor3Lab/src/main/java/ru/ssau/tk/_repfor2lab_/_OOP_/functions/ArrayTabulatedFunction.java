@@ -2,7 +2,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
