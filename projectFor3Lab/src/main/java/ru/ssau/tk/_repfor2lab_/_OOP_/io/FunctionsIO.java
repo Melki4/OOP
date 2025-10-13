@@ -1,5 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.io;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
@@ -107,5 +108,15 @@ final class FunctionsIO {
                 "[Ljava.lang.Double;"
         });
         return (ArrayTabulatedFunction) stream.fromXML(reader);
+    }
+    static void serializeJson(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        writer.write(objectMapper.writeValueAsString(function));
+        writer.flush();
+    }
+
+    static ArrayTabulatedFunction deserializeJson(BufferedReader reader) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readerFor(ArrayTabulatedFunction.class).readValue(reader);
     }
 }

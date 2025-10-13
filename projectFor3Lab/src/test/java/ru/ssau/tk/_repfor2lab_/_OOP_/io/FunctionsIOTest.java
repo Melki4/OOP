@@ -159,4 +159,29 @@ class FunctionsIOTest {
             e.printStackTrace();
         }
     }
+    @Test
+    void test5(){
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter("temp/serialized array functions.json"))) {
+
+            double[] xValues1 = {0.00, 0.20, 0.40, 0.60, 0.80, 1.0};
+            double[] yValues1 = {1.00, 1.179, 1.310, 1.390, 1.414, 1.674};
+
+            ArrayTabulatedFunction function1 = new ArrayTabulatedFunction(xValues1, yValues1);
+
+            FunctionsIO.serializeJson(fileWriter, function1);
+
+            fileWriter.close();
+
+            BufferedReader fileReader1 = new BufferedReader(new FileReader("temp/serialized array functions.json"));
+
+            ArrayTabulatedFunction f = FunctionsIO.deserializeJson(fileReader1);
+
+            assertEquals(function1.toString(), f.toString());
+
+            fileReader1.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 }

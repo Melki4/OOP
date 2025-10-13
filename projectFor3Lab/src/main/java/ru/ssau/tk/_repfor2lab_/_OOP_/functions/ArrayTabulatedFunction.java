@@ -1,7 +1,9 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -10,6 +12,12 @@ import java.util.NoSuchElementException;
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Serializable, Insertable, Removable {
 
     private static final long serialVersionUID = -7260590353279522614L;
+    @JsonFormat(shape = JsonFormat.Shape.ARRAY)
+    private double[] xValues;
+
+    @JsonFormat(shape = JsonFormat.Shape.ARRAY)
+    private double[] yValues;
+
 
     public Iterator<Point> iterator(){
         return new Iterator<Point>() {
@@ -32,8 +40,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         };
     }
 
-    private double[] xValues;
-    private double[] yValues;
     private int count;
 
     @Override
