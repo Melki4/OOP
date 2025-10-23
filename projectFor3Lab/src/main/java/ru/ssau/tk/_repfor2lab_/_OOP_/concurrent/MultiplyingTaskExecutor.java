@@ -5,7 +5,6 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.UnitFunction;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MultiplyingTaskExecutor {
 
@@ -24,7 +23,7 @@ public class MultiplyingTaskExecutor {
         }
 
         for (int i=0; i<10;++i) list.get(i).start();
-        Thread.sleep(100);
+        Thread.sleep(3000);
 
         System.out.println(f.getY(0));
     }
