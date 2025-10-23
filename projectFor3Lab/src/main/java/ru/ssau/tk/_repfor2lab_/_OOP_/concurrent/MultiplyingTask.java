@@ -4,7 +4,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 
 public class MultiplyingTask implements Runnable{
 
-    boolean done = false;
+    public boolean done = false;
 
     TabulatedFunction function;
 
