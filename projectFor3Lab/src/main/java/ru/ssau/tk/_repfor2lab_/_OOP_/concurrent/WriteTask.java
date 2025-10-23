@@ -2,18 +2,19 @@ package ru.ssau.tk._repfor2lab_._OOP_.concurrent;
 
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 
-public class ReadTask implements Runnable{
+public class WriteTask implements Runnable{
     private final TabulatedFunction function;
-    public ReadTask(TabulatedFunction func) {
+    private final double value;
+    public WriteTask(TabulatedFunction func, double value) {
         this.function = func;
+        this.value = value;
     }
 
     @Override
     public void run() {
         for (int i = 0; i < function.getCount(); i++) {
-            double x = function.getX(i);
-            double y = function.getY(i);
-            System.out.printf("After read: i = %d, x = %f, y = %f%n", i, x, y);
+            function.setY(i, value);
+            System.out.printf("Writing for index %d complete%n", i);
         }
     }
 }
