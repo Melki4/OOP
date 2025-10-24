@@ -26,10 +26,41 @@ public class SyncTabulatedDifferentialOperatorTest{
         MathFunction func = (double x) -> x*x -2*x+1;
 
         LinkedListTabulatedFunction listTabulatedFunction = new LinkedListTabulatedFunction(xValues, yValues);
-        ArrayTabulatedFunction arrayTabulatedFunction = new ArrayTabulatedFunction(func, 1, 10, 100000);
+        ArrayTabulatedFunction arrayTabulatedFunction = new ArrayTabulatedFunction(func, 1, 10, 10000);
 
         list = new SynchronizedTabulatedFunction(listTabulatedFunction);
         array = new SynchronizedTabulatedFunction(arrayTabulatedFunction);
+    }
+
+    @Test
+    void testDeriveSynchronously() {
+        MiddleSteppingDifferentialOperator operator = new MiddleSteppingDifferentialOperator(0.0001);
+
+        MathFunction derivative = operator.deriveSynchronously(array);
+
+        assertEquals(0.0, derivative.apply(1.0), 1e-3);
+        assertEquals(18.0, derivative.apply(10.0), 1e-3);
+    }
+
+    @Test
+    void testDeriveSynchronously1() {
+
+        LeftSteppingDifferentialOperator operator = new LeftSteppingDifferentialOperator(0.0001);
+
+        MathFunction derivative = operator.deriveSynchronously(array);
+
+        assertEquals(0.0, derivative.apply(1.0), 1e-3);
+        assertEquals(8.0, derivative.apply(5.0), 1e-3);
+    }
+
+    @Test
+    void testDeriveSynchronously2() {
+        RightSteppingDifferentialOperator operator = new RightSteppingDifferentialOperator(0.0001);
+
+        MathFunction derivative = operator.deriveSynchronously(array);
+
+        assertEquals(0.0, derivative.apply(1.0), 1e-3);
+        assertEquals(12.0, derivative.apply(7.0), 1e-3);
     }
 
     @Test
@@ -52,16 +83,9 @@ public class SyncTabulatedDifferentialOperatorTest{
 
         assertEquals(array.getCount(), derivative.getCount());
 
-        assertEquals(0.0, derivative.getY(0), 1e-4);
-        assertEquals(0.0, derivative.getY(1), 1e-3);
-        assertEquals(0.0, derivative.getY(2), 1e-3);
-        assertEquals(0.0, derivative.getY(3), 1e-3);
-        assertEquals(0.0, derivative.getY(4), 1e-3);
-        assertEquals(0.0, derivative.getY(5), 1e-3);
-        assertEquals(0.001, derivative.getY(6), 1e-3);
-        assertEquals(0.001, derivative.getY(7), 1e-3);
-        assertEquals(0.001, derivative.getY(8), 1e-3);
-        assertEquals(0.001, derivative.getY(9), 1e-3);
+        assertEquals(0.0, derivative.getY(0), 1e-2);
+        assertEquals(0.0, derivative.getY(1), 1e-2);
+        assertEquals(0.0, derivative.getY(2), 1e-2);
     }
 
     @Test

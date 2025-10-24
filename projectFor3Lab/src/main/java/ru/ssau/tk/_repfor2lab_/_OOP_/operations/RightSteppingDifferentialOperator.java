@@ -1,6 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
+import ru.ssau.tk._repfor2lab_._OOP_.concurrent.SynchronizedTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 
 public class RightSteppingDifferentialOperator extends SteppingDifferentialOperator{
 
@@ -19,5 +21,16 @@ public class RightSteppingDifferentialOperator extends SteppingDifferentialOpera
                 return (f_x_plus_h-f_x)/step;
             }
         };
+    }
+
+    public MathFunction deriveSynchronously(TabulatedFunction func){
+
+        SynchronizedTabulatedFunction f;
+
+        if (func instanceof SynchronizedTabulatedFunction) f = (SynchronizedTabulatedFunction) func;
+
+        else f = new SynchronizedTabulatedFunction(func);
+
+        return  f.doSynchronously(this::derive);
     }
 }
