@@ -7,21 +7,23 @@ import java.util.Iterator;
 
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
 
+    public SynchronizedTabulatedFunction(TabulatedFunction f){
+        function = f;
+    }
+
     final TabulatedFunction function;
 
     public interface Operation<T>{
         T apply(SynchronizedTabulatedFunction f);
     }
 
-    <T> T doSynchronously(Operation<? extends T> operation){
-        return operation.apply(this);
+    public <T> T doSynchronously(Operation<? extends T> operation){
+        synchronized (operation){
+            return operation.apply(this);
+        }
     }
 
 //    Collection<Integer> syncCollection = Collections.synchronizedCollection(new ArrayList<>());
-
-    public SynchronizedTabulatedFunction(TabulatedFunction f){
-        function = f;
-    }
 
     @Override
     public int getCount() { synchronized (function) {return function.getCount();} }

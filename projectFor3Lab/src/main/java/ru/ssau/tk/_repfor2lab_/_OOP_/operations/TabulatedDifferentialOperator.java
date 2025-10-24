@@ -1,5 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
+import ru.ssau.tk._repfor2lab_._OOP_.concurrent.SynchronizedTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
@@ -48,5 +49,16 @@ public class TabulatedDifferentialOperator implements DifferentialOperator<Tabul
         yValues[count - 1] = yValues[count - 2];
 
         return factory.create(xValues, yValues);
+    }
+
+    public TabulatedFunction deriveSynchronously(TabulatedFunction func){
+
+        SynchronizedTabulatedFunction f;
+
+        if (func instanceof SynchronizedTabulatedFunction) f = (SynchronizedTabulatedFunction) func;
+
+        else f = new SynchronizedTabulatedFunction(func);
+
+        return f.doSynchronously(this::derive);
     }
 }
