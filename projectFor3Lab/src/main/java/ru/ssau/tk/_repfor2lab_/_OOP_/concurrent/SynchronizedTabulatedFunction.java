@@ -3,14 +3,19 @@ package ru.ssau.tk._repfor2lab_._OOP_.concurrent;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
 
     final TabulatedFunction function;
+
+    public interface Operation<T>{
+        T apply(SynchronizedTabulatedFunction f);
+    }
+
+    <T> T doSynchronously(Operation<? extends T> operation){
+        return operation.apply(this);
+    }
 
 //    Collection<Integer> syncCollection = Collections.synchronizedCollection(new ArrayList<>());
 
