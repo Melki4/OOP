@@ -8,6 +8,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -110,6 +111,306 @@ class SynchronizedTabulatedFunctionTest {
                 i++;
             }
         }
+    }
+    @Test
+    void testIteratorBasicFunctionality() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        assertTrue(iterator.hasNext());
+
+        Point point1 = iterator.next();
+        assertEquals(1.0, point1.x, 0.0001);
+        assertEquals(1.0, point1.y, 0.0001);
+
+        Point point2 = iterator.next();
+        assertEquals(2.0, point2.x, 0.0001);
+        assertEquals(4.0, point2.y, 0.0001);
+
+        Point point3 = iterator.next();
+        assertEquals(3.0, point3.x, 0.0001);
+        assertEquals(9.0, point3.y, 0.0001);
+
+        Point point4 = iterator.next();
+        assertEquals(4.0, point4.x, 0.0001);
+        assertEquals(16.0, point4.y, 0.0001);
+
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    void testIteratorWithWhileLoop() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+        int index = 0;
+
+        while (iterator.hasNext()) {
+            Point point = iterator.next();
+            assertEquals(xValues[index], point.x, 0.0001);
+            assertEquals(yValues[index], point.y, 0.0001);
+            index++;
+        }
+
+        assertEquals(3, index);
+    }
+
+    @Test
+    void testIteratorWithForEachLoop() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        int index = 0;
+        for (Point point : syncFunction) {
+            assertEquals(xValues[index], point.x, 0.0001);
+            assertEquals(yValues[index], point.y, 0.0001);
+            index++;
+        }
+
+        assertEquals(3, index);
+    }
+
+    @Test
+    void testIteratorThrowsNoSuchElementException() {
+        double[] xValues = {1.0, 2.0};
+        double[] yValues = {1.0, 4.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        iterator.next();
+        iterator.next();
+
+        assertThrows(NoSuchElementException.class, iterator::next);
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    void testIteratorIsIndependentCopy() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        syncFunction.setY(1, 25.0);
+
+        Point point1 = iterator.next();
+        assertEquals(1.0, point1.x, 0.0001);
+        assertEquals(1.0, point1.y, 0.0001);
+
+        Point point2 = iterator.next();
+        assertEquals(2.0, point2.x, 0.0001);
+        assertEquals(4.0, point2.y, 0.0001);
+
+        Point point3 = iterator.next();
+        assertEquals(3.0, point3.x, 0.0001);
+        assertEquals(9.0, point3.y, 0.0001);
+    }
+
+    @Test
+    void testMultipleIteratorsAreIndependent() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator1 = syncFunction.iterator();
+        Iterator<Point> iterator2 = syncFunction.iterator();
+
+        Point point1FromIterator1 = iterator1.next();
+        Point point1FromIterator2 = iterator2.next();
+
+        assertEquals(point1FromIterator1.x, point1FromIterator2.x, 0.0001);
+        assertEquals(point1FromIterator1.y, point1FromIterator2.y, 0.0001);
+
+        Point point2FromIterator1 = iterator1.next();
+        assertEquals(2.0, point2FromIterator1.x, 0.0001);
+
+        Point point2FromIterator2 = iterator2.next();
+        assertEquals(2.0, point2FromIterator2.x, 0.0001);
+    }
+
+    @Test
+    void testIteratorConsistencyDuringModifications() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        Point point1 = iterator.next();
+        assertEquals(1.0, point1.x, 0.0001);
+        assertEquals(1.0, point1.y, 0.0001);
+
+        syncFunction.setY(2, 25.0);
+        syncFunction.setY(0, 0.5);
+
+        Point point2 = iterator.next();
+        assertEquals(2.0, point2.x, 0.0001);
+        assertEquals(4.0, point2.y, 0.0001);
+
+        Point point3 = iterator.next();
+        assertEquals(3.0, point3.x, 0.0001);
+        assertEquals(9.0, point3.y, 0.0001);
+
+        Point point4 = iterator.next();
+        assertEquals(4.0, point4.x, 0.0001);
+        assertEquals(16.0, point4.y, 0.0001);
+    }
+
+    @Test
+    void testMultipleIteratorsWithConcurrentModifications() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator1 = syncFunction.iterator();
+
+        syncFunction.setY(1, 25.0);
+
+        Iterator<Point> iterator2 = syncFunction.iterator();
+
+        Point point1FromIterator1 = iterator1.next();
+        assertEquals(1.0, point1FromIterator1.y, 0.0001);
+
+        Point point2FromIterator1 = iterator1.next();
+        assertEquals(4.0, point2FromIterator1.y, 0.0001);
+
+        Point point1FromIterator2 = iterator2.next();
+        assertEquals(1.0, point1FromIterator2.y, 0.0001);
+
+        Point point2FromIterator2 = iterator2.next();
+        assertEquals(25.0, point2FromIterator2.y, 0.0001);
+    }
+
+    @Test
+    void testIteratorWithLargeDataset() {
+        int size = 100;
+        double[] xValues = new double[size];
+        double[] yValues = new double[size];
+
+        for (int i = 0; i < size; i++) {
+            xValues[i] = i;
+            yValues[i] = i * i;
+        }
+
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+        int count = 0;
+
+        while (iterator.hasNext()) {
+            Point point = iterator.next();
+            assertEquals(count, point.x, 0.0001);
+            assertEquals(count * count, point.y, 0.0001);
+            count++;
+        }
+
+        assertEquals(size, count);
+    }
+
+    @Test
+    void testIteratorHasNextIdempotent() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
+
+        Point point1 = iterator.next();
+        assertEquals(1.0, point1.x, 0.0001);
+
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
+
+        Point point2 = iterator.next();
+        assertEquals(2.0, point2.x, 0.0001);
+
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
+
+        Point point3 = iterator.next();
+        assertEquals(3.0, point3.x, 0.0001);
+
+        assertFalse(iterator.hasNext());
+        assertFalse(iterator.hasNext());
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    void testIteratorWithZeroValues() {
+        double[] xValues = {0.0, 1.0, 2.0};
+        double[] yValues = {0.0, 0.0, 0.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        Point point1 = iterator.next();
+        assertEquals(0.0, point1.x, 0.0001);
+        assertEquals(0.0, point1.y, 0.0001);
+
+        Point point2 = iterator.next();
+        assertEquals(1.0, point2.x, 0.0001);
+        assertEquals(0.0, point2.y, 0.0001);
+
+        Point point3 = iterator.next();
+        assertEquals(2.0, point3.x, 0.0001);
+        assertEquals(0.0, point3.y, 0.0001);
+
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    void testIteratorWithNegativeValues() {
+        double[] xValues = {-2.0, -1.0, 0.0, 1.0, 2.0};
+        double[] yValues = {4.0, 1.0, 0.0, 1.0, 4.0};
+        ArrayTabulatedFunction arrayFunction = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunction = new SynchronizedTabulatedFunction(arrayFunction);
+
+        Iterator<Point> iterator = syncFunction.iterator();
+
+        Point point1 = iterator.next();
+        assertEquals(-2.0, point1.x, 0.0001);
+        assertEquals(4.0, point1.y, 0.0001);
+
+        Point point2 = iterator.next();
+        assertEquals(-1.0, point2.x, 0.0001);
+        assertEquals(1.0, point2.y, 0.0001);
+
+        Point point3 = iterator.next();
+        assertEquals(0.0, point3.x, 0.0001);
+        assertEquals(0.0, point3.y, 0.0001);
+
+        Point point4 = iterator.next();
+        assertEquals(1.0, point4.x, 0.0001);
+        assertEquals(1.0, point4.y, 0.0001);
+
+        Point point5 = iterator.next();
+        assertEquals(2.0, point5.x, 0.0001);
+        assertEquals(4.0, point5.y, 0.0001);
+
+        assertFalse(iterator.hasNext());
     }
 
     @Test

@@ -2,8 +2,10 @@ package ru.ssau.tk._repfor2lab_._OOP_.concurrent;
 
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedFunctionOperationService;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
 
@@ -50,7 +52,27 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     public double rightBound() { synchronized (function) {return function.rightBound();} }
 
     @Override
-    public Iterator<Point> iterator() {return function.iterator(); }
+    public Iterator<Point> iterator() {
+        Point[] points;
+        synchronized (function) {
+            points = TabulatedFunctionOperationService.asPoints(function);
+        }
+        return new Iterator<Point>() {
+            private int curIndex = 0;
+            @Override
+            public boolean hasNext() {
+                return curIndex < points.length;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("Элементов больше нет");
+                }
+                return points[curIndex++];
+            }
+        };
+    }
 
     @Override
     public double apply(double x) { synchronized (function) {return function.apply(x);} }
