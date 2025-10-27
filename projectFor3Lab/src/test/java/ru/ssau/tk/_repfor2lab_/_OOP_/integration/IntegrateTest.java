@@ -41,26 +41,6 @@ class IntegrateTest {
         }
     }
 
-    private double computeIntegralStrict(TabulatedFunction f, int forkFactor) {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(forkFactor);
-        try {
-
-            // Оцениваем общее количество задач (можно улучшить эту оценку)
-
-            int r = 1000;
-
-            int estimatedTasks = f.getCount() / r + 1;
-
-            Params params = new Params(forkFactor, r);
-
-            ForkJoinTask<Double> task = new Integrate(new Interval(0, f.getCount()-1), f, params);
-            return forkJoinPool.submit(task).join();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка вычисления интеграла", e);
-        }
-    }
-
     @Test
     @Timeout(5)
     void testConstantFunctionIntegration() {
@@ -163,10 +143,10 @@ class IntegrateTest {
     @Timeout(5)
     void testLargeNumberOfPoints() {
         // Тест с большим количеством точек
-        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 40001);
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 300001);
         double expected = 441.0;
 
-        double result = computeIntegral(f, 1);
+        double result = computeIntegral(f, 15);
 
         assertEquals(expected, result, 0.5, "Интеграл с большим количеством точек");
     }
@@ -208,7 +188,7 @@ class IntegrateTest {
     @Timeout(5)
     void testNegativeBounds() {
         // ∫ (2x + 3) dx от -2 до 2 = [x² + 3x] от -2 до 2 = (4+6) - (4-6) = 10 - (-2) = 12
-        TabulatedFunction f = new ArrayTabulatedFunction(LINEAR_FUNCTION, -2, 2, 1001);
+        TabulatedFunction f = new ArrayTabulatedFunction(LINEAR_FUNCTION, -2, 2, 100001);
         double expected = 12.0;
 
         double result = computeIntegral(f, 7);
