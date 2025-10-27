@@ -11,10 +11,8 @@ import static java.lang.Math.max;
 public class Integrate extends RecursiveTask<Double> {
 
     private final TabulatedFunction function;
-    //    private final Interval interval;
     private final int a;
     private final int b;
-    //    private final Params params;
     private final int size;
     private final Params params;
     private final Point[] points;
@@ -60,6 +58,7 @@ public class Integrate extends RecursiveTask<Double> {
     }
 
     private Double bruteForce() {
+//        System.out.println("Thread " + Thread.currentThread());
         double sum = 0;
         double step = (points[b].x - points[a].x) / (size - 1);
 

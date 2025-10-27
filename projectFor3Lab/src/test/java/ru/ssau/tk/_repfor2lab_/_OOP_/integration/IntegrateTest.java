@@ -37,10 +37,17 @@ class IntegrateTest {
 
             Point[] points = TabulatedFunctionOperationService.asPoints(f);
 
-            ForkJoinTask<Double> task = new Integrate(0, f.getCount()-1, f, params, points);
+            long startTime = System.currentTimeMillis();
 
+            ForkJoinTask<Double> task = new Integrate(0, f.getCount()-1, f, params, points);
             ForkJoinTask<Double> result = forkJoinPool.submit(task);
-            return result.join();
+
+            double res = result.join();
+            long time = System.currentTimeMillis() - startTime;
+            System.out.println("ForkFactor " + forkFactor + ": " + time + "ms");
+
+            return res;
+
         } catch (Exception e) {
             throw new RuntimeException("Ошибка вычисления интеграла", e);
         }
@@ -121,7 +128,7 @@ class IntegrateTest {
     @Test
     @Timeout(5)
     void testDifferentForkFactors() {
-        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 43001);
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 430001);
         double expected = 441.0;
 
         // Тестируем с разным количеством потоков
@@ -181,7 +188,7 @@ class IntegrateTest {
     @Timeout(5)
     void testZeroLengthInterval() {
         // ∫ f(x) dx от a до a = 0
-        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 5, 5, 1011);
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 5, 5, 1010001);
         double expected = 0.0;
 
         double result = computeIntegral(f, 7);
@@ -203,15 +210,15 @@ class IntegrateTest {
 
     @Test
     void testDifferentForkFactorsComparison() {
-        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 70_000_000);
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 40_000_000);
         double expected = 441.0;
 
         for (int forkFactor : new int[]{1, 2, 4, 8, 16}) {
-            long startTime = System.currentTimeMillis();
+//            long startTime = System.currentTimeMillis();
             double result = computeIntegral(f, forkFactor);
-            long time = System.currentTimeMillis() - startTime;
+//            long time = System.currentTimeMillis() - startTime;
 
-            System.out.println("ForkFactor " + forkFactor + ": " + time + "ms");
+//            System.out.println("ForkFactor " + forkFactor + ": " + time + "ms");
             assertEquals(expected, result, 0.5,
                     "Результат для forkFactor = " + forkFactor);
         }

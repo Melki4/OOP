@@ -11,14 +11,14 @@ import java.util.concurrent.ForkJoinTask;
 
 public class Test {
 
-    private static int forkFactor = 16;
+    private static int forkFactor = 8;
     private static ForkJoinPool forkJoinPool = new ForkJoinPool(forkFactor);
 
     private static final MathFunction LINEAR_FUNCTION = x -> 2 * x + 3;
 
     public static void main(String[] args) throws InterruptedException {
 
-        TabulatedFunction f = new ArrayTabulatedFunction(LINEAR_FUNCTION, 1, 4, 10000000);
+        TabulatedFunction f = new ArrayTabulatedFunction(LINEAR_FUNCTION, 1, 4, 10_000_000);
 
         // Оцениваем общее количество задач (можно улучшить эту оценку)
 
