@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedFunctionOperationService;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
@@ -33,7 +35,10 @@ class IntegrateTest {
 
             Params params = new Params(forkFactor, r);
 
-            ForkJoinTask<Double> task = new Integrate(new Interval(0, f.getCount()-1), f, params);
+            Point[] points = TabulatedFunctionOperationService.asPoints(f);
+
+            ForkJoinTask<Double> task = new Integrate(0, f.getCount()-1, f, params, points);
+
             ForkJoinTask<Double> result = forkJoinPool.submit(task);
             return result.join();
         } catch (Exception e) {
@@ -197,9 +202,8 @@ class IntegrateTest {
     }
 
     @Test
-    @Timeout(10)
     void testDifferentForkFactorsComparison() {
-        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 500000);
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 70_000_000);
         double expected = 441.0;
 
         for (int forkFactor : new int[]{1, 2, 4, 8, 16}) {

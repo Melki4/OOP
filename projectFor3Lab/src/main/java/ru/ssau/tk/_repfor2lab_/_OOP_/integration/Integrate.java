@@ -2,7 +2,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.integration;
 
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedFunctionOperationService;
 
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
@@ -12,22 +11,28 @@ import static java.lang.Math.max;
 public class Integrate extends RecursiveTask<Double> {
 
     private final TabulatedFunction function;
-    private final Interval interval;
+    //    private final Interval interval;
+    private final int a;
+    private final int b;
+    //    private final Params params;
+    private final int size;
     private final Params params;
     private final Point[] points;
 
-    public Integrate(Interval interval, TabulatedFunction f, Params params) {
+    public Integrate(int a, int b, TabulatedFunction f, Params params, Point[] points) {
         function = f;
-        this.interval = interval;
+        this.a = a;
+        size = b-a+1;
+        this.b = b;
         this.params = params;
-        params.maxInterval = max(params.maxInterval, interval.length()/100);
-        points = TabulatedFunctionOperationService.asPoints(function);
+        params.maxInterval = max(params.maxInterval, (size)/100);
+        this.points = points;
     }
 
     @Override
     protected Double compute() {
         Double result;
-        if (interval.length() < params.maxInterval || params.forkFactor == 1) {
+        if (size < params.maxInterval || params.forkFactor == 1) {
             result = bruteForce();
         } else {
             result = divideAndConquer();
@@ -38,10 +43,10 @@ public class Integrate extends RecursiveTask<Double> {
 
     private Double divideAndConquer() {
 
-        int i = (interval.b() - interval.a()) / 2;
+        int i = (b - a) / 2;
 
-        Integrate task1 = new Integrate(new Interval(interval.a(), interval.a() + i), function, params);
-        Integrate task2 = new Integrate(new Interval(interval.a() + i +1, interval.b()), function, params);
+        Integrate task1 = new Integrate(a, a + i, function, params, points);
+        Integrate task2 = new Integrate(a + i +1, b, function, params, points);
 
         ForkJoinTask.invokeAll(task1, task2);
 
@@ -55,22 +60,16 @@ public class Integrate extends RecursiveTask<Double> {
     }
 
     private Double bruteForce() {
-
-        int leftIndex = interval.a();
-        int rightIndex = interval.b();
-
-        int count = rightIndex - leftIndex + 1;
-
         double sum = 0;
-        double h = (points[rightIndex].x - points[leftIndex].x) / (count - 1);
+        double step = (points[b].x - points[a].x) / (size - 1);
 
-        for (int i = 0; i < count; i++) {
-            if (i == 0 || i == count-1) {
-                sum += 0.5 * points[leftIndex + i].y;
+        for (int i = 0; i < size; i++) {
+            if (i == 0 || i == size-1) {
+                sum += 0.5 * points[a + i].y;
             } else {
-                sum += points[leftIndex + i].y;
+                sum += points[a + i].y;
             }
         }
-        return h * sum;
+        return step * sum;
     }
 }
