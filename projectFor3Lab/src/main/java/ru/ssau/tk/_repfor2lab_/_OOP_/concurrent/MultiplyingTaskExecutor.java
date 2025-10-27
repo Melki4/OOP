@@ -11,7 +11,7 @@ public class MultiplyingTaskExecutor {
 
         MathFunction f1 = new UnitFunction();
 
-        LinkedListTabulatedFunction f = new LinkedListTabulatedFunction(f1, 1.0, 1000, 10000);
+        LinkedListTabulatedFunction f = new LinkedListTabulatedFunction(f1, 1.0, 1000, 1000);
 
         var arrayLists = new ArrayList<MultiplyingTask>();
         var list = new ArrayList<Thread>();
@@ -20,7 +20,7 @@ public class MultiplyingTaskExecutor {
 
             MultiplyingTask task = new MultiplyingTask(f);
 
-            String name = "Thread" + String.valueOf(i);
+            String name = "Thread" + i;
             Thread thread = new Thread(task, name);
 
             arrayLists.add(task);
@@ -36,6 +36,6 @@ public class MultiplyingTaskExecutor {
             if (arrayLists.isEmpty()) break;
         }
 
-        System.out.println(f.getY(0));
+        System.out.println(f);
     }
 }

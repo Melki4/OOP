@@ -25,8 +25,6 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
         }
     }
 
-//    Collection<Integer> syncCollection = Collections.synchronizedCollection(new ArrayList<>());
-
     @Override
     public int getCount() { synchronized (function) {return function.getCount();} }
 

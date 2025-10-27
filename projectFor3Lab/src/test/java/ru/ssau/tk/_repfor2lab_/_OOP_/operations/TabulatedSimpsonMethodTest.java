@@ -18,11 +18,11 @@ class TabulatedSimpsonMethodTest {
     void integrate() {
         TabulatedSimpsonMethod operator = new TabulatedSimpsonMethod(new ArrayTabulatedFunctionFactory());
         MathFunction functions = (double x) -> (x*x + 2*x +1);
-        TabulatedFunction f = new ArrayTabulatedFunction(functions, 1, 10, 10000);
+        TabulatedFunction f = new ArrayTabulatedFunction(functions, 1, 10, 10001);
 
         TabulatedFunction result = operator.integrate(f);
 
-        assertEquals(441, result.getY(9999), 0.1);
+        assertEquals(441, result.getY(10000), 0.1);
 
 //        System.out.println(result.getY(9999));
     }
@@ -46,7 +46,7 @@ class TabulatedSimpsonMethodTest {
     void testExpFunctionIntegration() {
         // ∫ e^x dx от 0 до 1 = [e^x] от 0 до 1 = e - 1 ≈ 1.71828
         TabulatedSimpsonMethod operator = new TabulatedSimpsonMethod(new ArrayTabulatedFunctionFactory());
-        TabulatedFunction f = new ArrayTabulatedFunction(EXP_FUNCTION, 0, 10, 1001);
+        TabulatedFunction f = new ArrayTabulatedFunction(EXP_FUNCTION, 0, 1, 1001);
         double expected = Math.E - 1;
 
         TabulatedFunction result = operator.integrate(f);

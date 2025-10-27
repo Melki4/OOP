@@ -6,7 +6,7 @@ public class MultiplyingTask implements Runnable{
 
     public boolean done = false;
 
-    TabulatedFunction function;
+    private final TabulatedFunction function;
 
     @Override
     public void run() {
