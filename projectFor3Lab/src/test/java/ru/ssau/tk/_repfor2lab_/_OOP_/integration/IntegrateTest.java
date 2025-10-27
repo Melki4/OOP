@@ -23,9 +23,10 @@ class IntegrateTest {
 
     // Вспомогательный метод для вычисления интеграла
     private double computeIntegral(TabulatedFunction f, int forkFactor) {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(forkFactor);
-        try {
 
+        ForkJoinPool forkJoinPool = new ForkJoinPool(forkFactor);
+
+        try {
             // Оцениваем общее количество задач (можно улучшить эту оценку)
 
             int r = 10000;
@@ -35,7 +36,6 @@ class IntegrateTest {
             ForkJoinTask<Double> task = new Integrate(new Interval(0, f.getCount()-1), f, params);
             ForkJoinTask<Double> result = forkJoinPool.submit(task);
             return result.join();
-
         } catch (Exception e) {
             throw new RuntimeException("Ошибка вычисления интеграла", e);
         }
@@ -146,7 +146,7 @@ class IntegrateTest {
         TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 300001);
         double expected = 441.0;
 
-        double result = computeIntegral(f, 15);
+        double result = computeIntegral(f, 1);
 
         assertEquals(expected, result, 0.5, "Интеграл с большим количеством точек");
     }
@@ -194,5 +194,22 @@ class IntegrateTest {
         double result = computeIntegral(f, 7);
 
         assertEquals(expected, result, 0.1, "Интеграл с отрицательными границами");
+    }
+
+    @Test
+    @Timeout(10)
+    void testDifferentForkFactorsComparison() {
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 500000);
+        double expected = 441.0;
+
+        for (int forkFactor : new int[]{1, 2, 4, 8, 16}) {
+            long startTime = System.currentTimeMillis();
+            double result = computeIntegral(f, forkFactor);
+            long time = System.currentTimeMillis() - startTime;
+
+            System.out.println("ForkFactor " + forkFactor + ": " + time + "ms");
+            assertEquals(expected, result, 0.5,
+                    "Результат для forkFactor = " + forkFactor);
+        }
     }
 }

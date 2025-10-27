@@ -16,8 +16,6 @@ public class Test {
 
     public static void main(String[] args) throws InterruptedException {
         TabulatedFunction f = new ArrayTabulatedFunction(LINEAR_FUNCTION, 1, 4, 400000);
-        double expected = 24.0;
-
         // Оцениваем общее количество задач (можно улучшить эту оценку)
 
         int r = 10000;
@@ -30,7 +28,7 @@ public class Test {
 
         ForkJoinTask<Double> result = forkJoinPool.submit(task);
 
-        Double d =result.join();
+        Double d = result.join();
 
         long t2 = System.currentTimeMillis() - start2;
 
