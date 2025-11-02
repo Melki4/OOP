@@ -59,7 +59,6 @@ public class TabulatedSimpsonMethod implements IntegrationOperatop<TabulatedFunc
                 EvenSum += functionValue; // четные индексы: 2, 4, 6...
             }
             yValues[i] = (step / 3) * (4 * OddSum + 2 * EvenSum + sum);
-            System.out.println(yValues[i]);
         }
 
         yValues[count-1] = (step / 3) * (sum + 4 * OddSum + 2 * EvenSum);

@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedFunctionOperationService;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
@@ -35,11 +33,11 @@ class IntegrateTest {
 
             Params params = new Params(forkFactor, r);
 
-            Point[] points = TabulatedFunctionOperationService.asPoints(f);
-
             long startTime = System.currentTimeMillis();
 
-            ForkJoinTask<Double> task = new Integrate(0, f.getCount()-1, f, params, points);
+            Interval interval = new Interval(0, f.getCount()-1);
+
+            ForkJoinTask<Double> task = new Integrate(f, params, interval);
             ForkJoinTask<Double> result = forkJoinPool.submit(task);
 
             double res = result.join();
@@ -167,17 +165,18 @@ class IntegrateTest {
     @Timeout(10)
     void testConcurrentExecution() throws InterruptedException {
         // Тест на правильность работы в конкурентной среде
-        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 10001);
+        TabulatedFunction f = new ArrayTabulatedFunction(QUADRATIC_FUNCTION, 1, 10, 1_000_001);
         double expected = 441.0;
 
         // Запускаем несколько вычислений параллельно
         CompletableFuture<Double>[] futures = new CompletableFuture[5];
         for (int i = 0; i < futures.length; i++) {
-            futures[i] = CompletableFuture.supplyAsync(() -> computeIntegral(f, 1));
+            futures[i] = CompletableFuture.supplyAsync(() -> computeIntegral(f, 8));
         }
 
         // Проверяем все результаты
         CompletableFuture.allOf(futures).join();
+
         for (CompletableFuture<Double> future : futures) {
             double result = future.join();
             assertEquals(expected, result, 1.0, "Параллельное вычисление интеграла");
@@ -214,11 +213,8 @@ class IntegrateTest {
         double expected = 441.0;
 
         for (int forkFactor : new int[]{1, 2, 4, 8, 16}) {
-//            long startTime = System.currentTimeMillis();
             double result = computeIntegral(f, forkFactor);
-//            long time = System.currentTimeMillis() - startTime;
 
-//            System.out.println("ForkFactor " + forkFactor + ": " + time + "ms");
             assertEquals(expected, result, 0.5,
                     "Результат для forkFactor = " + forkFactor);
         }

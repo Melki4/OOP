@@ -23,8 +23,6 @@ class TabulatedSimpsonMethodTest {
         TabulatedFunction result = operator.integrate(f);
 
         assertEquals(441, result.getY(10000), 0.1);
-
-//        System.out.println(result.getY(9999));
     }
 
     @Test
@@ -34,7 +32,6 @@ class TabulatedSimpsonMethodTest {
         TabulatedSimpsonMethod operator = new TabulatedSimpsonMethod(new ArrayTabulatedFunctionFactory());
         TabulatedFunction f = new ArrayTabulatedFunction(SIN_FUNCTION, 0, Math.PI, 10001);
         double expected = 2.0;
-//        System.out.println(f);
 
         TabulatedFunction result = operator.integrate(f);
 
