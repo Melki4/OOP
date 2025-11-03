@@ -4,38 +4,46 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.UnitFunction;
 
-import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MultiplyingTaskExecutor {
+
+    static MathFunction unitFunction = new UnitFunction();
+    public static int AmountOfThreads = 16;
+    static LinkedListTabulatedFunction listTabulatedFunction = new LinkedListTabulatedFunction(unitFunction, 1.0, 1000, 1000);
+
     public static void main(String[] s) throws InterruptedException {
 
-        MathFunction f1 = new UnitFunction();
+        CountDownLatch countDownLatch = new CountDownLatch(AmountOfThreads);
+        ExecutorService executor = Executors.newFixedThreadPool(8);
 
-        LinkedListTabulatedFunction f = new LinkedListTabulatedFunction(f1, 1.0, 1000, 1000);
-
-        var arrayLists = new ArrayList<MultiplyingTask>();
-        var list = new ArrayList<Thread>();
-
-        for (int i=0; i<10;++i){
-
-            MultiplyingTask task = new MultiplyingTask(f);
-
-            String name = "Thread" + i;
-            Thread thread = new Thread(task, name);
-
-            arrayLists.add(task);
-            list.add(thread);
-        }
-
-        for (int i=0; i<10;++i) list.get(i).start();
-
-        while (true){
-            for (int i=0;i< arrayLists.size();++i){
-                if (arrayLists.get(i).done) arrayLists.remove(i);
+        for (int i =0; i<AmountOfThreads;++i){
+            executor.submit(() -> {
+                try{
+                    createMultiplayingTask().run();
+                } finally {
+                     countDownLatch.countDown();
+                }
             }
-            if (arrayLists.isEmpty()) break;
+            );
         }
 
-        System.out.println(f);
+        try {
+            countDownLatch.await();
+        }
+        catch (InterruptedException e){
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(listTabulatedFunction);
+
+        executor.shutdown();
+    }
+
+    public static MultiplyingTask createMultiplayingTask(){
+        return new MultiplyingTask(listTabulatedFunction);
     }
 }
