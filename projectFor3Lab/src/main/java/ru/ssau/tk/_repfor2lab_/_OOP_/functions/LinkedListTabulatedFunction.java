@@ -3,7 +3,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
-import ru.ssau.tk._repfor2lab_._OOP_.integration.Integrate;
 
 import java.io.Serial;
 import java.io.Serializable;

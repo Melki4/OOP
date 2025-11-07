@@ -2,6 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
@@ -14,7 +16,10 @@ import java.util.Locale;
 
 final class FunctionsIO {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FunctionsIO.class);
+
     private FunctionsIO(){
+        LOGGER.warn("Ошибка в сериализации");
         throw new UnsupportedOperationException();
     }
 

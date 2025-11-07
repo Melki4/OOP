@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InconsistentFunctionsException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
@@ -8,6 +10,8 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.*;
 public class TabulatedFunctionOperationService {
 
     TabulatedFunctionFactory factory;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TabulatedFunctionOperationService.class);
 
     TabulatedFunctionOperationService(TabulatedFunctionFactory factory){
         this.factory = factory;
@@ -39,7 +43,10 @@ public class TabulatedFunctionOperationService {
     }
 
     private TabulatedFunction doOperation(TabulatedFunction a, TabulatedFunction b, BiOperation operation){
-        if (a.getCount()!=b.getCount()) throw new InconsistentFunctionsException("Разное кол-во элементов в функциях");
+        if (a.getCount()!=b.getCount()) {
+            LOGGER.warn("Разное кол-во элементов в функциях");
+            throw new InconsistentFunctionsException("Разное кол-во элементов в функциях");
+        }
 
         Point[] aArray = asPoints(a);
         Point[] bArray = asPoints(b);
@@ -48,7 +55,10 @@ public class TabulatedFunctionOperationService {
         double[] yValues = new double[aArray.length];
 
         for (int i=0; i< aArray.length; ++i){
-            if (aArray[i].x!=bArray[i].x) throw new InconsistentFunctionsException("Разные элементы икс в массивах");
+            if (aArray[i].x!=bArray[i].x){
+                LOGGER.warn("Разные элементы икс в массивах");
+                throw new InconsistentFunctionsException("Разные элементы икс в массивах");
+            }
             xValues[i] = aArray[i].x;
             yValues[i] = operation.apply(aArray[i].y, bArray[i].y);
         }
