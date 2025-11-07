@@ -2,9 +2,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.integration;
 
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedFunctionOperationService;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;

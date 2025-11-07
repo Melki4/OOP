@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <property name="LOGDIR" value = "D:\\GitProject\\oopprod\\projectFor3Lab\\" />
+
+    <appender name = "Console" class = "ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d [%thread] %-5level %-40logger{40} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name = "File" class = "ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGDIR}Laboratory.log</file>
+        <encoder>
+            <pattern>%d [%thread] %-5level %-40logger{40} - %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy
+                class = "ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGDIR}Laboratory-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name = "ru.ssau.tk._repfor2lab_._OOP_.integration" level = "ERROR"/>
+
+    <logger name = "ru.ssau.tk._repfor2lab_._OOP_.concurrent" level = "INFO"/>
+
+    <root level = "INFO">
+        <appender-ref ref = "Console" />
+        <appender-ref ref = "File" />
+    </root>
+</configuration>
