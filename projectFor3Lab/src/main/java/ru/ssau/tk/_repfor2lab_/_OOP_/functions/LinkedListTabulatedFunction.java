@@ -1,6 +1,9 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
+import ru.ssau.tk._repfor2lab_._OOP_.integration.Integrate;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -10,6 +13,7 @@ import java.util.NoSuchElementException;
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable{//нет реализации отрицательный индекс - начинаем с хвоста
     @Serial
     private static final long serialVersionUID = -1612741369740171735L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedListTabulatedFunction.class);
 
     public Iterator<Point> iterator(){
         return new Iterator<Point>() {
@@ -23,6 +27,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             @Override
             public Point next() {
                 if (!(hasNext())) {
+                    LOGGER.warn("Элементов не осталось");
                     throw new NoSuchElementException("Элементов не осталось");
                 }
                 Point point = new Point(node.x, node.y);
@@ -50,6 +55,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
         if (xValues.length < 2 || yValues.length < 2) {
+            LOGGER.warn("Длина массивов меньше минимальной возможной");
             throw new IllegalArgumentException("Длина массивов меньше минимальной возможной");
         }
         checkLengthIsTheSame(xValues, yValues);
@@ -62,7 +68,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
 
-        if (count < 2) throw new IllegalArgumentException("Количество элементов меньше минимума");
+        if (count < 2) {
+            LOGGER.warn("Количество элементов меньше минимума");
+            throw new IllegalArgumentException("Количество элементов меньше минимума");
+        }
 
         if (xFrom > xTo) {
             double boof = xFrom;
@@ -108,6 +117,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     public void remove(int indexDelX) {//нет реализации отрицательный индекс - начинаем с хвоста
         if (indexDelX < 0 || indexDelX >= count){
+            LOGGER.warn("Неверный индекс для удаления");
             throw new IllegalArgumentException("Неверный индекс для удаления");
         }
         else if (count == 1) {
@@ -174,6 +184,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     protected Node getNode(int index){//индекс больше count - ошибка
         if (index < 0 || index >= count){
+            LOGGER.warn("Неверный индекс для получения узла");
             throw new IllegalArgumentException("Неверный индекс для получения узла");
         }
         else if (index == 0) return head;
@@ -187,7 +198,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateRight(double newX) {
-        if (count == 1) throw new InterpolationException("Мало аргументов для экстраполяции");
+        if (count == 1) {
+            LOGGER.warn("Мало аргументов для экстраполяции справа");
+            throw new InterpolationException("Мало аргументов для экстраполяции");
+        }
         double x = rightBound();
         double y = getY(indexOfX(x));
 
@@ -199,7 +213,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) throw new InterpolationException("Мало аргументов для экстраполяции");
+        if (count == 1) {
+            LOGGER.warn("Мало аргументов для экстраполяции слева");
+            throw new InterpolationException("Мало аргументов для экстраполяции");
+        }
         double leftX = leftBound();
         double leftY = getY(indexOfX(leftX));
 
@@ -212,7 +229,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     protected double interpolate(double x, int floorIndex) {
 
-        if (count <= 1) throw new InterpolationException("Мало аргументов для интерполяции");
+        if (count <= 1) {
+            LOGGER.warn("Мало аргументов для интерполяции");
+            throw new InterpolationException("Мало аргументов для интерполяции");
+        }
 
         double leftX = getX(floorIndex);
         double leftY = getY(floorIndex);
@@ -220,6 +240,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         double rightY = getY(floorIndex+1);
 
         if (x > rightX || x < leftX){
+            LOGGER.warn("Поступивший икс больше максимального значения или меньше минимального значения.");
             throw new InterpolationException();
         }
 
@@ -232,7 +253,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double interpolate(double x, double leftX, double rightX, double leftY, double rightY) {
-        if (count <= 1) throw new InterpolationException("Мало аргументов для интерполяции");
+        if (count <= 1) {
+            LOGGER.warn("Мало аргументов для интерполяции, кол-во точек меньше двух в интерполяции для четырёх значений");
+            throw new InterpolationException("Мало аргументов для интерполяции");
+        }
         return super.interpolate(x, leftX, rightX, leftY, rightY);
     }
 
@@ -264,7 +288,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected int floorIndexOfX(double x) {
-        if (x < head.x) throw new IllegalArgumentException("Икс меньше левой границы");
+        if (x < head.x) {
+            LOGGER.warn("Икс меньше левой границы при поиске индекса меньшего элемента");
+            throw new IllegalArgumentException("Икс меньше левой границы");
+        }
         for (int i=0; i<count;++i){
             if (getX(i) == x) return i;
         }
@@ -282,8 +309,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void setY(int index, double value) {
-        if (count == 0) throw new NullPointerException("Обращение к пустому списку");
+        if (count == 0) {
+            LOGGER.warn("Обращение к пустому списку");
+            throw new NullPointerException("Обращение к пустому списку");
+        }
         else if (index < 0 || index >= count){
+            LOGGER.warn("Неверный индекс");
             throw new IllegalArgumentException("Неверный индекс");
         }
         getNode(index).y = value;
@@ -296,9 +327,13 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public double getY(int index) {
-        if (count == 0) throw new NullPointerException("Обращение к пустому списку");
+        if (count == 0) {
+            LOGGER.warn("Попытка получить значение игрек из пустого списка");
+            throw new NullPointerException("Обращение к пустому списку");
+        }
         else
             if (index < 0 || index >= count){
+            LOGGER.warn("Неверный индекс при попытке получить значение игрек из пустого списка");
             throw new IllegalArgumentException("Неверный индекс");
         }
         return getNode(index).y;
@@ -306,8 +341,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public double getX(int index) {
-        if (index == count && count == 0) throw new NullPointerException("Обращение к пустому списку");
+        if (index == count && count == 0) {
+            LOGGER.warn("Попытка получить значение икс из пустого списка");
+            throw new NullPointerException("Обращение к пустому списку");
+        }
         else if (index < 0 || index >= count){
+            LOGGER.warn("Неверный индекс при попытке получить значение икс из пустого списка");
             throw new IllegalArgumentException("Неверный индекс");
         }
         return getNode(index).x;
