@@ -100,6 +100,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void insert(double x, double y) {
+        LOGGER.trace("Вставляем элемент");
         if (count == 0) addNode(x, y);
         else if (indexOfX(x)!= -1) {
             setY(indexOfX(x), y);
@@ -111,10 +112,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         else {
             addNode(getNode(floorIndexOfX(x)), x, y);
         }
+        LOGGER.trace("Закончили вставку");
     }
 
     @Override
     public void remove(int indexDelX) {//нет реализации отрицательный индекс - начинаем с хвоста
+        LOGGER.trace("удаляем элемент из списка");
         if (indexDelX < 0 || indexDelX >= count){
             LOGGER.warn("Неверный индекс для удаления");
             throw new IllegalArgumentException("Неверный индекс для удаления");
@@ -139,9 +142,11 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             getNode(indexDelX+1).prev = getNode(indexDelX-1);
             count--;
         }
+        LOGGER.trace("корректно удалили");
     }
 
     private void addNode(double x, double y) {
+        LOGGER.trace("начинаем добавление узла");
         if (head == null){
             head = new Node();
 
@@ -165,6 +170,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             head.prev = boof;
             count+=1;
         }
+        LOGGER.trace("узел добавлен");
     }//вставка в конец
 
     private void addNode(Node node, double x, double y) {//Вставка за элементом node
@@ -197,6 +203,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateRight(double newX) {
+        LOGGER.trace("начинаем экстраполяцию справа");
         if (count == 1) {
             LOGGER.warn("Мало аргументов для экстраполяции справа");
             throw new InterpolationException("Мало аргументов для экстраполяции");
@@ -206,12 +213,13 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         double lowerX = getX(indexOfX(x)-1);
         double lowerY = getY(indexOfX(lowerX));
-
+        LOGGER.trace("закончили экстраполяцию справа");
         return lowerY + (newX - lowerX)/(x-lowerX)*(y-lowerY);
     }
 
     @Override
     protected double extrapolateLeft(double x) {
+        LOGGER.trace("начинаем экстраполяцию слева");
         if (count == 1) {
             LOGGER.warn("Мало аргументов для экстраполяции слева");
             throw new InterpolationException("Мало аргументов для экстраполяции");
@@ -221,13 +229,13 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         double rightX = getX(indexOfX(leftX)+1);
         double rightY = getY(indexOfX(rightX));
-
+        LOGGER.trace("закончили экстраполяцию слева");
         return (leftY*(rightX-x)-rightY*(leftX-x))/(rightX-leftX);
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
-
+        LOGGER.trace("начинаем интерполяцию");
         if (count <= 1) {
             LOGGER.warn("Мало аргументов для интерполяции");
             throw new InterpolationException("Мало аргументов для интерполяции");
@@ -242,7 +250,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             LOGGER.warn("Поступивший икс больше максимального значения или меньше минимального значения.");
             throw new InterpolationException();
         }
-
+        LOGGER.trace("закончили интерполяцию");
         return interpolate(x, leftX, rightX, leftY, rightY);
     }
 

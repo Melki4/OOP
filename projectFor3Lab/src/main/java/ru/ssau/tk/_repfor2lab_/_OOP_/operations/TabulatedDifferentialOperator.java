@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.concurrent.SynchronizedTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
@@ -9,6 +11,8 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 public class TabulatedDifferentialOperator implements DifferentialOperator<TabulatedFunction> {
 
     private TabulatedFunctionFactory factory;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TabulatedDifferentialOperator.class);
 
     public TabulatedDifferentialOperator(TabulatedFunctionFactory factory){
         this.factory = factory;
@@ -29,6 +33,8 @@ public class TabulatedDifferentialOperator implements DifferentialOperator<Tabul
     @Override
     public TabulatedFunction derive(TabulatedFunction func) {
 
+        LOGGER.trace("Начало вычисления производной в общем случае");
+
         Point[] points = TabulatedFunctionOperationService.asPoints(func);
 
         int count = points.length;
@@ -48,17 +54,18 @@ public class TabulatedDifferentialOperator implements DifferentialOperator<Tabul
 
         yValues[count - 1] = yValues[count - 2];
 
+        LOGGER.trace("Отработало хорошо, создаём табулированную функцию");
         return factory.create(xValues, yValues);
     }
 
     public TabulatedFunction deriveSynchronously(TabulatedFunction func){
-
+        LOGGER.trace("Начало синхронного вычисления производной в общем случае");
         SynchronizedTabulatedFunction f;
 
         if (func instanceof SynchronizedTabulatedFunction) f = (SynchronizedTabulatedFunction) func;
 
         else f = new SynchronizedTabulatedFunction(func);
-
+        LOGGER.trace("Отработало хорошо, синхронно создаём табулированную функцию");
         return f.doSynchronously(this::derive);
     }
 }

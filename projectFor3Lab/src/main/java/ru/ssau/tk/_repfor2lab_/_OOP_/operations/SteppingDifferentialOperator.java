@@ -2,7 +2,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 
 public abstract class SteppingDifferentialOperator implements DifferentialOperator<MathFunction>{

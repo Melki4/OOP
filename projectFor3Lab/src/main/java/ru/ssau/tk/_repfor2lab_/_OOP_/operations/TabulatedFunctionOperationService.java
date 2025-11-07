@@ -43,6 +43,8 @@ public class TabulatedFunctionOperationService {
     }
 
     private TabulatedFunction doOperation(TabulatedFunction a, TabulatedFunction b, BiOperation operation){
+        LOGGER.trace("Начинаем выполнение {}", operation.toString());
+
         if (a.getCount()!=b.getCount()) {
             LOGGER.warn("Разное кол-во элементов в функциях");
             throw new InconsistentFunctionsException("Разное кол-во элементов в функциях");
@@ -62,6 +64,7 @@ public class TabulatedFunctionOperationService {
             xValues[i] = aArray[i].x;
             yValues[i] = operation.apply(aArray[i].y, bArray[i].y);
         }
+        LOGGER.trace("закончили выполнение создаём новую функцию по операции");
         return factory.create(xValues, yValues);
     }
 

@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.concurrent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedFunctionOperationService;
@@ -14,6 +16,7 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     }
 
     final TabulatedFunction function;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SynchronizedTabulatedFunction.class);
 
     public interface Operation<T>{
         T apply(SynchronizedTabulatedFunction f);

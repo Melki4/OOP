@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.operations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.concurrent.SynchronizedTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
@@ -9,6 +11,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 public class TabulatedSimpsonMethod implements IntegrationOperatop<TabulatedFunction>{
 
     private TabulatedFunctionFactory factory;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TabulatedSimpsonMethod.class);
 
     public TabulatedSimpsonMethod(TabulatedFunctionFactory factory){
         this.factory = factory;
@@ -27,7 +30,7 @@ public class TabulatedSimpsonMethod implements IntegrationOperatop<TabulatedFunc
     }
 
     public TabulatedFunction integrate(TabulatedFunction function) {
-
+        LOGGER.trace("Вычисляем интеграл методом симпсона");
         Point[] points = TabulatedFunctionOperationService.asPoints(function);
 
         int count = points.length;
@@ -62,18 +65,18 @@ public class TabulatedSimpsonMethod implements IntegrationOperatop<TabulatedFunc
         }
 
         yValues[count-1] = (step / 3) * (sum + 4 * OddSum + 2 * EvenSum);
-
+        LOGGER.trace("всё прошло корректно создаём функцию по полученным значениям");
         return factory.create(xValues, yValues);
     }
 
     public TabulatedFunction integrateSynchronously(TabulatedFunction func){
-
+        LOGGER.trace("синхронно вычисляем интеграл методом симпсона");
         SynchronizedTabulatedFunction f;
 
         if (func instanceof SynchronizedTabulatedFunction) f = (SynchronizedTabulatedFunction) func;
 
         else f = new SynchronizedTabulatedFunction(func);
-
+        LOGGER.trace("всё прошло корректно создаём функцию по полученным значениям в синхронном режиме");
         return f.doSynchronously(this::integrate);
     }
 }
