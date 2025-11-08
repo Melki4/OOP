@@ -69,16 +69,20 @@ public class TabulatedFunctionOperationService {
     }
 
     public TabulatedFunction addition(TabulatedFunction a, TabulatedFunction b){
+        LOGGER.info("Сложение двух функций:");
         return doOperation(a, b, (double f, double s) -> f + s);
     }
 
     public TabulatedFunction subtraction(TabulatedFunction a, TabulatedFunction b){
+        LOGGER.info("Вычитание функций:");
         return doOperation(a, b, (double f, double s) -> f - s);
     }
     public TabulatedFunction multiplication(TabulatedFunction a, TabulatedFunction b) {
+        LOGGER.info("Умножение двух функций:");
         return doOperation(a, b, (double f, double s) -> f * s);
     }
     public TabulatedFunction division(TabulatedFunction a, TabulatedFunction b) {
+        LOGGER.info("Деление функций:");
         return doOperation(a, b, (double f, double s) -> f / s);
     }
 }

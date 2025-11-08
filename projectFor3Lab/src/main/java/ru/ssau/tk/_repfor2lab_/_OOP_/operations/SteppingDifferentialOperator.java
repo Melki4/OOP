@@ -10,6 +10,7 @@ public abstract class SteppingDifferentialOperator implements DifferentialOperat
     private static final Logger LOGGER = LoggerFactory.getLogger(SteppingDifferentialOperator.class);
 
     public SteppingDifferentialOperator(double step){
+        LOGGER.info("Создание диф. оператора");
         if(step<=0 || Double.isInfinite(step) || Double.isNaN(step)) {
             LOGGER.warn("Неверный аргумент в диф. операторе передан был в конструктор");
             throw new IllegalArgumentException("Неверный аргумент в диф. операторе");

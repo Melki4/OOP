@@ -10,6 +10,7 @@ public class WriteTask implements Runnable{
     private static final Logger LOGGER = LoggerFactory.getLogger(WriteTask.class);
 
     public WriteTask(TabulatedFunction func, double value) {
+        LOGGER.info("Создание WriteTask");
         this.function = func;
         this.value = value;
     }

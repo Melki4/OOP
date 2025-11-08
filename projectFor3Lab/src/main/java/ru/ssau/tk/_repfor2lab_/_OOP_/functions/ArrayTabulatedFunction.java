@@ -1,5 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.functions;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.InterpolationException;
@@ -12,6 +13,7 @@ import java.util.NoSuchElementException;
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Serializable, Insertable, Removable {
 
     private static final long serialVersionUID = -7260590353279522614L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArrayTabulatedFunction.class);
 
     @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] xValues;
@@ -96,6 +98,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @JsonCreator
     public ArrayTabulatedFunction(@JsonProperty(value = "xValues") double[] xValues,
                                   @JsonProperty(value = "yValues") double[] yValues){//xValues не повторяются и упорядочены изначально, длины массивов совпадают
+        LOGGER.info("Создание массива из табулированных функций");
         if (xValues.length < 2 || yValues.length < 2) {
             throw new IllegalArgumentException("Длина массивов меньше минимальной возможной");
         }

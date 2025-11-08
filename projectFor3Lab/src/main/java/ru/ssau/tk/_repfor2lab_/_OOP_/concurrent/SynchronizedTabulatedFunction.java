@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
 
     public SynchronizedTabulatedFunction(TabulatedFunction f){
+        LOGGER.info("Создание синхронизированной табулированной функции");
         function = f;
     }
 

@@ -9,6 +9,7 @@ public class ReadTask implements Runnable{
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadTask.class);
 
     public ReadTask(TabulatedFunction func) {
+        LOGGER.info("Создание ReadTask");
         this.function = func;
     }
 

@@ -53,6 +53,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues){
+        LOGGER.info("Создание списка из табулированных функций");
         if (xValues.length < 2 || yValues.length < 2) {
             LOGGER.warn("Длина массивов меньше минимальной возможной");
             throw new IllegalArgumentException("Длина массивов меньше минимальной возможной");

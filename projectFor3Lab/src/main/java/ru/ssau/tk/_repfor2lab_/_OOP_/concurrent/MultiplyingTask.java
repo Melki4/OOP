@@ -13,7 +13,7 @@ public class MultiplyingTask implements Runnable{
 
     @Override
     public void run() {
-        LOGGER.info("Starting multithread work");
+        LOGGER.info("Начало многопоточной работы");
         int h = function.getCount();
 
         for(int i=0; i<h;++i){
@@ -26,7 +26,7 @@ public class MultiplyingTask implements Runnable{
         System.out.println("Текущий поток " + Thread.currentThread().getName() + " закончил выполнение задачи");
 
         done = true;
-        LOGGER.info("Work is done!");
+        LOGGER.info("Работа окончена!");
     }
 
     public MultiplyingTask(TabulatedFunction f){

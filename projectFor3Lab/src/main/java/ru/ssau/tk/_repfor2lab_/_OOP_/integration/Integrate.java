@@ -15,6 +15,7 @@ public class Integrate extends RecursiveTask<Double> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Integrate.class);
 
     public Integrate(TabulatedFunction f, Params params, Interval interval) {
+        LOGGER.info("Создание интегрируемой функции");
         function = f;
         this.interval = interval;
         this.params = params;
@@ -33,7 +34,7 @@ public class Integrate extends RecursiveTask<Double> {
     }
 
     private Double divideAndConquer() {
-        LOGGER.trace("Starting splitting massive");
+        LOGGER.trace("Начинаем разделение массива");
         int i = (interval.b() - interval.a()) / 2;
 
         Integrate task1 = new Integrate(function, params, new Interval(interval.a(), interval.a() + i));
@@ -45,12 +46,12 @@ public class Integrate extends RecursiveTask<Double> {
 
         res+=task2.join();
         res+=task1.join();
-        LOGGER.trace("Ending splitting massive");
+        LOGGER.trace("Заканчиваем разделение массива");
         return res;
     }
 
     private Double bruteForce() {
-        LOGGER.trace("Starting calculating");
+        LOGGER.trace("Начало вычисления");
         double sum = 0;
 
         double step = (function.getX(interval.b()) - function.getX(interval.a())) / (interval.length() - 1);
@@ -63,7 +64,7 @@ public class Integrate extends RecursiveTask<Double> {
                 sum += function.getY(interval.a()+i);
             }
         }
-        LOGGER.trace("Ending calculating");
+        LOGGER.trace("Окончание вычисления");
         return step * sum;
     }
 }
