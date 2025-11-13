@@ -20,38 +20,15 @@ public class userInterface {
         }
     }
 
-    public void addUser(String factoryType, String login, String password, String role){
-        String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
-        try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
-            statement.setString(1, factoryType);
-            statement.setString(2, login);
-            statement.setString(3, password);
-            statement.setString(4, role);
-
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void deleteUserById(int id){
-        String sql = loaderSQL.loadSQL("scripts\\users\\delete_user_by_id.sql");
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-            statement.setInt(1, id);
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public List<String> selectAllUsers(){
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
-            StringBuilder boof = new StringBuilder("");
+            StringBuilder boof;
             while(resultSet.next()){
+                boof = new StringBuilder();
                 boof.append(resultSet.getInt(1)).append(" ");
                 boof.append(resultSet.getString(2)).append(" ");
                 boof.append(resultSet.getString(3)).append(" ");
@@ -75,7 +52,7 @@ public class userInterface {
 
             var resultSet = statement.executeQuery();
 
-            StringBuilder boof = new StringBuilder("");
+            StringBuilder boof = new StringBuilder();
 
             resultSet.next();
 
@@ -171,6 +148,30 @@ public class userInterface {
         } catch (SQLException e) {
             throw new RuntimeException(e);
 
+        }
+    }
+
+    public void deleteUserById(int id){
+        String sql = loaderSQL.loadSQL("scripts\\users\\delete_user_by_id.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+            statement.setInt(1, id);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void addUser(String factoryType, String login, String password, String role){
+        String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
+        try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
+            statement.setString(1, factoryType);
+            statement.setString(2, login);
+            statement.setString(3, password);
+            statement.setString(4, role);
+
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

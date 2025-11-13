@@ -1,0 +1,1 @@
+insert into simple_functions(function_code, local_name) values (?, ?)
