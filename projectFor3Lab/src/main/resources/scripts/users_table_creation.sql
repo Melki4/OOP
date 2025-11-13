@@ -1,7 +1,0 @@
-CREATE TABLE users(
-	userID BIGINT NOT NULL PRIMARY KEY,
-	factoryType VARCHAR(8) NOT NULL DEFAULT 'array',
-	login VARCHAR(32) NOT NULL,
-	password VARCHAR(256) NOT NULL,
-	role VARCHAR(8) NOT NULL DEFAULT 'user'
-);

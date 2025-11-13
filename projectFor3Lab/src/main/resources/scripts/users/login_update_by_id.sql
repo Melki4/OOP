@@ -1,0 +1,1 @@
+UPDATE users SET login = ? WHERE user_id = ?

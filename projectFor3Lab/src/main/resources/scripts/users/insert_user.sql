@@ -1,0 +1,1 @@
+insert into users(factory_type, login, password, role) values (?, ?, ?, ?);
