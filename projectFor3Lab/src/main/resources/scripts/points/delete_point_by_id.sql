@@ -1,0 +1,1 @@
+DELETE FROM points WHERE point_id = ?

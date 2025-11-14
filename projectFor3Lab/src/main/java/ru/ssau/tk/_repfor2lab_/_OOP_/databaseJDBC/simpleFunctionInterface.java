@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class simpleFunctionInterface {
-
     public void createTable(){
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\simple_functions_table_creation.sql");
 
@@ -19,7 +18,6 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
-
     public List<String> selectAllSimpleFunctions(){
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_simple_functions.sql");
@@ -38,7 +36,6 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
-
     public String selectSimpleFunctionByFunctionCode(String code){
 
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_local_name_by_f_code.sql");
@@ -56,7 +53,6 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
-
     public void updateLocalNameByFunctionCode(String localName, String code){
 
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\local_name_update.sql");
@@ -71,7 +67,6 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
-
     public void deleteSimpleFunctionByFunctionCode(String code){
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\delete_simple_function.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -81,7 +76,6 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
-
     public void addSimpleFunction(String functionCode, String localName){
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\insert_simple_function.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
@@ -93,9 +87,4 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
-
-//    static void main(){
-//        var s = new simpleFunctionInterface();
-//        s.addSimpleFunction("sqrFunc", "Квадратичная функция");
-//    }
 }

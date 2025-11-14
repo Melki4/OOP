@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class userInterface {
-
     public void createTable(){
         String sql = loaderSQL.loadSQL("scripts\\users\\users_table_creation.sql");
 
@@ -19,7 +18,6 @@ public class userInterface {
             throw new RuntimeException(e);
         }
     }
-
     public List<String> selectAllUsers(){
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
@@ -41,7 +39,6 @@ public class userInterface {
             throw new RuntimeException(e);
         }
     }
-
     public String selectUserById(int id){
 
         String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_id.sql");
@@ -67,7 +64,6 @@ public class userInterface {
             throw new RuntimeException(e);
         }
     }
-
     public int selectIdByLogin(String login){
 
         String sql = loaderSQL.loadSQL("scripts\\users\\select_id_by_login.sql");
@@ -86,7 +82,6 @@ public class userInterface {
             return -1;
         }
     }
-
     public void updateFactoryTypeById(String factoryType, int id){
 
         String sql = loaderSQL.loadSQL("scripts\\users\\factory_type_update_by_id.sql");
@@ -102,7 +97,6 @@ public class userInterface {
 
         }
     }
-
     public void updatePasswordById(String password, int id){
 
         String sql = loaderSQL.loadSQL("scripts\\users\\password_update_by_id.sql");
@@ -118,7 +112,6 @@ public class userInterface {
 
         }
     }
-
     public void updateLoginById(String login, int id){
 
         String sql = loaderSQL.loadSQL("scripts\\users\\login_update_by_id.sql");
@@ -134,7 +127,6 @@ public class userInterface {
 
         }
     }
-
     public void updateRoleById(String role, int id){
 
         String sql = loaderSQL.loadSQL("scripts\\users\\role_update_by_id.sql");
@@ -150,7 +142,6 @@ public class userInterface {
 
         }
     }
-
     public void deleteUserById(int id){
         String sql = loaderSQL.loadSQL("scripts\\users\\delete_user_by_id.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -160,7 +151,6 @@ public class userInterface {
             throw new RuntimeException(e);
         }
     }
-
     public void addUser(String factoryType, String login, String password, String role){
         String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){

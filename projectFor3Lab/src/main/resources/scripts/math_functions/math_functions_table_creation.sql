@@ -2,8 +2,8 @@ CREATE TABLE IF NOT EXISTS math_functions(
 	math_function_id SERIAL NOT NULL PRIMARY KEY,
 	function_name VARCHAR(128) NOT NULL,
 	amount_of_dots BIGINT NOT NULL,
-	left_boarder BIGINT NOT NULL,
-	right_boarder BIGINT NOT NULL,
+	left_boarder DECIMAL NOT NULL,
+	right_boarder DECIMAL NOT NULL,
 
 	owner_id BIGINT NOT NULL,
 	function_type VARCHAR(16) DEFAULT 'tabulated_f' NOT NULL,

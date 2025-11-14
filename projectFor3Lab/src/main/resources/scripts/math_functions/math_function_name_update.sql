@@ -1,0 +1,1 @@
+UPDATE math_functions SET function_name = ? WHERE math_function_id = ?

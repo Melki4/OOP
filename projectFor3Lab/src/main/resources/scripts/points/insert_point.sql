@@ -1,0 +1,1 @@
+insert into points(xvalue, yvalue, function_id) values (?, ?, ?);
