@@ -119,7 +119,7 @@ public class createAComparebleTable {
         /*------------------------------------------------------------------*/
 
         long startTime1_3 = System.currentTimeMillis();
-        for (int i = 0; i< array1.getCount();++i){
+        for (int i = 0; i< 10;++i){
             double x = array1.getX(i);
             int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id1);
             pointsInterface.updateYValueById(1.1, index_in_table);
@@ -161,7 +161,7 @@ public class createAComparebleTable {
             row1.createCell(1).setCellValue("Вставка значений");
             row1.createCell(2).setCellValue("Чтение всего");
             row1.createCell(3).setCellValue("Чтение по ф-ции");
-            row1.createCell(4).setCellValue("Обновление");
+            row1.createCell(4).setCellValue("Обновление 10 знач.");
             row1.createCell(5).setCellValue("Удаление");
 
             row2.createCell(0).setCellValue("10k элементов");
@@ -199,7 +199,7 @@ public class createAComparebleTable {
             row6.createCell(4).setCellValue(0);
             row6.createCell(5).setCellValue(endTime5_4-startTime5_4);
 
-            try (FileOutputStream out = new FileOutputStream("Example.xlsx")) {
+            try (FileOutputStream out = new FileOutputStream("Table.xlsx")) {
                 workbook.write(out);
             }  // Работа с файлом завершена, он закрыт
         } catch (IOException e) {
@@ -209,7 +209,7 @@ public class createAComparebleTable {
         pointsInterface.deleteAllPoints();
         simpleFunctionInterface.deleteAllFunctions();
         userInterface.deleteAllUsers();
-
+        m.deleteAllFunctions();
         System.out.println("Done");
     }
 
