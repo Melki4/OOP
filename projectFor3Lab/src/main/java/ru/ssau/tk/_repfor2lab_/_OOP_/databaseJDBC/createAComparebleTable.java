@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class createAComparebleTable {
+
     public void testWithATF(){
 
         pointsInterface pointsInterface = new pointsInterface();
