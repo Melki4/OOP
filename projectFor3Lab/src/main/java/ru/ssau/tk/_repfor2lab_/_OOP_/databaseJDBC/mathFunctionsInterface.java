@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 
@@ -9,16 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class mathFunctionsInterface {
+    private static final Logger LOGGER = LoggerFactory.getLogger(mathFunctionsInterface.class);
+
     public void createTable(){
+        LOGGER.info("Приступаем к созданию таблицы");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\math_functions_table_creation.sql");
         String sql1 = loaderSQL.loadSQL("scripts\\math_functions\\alter_math_function_table.sql");
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
-            if (statement.execute(sql)) statement.execute(sql1);
+            if (statement.execute(sql)){
+                statement.execute(sql1);
+                LOGGER.info("Таблица создана");
+            }
+            else {
+                LOGGER.info("Таблица и так существует");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
     public List<String> selectAllMathFunctions(){
+        LOGGER.info("Выбор всех данных в таблице");
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_all_math_functions.sql");
 
@@ -40,8 +52,10 @@ public class mathFunctionsInterface {
 
                 list.add(boof.toString());
             }
+            LOGGER.info("Данные успешно получены");
             return list;
         } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе данных");
             throw new RuntimeException(e);
         }
     }
@@ -79,7 +93,7 @@ public class mathFunctionsInterface {
     }
     public void updateFunctionNameByFunctionId(String name, int id){
 
-        String sql = loaderSQL.loadSQL("scripts\\math_functions\\delete_math_function.sql");
+        String sql = loaderSQL.loadSQL("scripts\\math_functions\\math_function_name_update.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
@@ -100,8 +114,8 @@ public class mathFunctionsInterface {
             throw new RuntimeException(e);
         }
     }
-    public void addUser(String function_name, int amount_of_dots, double left_boarder,
-                        double right_boarder, int owner_id, String function_type){
+    public void addMathFunction(String function_name, int amount_of_dots, double left_boarder,
+                                double right_boarder, int owner_id, String function_type){
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\insert_math_function.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 

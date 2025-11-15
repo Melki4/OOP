@@ -1,0 +1,1 @@
+drop table simple_functions

@@ -102,6 +102,15 @@ public class pointsInterface {
             throw new RuntimeException(e);
         }
     }
+    public void deleteAllFunctions(){
+        String sql = loaderSQL.loadSQL("scripts\\points\\drop_table_points.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        createTable();
+    }
     public void addPoint(Double x_value, Double y_value, int id){
         String sql = loaderSQL.loadSQL("scripts\\points\\insert_point.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){

@@ -76,6 +76,15 @@ public class simpleFunctionInterface {
             throw new RuntimeException(e);
         }
     }
+    public void deleteAllFunctions(){
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\drop_table_simple_functions.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        createTable();
+    }
     public void addSimpleFunction(String functionCode, String localName){
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\insert_simple_function.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
