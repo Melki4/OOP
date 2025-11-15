@@ -16,14 +16,20 @@ import java.util.List;
 public class createAComparebleTable {
 
     public void testWithATF(){
+        simpleFunctionInterface simpleFunctionInterface = new simpleFunctionInterface();
+        simpleFunctionInterface.createTable();
+
+        userInterface userInterface = new userInterface();
+        userInterface.createTable();
+
+        mathFunctionsInterface m = new mathFunctionsInterface();
+        m.createTable();
 
         pointsInterface pointsInterface = new pointsInterface();
-        simpleFunctionInterface simpleFunctionInterface = new simpleFunctionInterface();
+        pointsInterface.createTable();
 
         // таблица функций нужна, т.к. в points есть внешний ключ
-        simpleFunctionInterface.createTable();
         simpleFunctionInterface.addSimpleFunction("SqrFunc", "Квадратичная ф-ция");
-        pointsInterface.createTable();
 
         MathFunction mathFunction = (double x)-> x*x + 2*x +1;
 
@@ -45,12 +51,9 @@ public class createAComparebleTable {
         fillArrays(array4, points4);
         fillArrays(array5, points5);
 
-        userInterface userInterface = new userInterface();
-
         userInterface.addUser("array", "login", "hardpassword", "user");
         int user_id = userInterface.selectIdByLogin("login");
 
-        mathFunctionsInterface m = new mathFunctionsInterface();
         m.addMathFunction("x^2+2x+1", 10000, -100.0,
                 1, user_id, "SqrFunc");
         m.addMathFunction("x^2+2x+1", 20000, -100.0,
@@ -126,6 +129,38 @@ public class createAComparebleTable {
         }
         long endTime1_3 = System.currentTimeMillis();
 
+        long startTime2_3 = System.currentTimeMillis();
+        for (int i = 0; i< 10;++i){
+            double x = array2.getX(i);
+            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id2);
+            pointsInterface.updateYValueById(1.1, index_in_table);
+        }
+        long endTime2_3 = System.currentTimeMillis();
+
+        long startTime3_3 = System.currentTimeMillis();
+        for (int i = 0; i< 10;++i){
+            double x = array3.getX(i);
+            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id3);
+            pointsInterface.updateYValueById(1.1, index_in_table);
+        }
+        long endTime3_3 = System.currentTimeMillis();
+
+        long startTime4_3 = System.currentTimeMillis();
+        for (int i = 0; i< 10;++i){
+            double x = array4.getX(i);
+            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id4);
+            pointsInterface.updateYValueById(1.1, index_in_table);
+        }
+        long endTime4_3 = System.currentTimeMillis();
+
+        long startTime5_3 = System.currentTimeMillis();
+        for (int i = 0; i< 10;++i){
+            double x = array5.getX(i);
+            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id5);
+            pointsInterface.updateYValueById(1.1, index_in_table);
+        }
+        long endTime5_3 = System.currentTimeMillis();
+
         /*------------------------------------------------------------------*/
 
         long startTime1_4 = System.currentTimeMillis();
@@ -175,31 +210,31 @@ public class createAComparebleTable {
             row3.createCell(1).setCellValue(endTime2-startTime2);
             row3.createCell(2).setCellValue(endTime1_1-startTime1_1);//одинаковое везде
             row3.createCell(3).setCellValue(endTime2_2-startTime2_2);
-            row3.createCell(4).setCellValue(0);
+            row3.createCell(4).setCellValue(endTime2_3-startTime2_3);
             row3.createCell(5).setCellValue(endTime2_4-startTime2_4);
 
             row4.createCell(0).setCellValue("40k элементов");
             row4.createCell(1).setCellValue(endTime3-startTime3);
             row4.createCell(2).setCellValue(endTime1_1-startTime1_1);//одинаковое везде
             row4.createCell(3).setCellValue(endTime3_2-startTime3_2);
-            row4.createCell(4).setCellValue(0);
+            row4.createCell(4).setCellValue(endTime3_3-startTime3_3);
             row4.createCell(5).setCellValue(endTime3_4-startTime3_4);
 
             row5.createCell(0).setCellValue("80k элементов");
             row5.createCell(1).setCellValue(endTime4-startTime4);
             row5.createCell(2).setCellValue(endTime1_1-startTime1_1);//одинаковое везде
             row5.createCell(3).setCellValue(endTime4_2-startTime4_2);
-            row5.createCell(4).setCellValue(0);
+            row5.createCell(4).setCellValue(endTime4_3-startTime4_3);
             row5.createCell(5).setCellValue(endTime4_4-startTime4_4);
 
             row6.createCell(0).setCellValue("100k элементов");
             row6.createCell(1).setCellValue(endTime5-startTime5);
             row6.createCell(2).setCellValue(endTime1_1-startTime1_1);//одинаковое везде
             row6.createCell(3).setCellValue(endTime5_2-startTime5_2);
-            row6.createCell(4).setCellValue(0);
+            row6.createCell(4).setCellValue(endTime5_3-startTime5_3);
             row6.createCell(5).setCellValue(endTime5_4-startTime5_4);
 
-            try (FileOutputStream out = new FileOutputStream("Table.xlsx")) {
+            try (FileOutputStream out = new FileOutputStream("New_Table1.xlsx")) {
                 workbook.write(out);
             }  // Работа с файлом завершена, он закрыт
         } catch (IOException e) {
@@ -208,8 +243,8 @@ public class createAComparebleTable {
 
         pointsInterface.deleteAllPoints();
         simpleFunctionInterface.deleteAllFunctions();
-        userInterface.deleteAllUsers();
         m.deleteAllFunctions();
+        userInterface.deleteAllUsers();
         System.out.println("Done");
     }
 
