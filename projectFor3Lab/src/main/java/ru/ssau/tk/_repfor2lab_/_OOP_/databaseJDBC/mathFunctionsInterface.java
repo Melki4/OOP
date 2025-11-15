@@ -15,8 +15,10 @@ public class mathFunctionsInterface {
 
     public void createTable(){
         LOGGER.info("Приступаем к созданию таблицы");
+
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\math_functions_table_creation.sql");
         String sql1 = loaderSQL.loadSQL("scripts\\math_functions\\alter_math_function_table.sql");
+
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             if (statement.execute(sql)){
                 statement.execute(sql1);
@@ -29,6 +31,7 @@ public class mathFunctionsInterface {
             throw new RuntimeException(e);
         }
     }
+
     public List<String> selectAllMathFunctions(){
         LOGGER.info("Выбор всех данных в таблице");
         List<String> list = new ArrayList<>();
@@ -55,12 +58,12 @@ public class mathFunctionsInterface {
             LOGGER.info("Данные успешно получены");
             return list;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при выборе данных");
+            LOGGER.warn("Произошла ошибка при выборе всех данных");
             throw new RuntimeException(e);
         }
     }
     public List<String> selectMathFunctionByUserId(int id){
-
+        LOGGER.info("Начинаем поиск ф-ций пользователя по его айди");
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_user.sql");
 
@@ -86,13 +89,16 @@ public class mathFunctionsInterface {
 
                 list.add(boof.toString());
             }
+            LOGGER.info("Возвращаем список ф-ций");
             return list;
         } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при поиске ф-ций пользователя с айди {}", id);
             throw new RuntimeException(e);
         }
     }
-    public void updateFunctionNameByFunctionId(String name, int id){
 
+    public void updateFunctionNameByFunctionId(String name, int id){
+        LOGGER.info("Начинаем обновление имени ф-ции по её айди");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\math_function_name_update.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -101,21 +107,51 @@ public class mathFunctionsInterface {
             statement.setInt(2, id);
 
             statement.executeUpdate();
+            LOGGER.info("Успешно обновили");
         } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при обновлении имени ф-ции по айди{}", id);
             throw new RuntimeException(e);
         }
     }
+
     public void deleteMathFunctionByFunctionId(int id){
+        LOGGER.info("Начинаем удаление мат. ф-ции по айди");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\delete_math_function.sql");
+
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
             statement.setInt(1, id);
             statement.execute();
+            LOGGER.info("Успешно удалили");
         } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при удалении мат. ф-ции по айди{}", id);
             throw new RuntimeException(e);
         }
     }
+
+    public void deleteAllFunctions(){
+        LOGGER.info("Пробуем удалить все мат. ф-ции");
+        String sql = loaderSQL.loadSQL("scripts\\math_functions\\delete_math_function.sql");
+
+        List<String> all_functions = selectAllMathFunctions();
+        List<Integer> all_codes = new ArrayList<>();
+        for (var el : all_functions) all_codes.add(Integer.parseInt(el.split(" ")[0]));
+
+        for(var el : all_codes) {
+            try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, el);
+                statement.execute();
+            } catch (SQLException e) {
+                LOGGER.warn("Произошла ошибка при обработке запроса по удалению какой-то мат ф.ции её айди: {}", el);
+                throw new RuntimeException(e);
+            }
+        }
+        LOGGER.info("Удаление прошло успешно");
+    }
+
     public void addMathFunction(String function_name, int amount_of_dots, double left_boarder,
                                 double right_boarder, int owner_id, String function_type){
+        LOGGER.info("Начинаем добавление мат. ф-ции");
+
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\insert_math_function.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
@@ -127,7 +163,9 @@ public class mathFunctionsInterface {
             statement.setString(6, function_type);
 
             statement.execute();
+            LOGGER.info("Всё прошло успешно, ф-ция занесена в бд");
         } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка с добавлением ф-ции в бд");
             throw new RuntimeException(e);
         }
     }

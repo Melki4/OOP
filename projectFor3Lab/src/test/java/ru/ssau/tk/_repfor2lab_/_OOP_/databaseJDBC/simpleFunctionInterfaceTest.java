@@ -11,6 +11,8 @@ class simpleFunctionInterfaceTest {
 
     @BeforeEach
     void setUp() {
+        var s = new simpleFunctionInterface();
+        s.deleteAllFunctions();
         simpleFunctionInterface = new simpleFunctionInterface();
         simpleFunctionInterface.createTable();
     }
@@ -18,18 +20,8 @@ class simpleFunctionInterfaceTest {
     @AfterEach
     void tearDown() {
         // Очищаем тестовые данные
-        List<String> allFunctions = simpleFunctionInterface.selectAllSimpleFunctions();
-        for (String function : allFunctions) {
-            String[] parts = function.split(" ");
-            if (parts.length >= 2) {
-                String functionCode = parts[0];
-                // Удаляем тестовые функции
-                if (functionCode.startsWith("TEST_") || functionCode.equals("SIN") ||
-                        functionCode.equals("COS") || functionCode.equals("TAN")) {
-                    simpleFunctionInterface.deleteSimpleFunctionByFunctionCode(functionCode);
-                }
-            }
-        }
+        var s = new simpleFunctionInterface();
+        s.deleteAllFunctions();
     }
 
     @Test

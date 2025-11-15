@@ -16,6 +16,7 @@ class userInterfaceTest {
     @BeforeEach
     void setUp() {
         userInterface = new userInterface();
+        userInterface.deleteAllUsers();
         createdUserIds = new ArrayList<>();
         random = new Random();
 
@@ -25,15 +26,8 @@ class userInterfaceTest {
 
     @AfterEach
     void tearDown() {
-        // Очищаем тестовые данные после каждого теста
-        for (Integer userId : createdUserIds) {
-            try {
-                userInterface.deleteUserById(userId);
-            } catch (Exception e) {
-                // Игнорируем ошибки удаления
-            }
-        }
-        createdUserIds.clear();
+        var u = new userInterface();
+        u.deleteAllUsers();
     }
 
     // Генератор случайных данных

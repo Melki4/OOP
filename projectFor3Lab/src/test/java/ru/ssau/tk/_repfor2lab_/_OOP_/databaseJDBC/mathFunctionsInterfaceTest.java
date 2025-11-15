@@ -19,14 +19,8 @@ class mathFunctionsInterfaceTest {
 
     @AfterEach
     void tearDown() {
-        // Очищаем тестовые данные
-        List<String> allFunctions = mathFunctionsInterface.selectAllMathFunctions();
-        for (String function : allFunctions) {
-            String[] parts = function.split(" ");
-            int functionCode = Integer.parseInt(parts[0]);
-            // Удаляем тестовые функции
-            mathFunctionsInterface.deleteMathFunctionByFunctionId(functionCode);
-        }
+        var f = new mathFunctionsInterface();
+        f.deleteAllFunctions();
     }
 
     @Test

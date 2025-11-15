@@ -1,6 +1,11 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.junit.jupiter.api.*;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
+
+import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,20 +27,26 @@ class pointsInterfaceTest {
 
     @AfterEach
     void tearDown() {
-        pointsInterface.deleteAllFunctions();
+        pointsInterface.deleteAllPoints();
         simpleFunctionInterface.deleteAllFunctions();
+        var boof_to_clear = new mathFunctionsInterface();
+        boof_to_clear.deleteAllFunctions();
     }
 
     @Test
     @DisplayName("Полный CRUD для points")
     void testFullCrudForPoints() {
-        simpleFunctionInterface.deleteAllFunctions();
         mathFunctionsInterface s = new mathFunctionsInterface();
+
         userInterface u = new userInterface();
+
         u.addUser("array", "login", "hardpassword", "user");
+
         int id = u.selectIdByLogin("login");
+
         s.addMathFunction("x^2-1", 100, -42.2,
                 42.2, id, "SqrFunc");
+
         int i = Integer.parseInt(s.selectAllMathFunctions().get(0).split(" ")[0]);
 
         // Добавляем базовую функцию, чтобы id подходил
@@ -55,7 +66,7 @@ class pointsInterfaceTest {
         assertTrue(allPoints.size() >= 3);
 
         // Проверяем выборку по id функции
-        List<String> functionPoints = pointsInterface.selectPointsById(i);
+        List<String> functionPoints = pointsInterface.selectPointsByFunctionId(i);
         assertEquals(3, functionPoints.size());
 
         // Разбираем строку и проверяем корректность
@@ -73,7 +84,7 @@ class pointsInterfaceTest {
         pointsInterface.updateXValueById(10.0, Integer.parseInt(parts[0]));
         pointsInterface.updateYValueById(20.0, Integer.parseInt(parts[0]));
 
-        List<String> updated = pointsInterface.selectPointsById(i);
+        List<String> updated = pointsInterface.selectPointsByFunctionId(i);
         String updatedPointStr = updated.get(2).split(" ")[0];
         int updatedId = Integer.parseInt(updatedPointStr);
 
@@ -84,7 +95,7 @@ class pointsInterfaceTest {
         // DELETE
         pointsInterface.deletePointById(updatedId);
 
-        List<String> afterDelete = pointsInterface.selectPointsById(i);
+        List<String> afterDelete = pointsInterface.selectPointsByFunctionId(i);
         assertEquals(2, afterDelete.size());
     }
 
@@ -112,8 +123,8 @@ class pointsInterfaceTest {
         List<String> all = pointsInterface.selectAllPoints();
         assertEquals(10, all.size());
 
-        // deleteAllFunctions
-        pointsInterface.deleteAllFunctions();
+        // deleteAllPoints
+        pointsInterface.deleteAllPoints();
 
         List<String> empty = pointsInterface.selectAllPoints();
         assertTrue(empty.isEmpty());
@@ -154,5 +165,31 @@ class pointsInterfaceTest {
         String[] parts = after.get(0).split(" ");
         assertEquals(100.0, Double.parseDouble(parts[1]));
         assertEquals(200.0, Double.parseDouble(parts[2]));
+    }
+
+    @Test
+    void testWithATF(){
+        MathFunction mathFunction = (double x)-> x*x + 2*x +1;
+        var array = new ArrayTabulatedFunction(mathFunction, -100.0, 100.0, 100000);
+
+        List<Point> points = new ArrayList<>();
+
+        for (int i = 0; i< array.getCount(); ++i){
+            Point p = new Point(array.getX(i), array.getY(i));
+            points.add(p);
+        }
+
+        userInterface u = new userInterface();
+        u.addUser("array", "login", "hardpassword", "user");
+        int user_id = u.selectIdByLogin("login");
+
+        mathFunctionsInterface m = new mathFunctionsInterface();
+        m.addMathFunction("x^2+2x+1", 100, -100.0,
+                1, user_id, "SqrFunc");
+        int function_id = Integer.parseInt(m.selectAllMathFunctions().get(0).split(" ")[0]);
+
+        pointsInterface.bulkInsertPointsDirect(points, function_id);
+
+        System.out.println("Done");
     }
 }

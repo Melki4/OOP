@@ -1,0 +1,1 @@
+select point_id from points where xvalue = ? and function_id = ?

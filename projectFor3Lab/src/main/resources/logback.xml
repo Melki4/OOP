@@ -28,7 +28,7 @@
     <logger name = "ru.ssau.tk._repfor2lab_._OOP_.operations" level = "WARN"/>
     <logger name = "ru.ssau.tk._repfor2lab_._OOP_.concurrent" level = "WARN"/>
     <logger name = "ru.ssau.tk._repfor2lab_._OOP_.concurrent" level = "WARN"/>
-    <logger name = "ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC" level = "INFO"/>
+    <logger name = "ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC" level = "WARN"/>
 
     <root level = "INFO">
         <appender-ref ref = "Console" />
