@@ -33,18 +33,19 @@ public class MathFunctions {
     @JoinColumn(name = "ownerID", nullable = false)
     private Users users;
 
-    @OneToMany(mappedBy = "MathFunctions")
+    @OneToMany(mappedBy = "mathFunctions")
     private List<Points> points;
 
     public MathFunctions(){}
 
     public MathFunctions(Long mathFunctionsID, String nameOfFunction, Long amountOfDots,
-                         Double leftBoarder, Double rightBoarder){
+                         Double leftBoarder, Double rightBoarder, Users users){
         this.mathFunctionsID = mathFunctionsID;
         this.nameOfFunction = nameOfFunction;
         this.amountOfDots = amountOfDots;
         this.leftBoarder = leftBoarder;
         this.rightBoarder = rightBoarder;
+        this.users = users;
     }
 
     public Long getMathFunctionsID() {

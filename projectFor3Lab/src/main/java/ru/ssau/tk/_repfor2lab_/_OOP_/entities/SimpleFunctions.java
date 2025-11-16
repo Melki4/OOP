@@ -16,7 +16,7 @@ public class SimpleFunctions {
     private String localName;
 
     public SimpleFunctions(){}
-    public SimpleFunctions(String functionCode, String localName, Long priority){
+    public SimpleFunctions(String functionCode, String localName){
         this.functionCode = functionCode;
         this.localName = localName;
     }
