@@ -2,6 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 
@@ -77,6 +79,24 @@ public class userInterface {
             LOGGER.warn("Произошла ошибка при поиске пользователя по ID: {}", id);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<UserDTO> selectAllUsersAsDTO() {
+        LOGGER.info("Начинаем выбор всех пользователей и вернём их как лист DTO");
+        List<String> rawData = selectAllUsers();
+        List<UserDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toUserDTO(data));
+        }
+        LOGGER.info("Возвращаем список пользователей как лист DTO");
+        return result;
+    }
+
+    public UserDTO selectUserByIdAsDTO(int id) {
+        LOGGER.info("Начинаем поиск пользователя по айди и вернём его как DTO, айди{}", id);
+        String rawData = selectUserById(id);
+        return DTOMapper.toUserDTO(rawData);
     }
 
     public int selectIdByLogin(String login){

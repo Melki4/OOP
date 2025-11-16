@@ -2,6 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 
@@ -36,8 +38,9 @@ public class simpleFunctionInterface {
             StringBuilder boof;
             while(resultSet.next()){
                 boof = new StringBuilder();
-                boof.append(resultSet.getString(1)).append(" ");
+                boof.append(resultSet.getInt(1)).append(" ");
                 boof.append(resultSet.getString(2)).append(" ");
+                boof.append(resultSet.getString(3)).append(" ");
                 list.add(boof.toString());
             }
             LOGGER.info("Все простые функции успешно получены");
@@ -50,7 +53,33 @@ public class simpleFunctionInterface {
 
     public String selectSimpleFunctionByFunctionCode(String code){
         LOGGER.info("Начинаем поиск простой функции по коду: {}", code);
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_local_name_by_f_code.sql");
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_by_f_code.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, code);
+
+            var resultSet = statement.executeQuery();
+
+            StringBuilder boof = new StringBuilder();
+
+            resultSet.next();
+
+            boof.append(resultSet.getInt(1)).append(" ");
+            boof.append(resultSet.getString(2)).append(" ");
+            boof.append(resultSet.getString(3)).append(" ");
+
+            LOGGER.info("Функция с кодом {} успешно найдена", code);
+            return boof.toString();
+        } catch (SQLException e) {
+            LOGGER.warn("Ф-ции с таким кодом нет или произошла ошибка при поиске функции по коду: {}", code);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String selectSimpleFunctionNameByFunctionCode(String code){
+        LOGGER.info("Начинаем поиск имени простой функции по коду: {}", code);
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_name_by_f_code.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
@@ -60,12 +89,30 @@ public class simpleFunctionInterface {
 
             resultSet.next();
 
-            LOGGER.info("Функция с кодом {} успешно найдена", code);
+            LOGGER.info("Имя функции с кодом {} успешно найдена", code);
             return resultSet.getString(1);
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске функции по коду: {}", code);
+            LOGGER.warn("Ф-ции с таким кодом нет или произошла ошибка при поиске имени функции по коду: {}", code);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<SimpleFunctionDTO> selectAllSimpleFunctionsAsDTO() {
+        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист DTO");
+        List<String> rawData = selectAllSimpleFunctions();
+        List<SimpleFunctionDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toSimpleFunctionDTO(data));
+        }
+        LOGGER.info("Возвращаем список ф-ций как лист DTO");
+        return result;
+    }
+
+    public SimpleFunctionDTO selectSimpleFunctionByFunctionCodeAsDTO(String code) {
+        LOGGER.info("Начинаем поиск ф-ции по коду и вернём её как DTO, код{}", code);
+        String rawData = selectSimpleFunctionByFunctionCode(code);
+        return DTOMapper.toSimpleFunctionDTO(rawData);
     }
 
     public void updateLocalNameByFunctionCode(String localName, String code){

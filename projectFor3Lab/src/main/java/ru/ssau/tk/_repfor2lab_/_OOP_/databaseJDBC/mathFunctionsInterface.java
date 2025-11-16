@@ -2,6 +2,9 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 
@@ -63,7 +66,7 @@ public class mathFunctionsInterface {
         }
     }
 
-    public List<String> selectMathFunctionByUserId(int id){
+    public List<String> selectMathFunctionsByUserId(int id){
         LOGGER.info("Начинаем поиск ф-ций пользователя по его айди");
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_user.sql");
@@ -98,8 +101,32 @@ public class mathFunctionsInterface {
         }
     }
 
+    public List<MathFunctionDTO> selectAllMathFunctionsAsDTO() {
+        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист DTO");
+        List<String> rawData = selectAllMathFunctions();
+        List<MathFunctionDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toMathFunctionDTO(data));
+        }
+        LOGGER.info("Возвращаем список ф-ций как лист DTO");
+        return result;
+    }
+
+    public List<MathFunctionDTO> selectMathFunctionsByUserIdAsDTO(int id) {
+        LOGGER.info("Начинаем выбор ф-ций по айди владельца и вернём их как лист DTO, айди{}", id);
+        List<String> rawData = selectMathFunctionsByUserId(id);
+        List<MathFunctionDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toMathFunctionDTO(data));
+        }
+        LOGGER.info("Возвращаем список ф-ций владельца как лист DTO");
+        return result;
+    }
+
     public void updateFunctionNameByFunctionId(String name, int id){
-        LOGGER.info("Начинаем обновление имени ф-ции по её айди");
+        LOGGER.info("Начинаем обновление имени ф-ции по её айди {}", id);
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\math_function_name_update.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){

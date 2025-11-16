@@ -38,18 +38,18 @@ class simpleFunctionInterfaceTest {
         // Ищем конкретную функцию по коду
         String sinLocalName = simpleFunctionInterface.selectSimpleFunctionByFunctionCode("SIN");
         assertNotNull(sinLocalName);
-        assertEquals("Синус", sinLocalName);
+        assertEquals("Синус", sinLocalName.split(" ")[2]);
 
         String cosLocalName = simpleFunctionInterface.selectSimpleFunctionByFunctionCode("COS");
         assertNotNull(cosLocalName);
-        assertEquals("Косинус", cosLocalName);
+        assertEquals("Косинус", cosLocalName.split(" ")[2]);
 
         // UPDATE - Обновляем локальное имя
-        simpleFunctionInterface.updateLocalNameByFunctionCode("Синус функция", "SIN");
+        simpleFunctionInterface.updateLocalNameByFunctionCode("Синус_функция", "SIN");
 
         // Проверяем обновление
         String updatedSinLocalName = simpleFunctionInterface.selectSimpleFunctionByFunctionCode("SIN");
-        assertEquals("Синус функция", updatedSinLocalName);
+        assertEquals("Синус_функция", updatedSinLocalName.split(" ")[2]);
 
         // DELETE - Удаляем одну функцию
         simpleFunctionInterface.deleteSimpleFunctionByFunctionCode("TAN");
@@ -66,7 +66,7 @@ class simpleFunctionInterfaceTest {
         // Добавляем функции с разными кодами и именами
         simpleFunctionInterface.addSimpleFunction("TEST_LOG", "Логарифм");
         simpleFunctionInterface.addSimpleFunction("TEST_EXP", "Экспонента");
-        simpleFunctionInterface.addSimpleFunction("TEST_SQRT", "Квадратный корень");
+        simpleFunctionInterface.addSimpleFunction("TEST_SQRT", "Квадратный_корень");
         simpleFunctionInterface.addSimpleFunction("TEST_POW", "Степень");
 
         // Проверяем добавление
@@ -74,20 +74,20 @@ class simpleFunctionInterfaceTest {
         assertTrue(allFunctions.size() >= 4);
 
         // Проверяем поиск по каждому коду
-        assertEquals("Логарифм", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_LOG"));
-        assertEquals("Экспонента", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_EXP"));
-        assertEquals("Квадратный корень", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_SQRT"));
-        assertEquals("Степень", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_POW"));
+        assertEquals("Логарифм", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_LOG").split(" ")[2]);
+        assertEquals("Экспонента", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_EXP").split(" ")[2]);
+        assertEquals("Квадратный_корень", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_SQRT").split(" ")[2]);
+        assertEquals("Степень", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_POW").split(" ")[2]);
 
         // Обновляем все локальные имена
-        simpleFunctionInterface.updateLocalNameByFunctionCode("Натуральный логарифм", "TEST_LOG");
-        simpleFunctionInterface.updateLocalNameByFunctionCode("Экспоненциальная функция", "TEST_EXP");
-        simpleFunctionInterface.updateLocalNameByFunctionCode("Корень квадратный", "TEST_SQRT");
+        simpleFunctionInterface.updateLocalNameByFunctionCode("Натуральный_логарифм", "TEST_LOG");
+        simpleFunctionInterface.updateLocalNameByFunctionCode("Экспоненциальная_функция", "TEST_EXP");
+        simpleFunctionInterface.updateLocalNameByFunctionCode("Корень_квадратный", "TEST_SQRT");
 
         // Проверяем обновления
-        assertEquals("Натуральный логарифм", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_LOG"));
-        assertEquals("Экспоненциальная функция", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_EXP"));
-        assertEquals("Корень квадратный", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_SQRT"));
+        assertEquals("Натуральный_логарифм", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_LOG").split(" ")[2]);
+        assertEquals("Экспоненциальная_функция", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_EXP").split(" ")[2]);
+        assertEquals("Корень_квадратный", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_SQRT").split(" ")[2]);
 
         // Удаляем несколько функций
         simpleFunctionInterface.deleteSimpleFunctionByFunctionCode("TEST_LOG");
@@ -102,7 +102,7 @@ class simpleFunctionInterfaceTest {
         );
 
         // Проверяем что оставшиеся функции все еще существуют
-        assertEquals("Корень квадратный", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_SQRT"));
-        assertEquals("Степень", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_POW"));
+        assertEquals("Корень_квадратный", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_SQRT").split(" ")[2]);
+        assertEquals("Степень", simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_POW").split(" ")[2]);
     }
 }

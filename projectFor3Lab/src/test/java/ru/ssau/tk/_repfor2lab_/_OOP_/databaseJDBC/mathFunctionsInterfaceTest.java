@@ -47,7 +47,7 @@ class mathFunctionsInterfaceTest {
         List<String> allFunctions = mathFunctionsInterface.selectAllMathFunctions();
         assertFalse(allFunctions.isEmpty());
 
-        List<String> sinLocalName = mathFunctionsInterface.selectMathFunctionByUserId(id);
+        List<String> sinLocalName = mathFunctionsInterface.selectMathFunctionsByUserId(id);
         assertNotNull(sinLocalName);
 
         // UPDATE - Обновляем локальное имя
@@ -55,7 +55,6 @@ class mathFunctionsInterfaceTest {
 
         // DELETE - Удаляем одну функцию
         mathFunctionsInterface.deleteMathFunctionByFunctionId(2);
-
         s.deleteAllFunctions();
     }
 }

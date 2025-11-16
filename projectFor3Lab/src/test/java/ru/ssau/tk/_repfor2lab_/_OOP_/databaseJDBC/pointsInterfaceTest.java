@@ -53,7 +53,7 @@ class pointsInterfaceTest {
         simpleFunctionInterface.addSimpleFunction("TEST_FUNC", "Тестовая функция");
 
         // Выбираем id функции
-        String local = simpleFunctionInterface.selectSimpleFunctionByFunctionCode("TEST_FUNC");
+        String local = simpleFunctionInterface.selectSimpleFunctionNameByFunctionCode("TEST_FUNC");
         assertEquals("Тестовая функция", local);
 
         // Добавляем точки

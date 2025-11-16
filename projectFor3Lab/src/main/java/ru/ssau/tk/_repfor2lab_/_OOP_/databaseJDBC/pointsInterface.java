@@ -2,6 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
@@ -78,6 +80,30 @@ public class pointsInterface {
             LOGGER.warn("Произошла ошибка при выборе точек по айди ф-ции {}", id);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<PointDTO> selectAllPointsAsDTO() {
+        LOGGER.info("Начинаем выбор всех точек и вернём их как лист DTO");
+        List<String> rawData = selectAllPoints();
+        List<PointDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toPointDTO(data));
+        }
+        LOGGER.info("Возвращаем список точек как лист DTO");
+        return result;
+    }
+
+    public List<PointDTO> selectPointsByFunctionIdAsDTO(int id) {
+        LOGGER.info("Начинаем выбор точек по айди ф-ции и вернём их как лист DTO, айди{}", id);
+        List<String> rawData = selectPointsByFunctionId(id);
+        List<PointDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toPointDTO(data));
+        }
+        LOGGER.info("Возвращаем список точек ф-ции как лист DTO");
+        return result;
     }
 
     public int selectPointIdByXValueAndFunctionId(double x, int function_id){
