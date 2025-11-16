@@ -44,7 +44,6 @@ public class JdbcPointRepository implements PointRepository{
                 boof.append(resultSet.getDouble(2)).append(" ");
                 boof.append(resultSet.getDouble(3)).append(" ");
                 boof.append(resultSet.getInt(4)).append(" ");
-                boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
 
@@ -80,7 +79,6 @@ public class JdbcPointRepository implements PointRepository{
                 boof.append(resultSet.getDouble(2)).append(" ");
                 boof.append(resultSet.getDouble(3)).append(" ");
                 boof.append(resultSet.getInt(4)).append(" ");
-                boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
 
@@ -119,7 +117,6 @@ public class JdbcPointRepository implements PointRepository{
             boof.append(resultSet.getDouble(2)).append(" ");
             boof.append(resultSet.getDouble(3)).append(" ");
             boof.append(resultSet.getInt(4)).append(" ");
-            boof.append(resultSet.getString(5)).append(" ");
 
             LOGGER.info("Точка корректно нашлась");
             return boof.toString();
@@ -143,7 +140,6 @@ public class JdbcPointRepository implements PointRepository{
                 boof.append(resultSet.getDouble(2)).append(" ");
                 boof.append(resultSet.getDouble(3)).append(" ");
                 boof.append(resultSet.getInt(4)).append(" ");
-                boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
             if (list.isEmpty()){
@@ -178,7 +174,6 @@ public class JdbcPointRepository implements PointRepository{
                 boof.append(resultSet.getDouble(2)).append(" ");
                 boof.append(resultSet.getDouble(3)).append(" ");
                 boof.append(resultSet.getInt(4)).append(" ");
-                boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
 
