@@ -234,7 +234,7 @@ public class createAComparebleTable {
             row6.createCell(4).setCellValue(endTime5_3-startTime5_3);
             row6.createCell(5).setCellValue(endTime5_4-startTime5_4);
 
-            try (FileOutputStream out = new FileOutputStream("New_Table1.xlsx")) {
+            try (FileOutputStream out = new FileOutputStream("New_Table3.xlsx")) {
                 workbook.write(out);
             }  // Работа с файлом завершена, он закрыт
         } catch (IOException e) {

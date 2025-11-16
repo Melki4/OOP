@@ -216,8 +216,15 @@ public class JdbcUserRepository implements UserRepository{
     public void deleteAllUsers(){
         LOGGER.info("Начинаем удаление всех пользователей");
         String sql = loaderSQL.loadSQL("scripts\\users\\delete_user_by_id.sql");
+        List<String> all_functions;
 
-        List<String> all_functions = selectAllUsers();
+        try {
+            all_functions = selectAllUsers();
+        } catch (DataDoesNotExistException e) {
+            LOGGER.info("И так всё удалено");
+            return;
+        }
+
         List<Integer> all_codes = new ArrayList<>();
         for (var el : all_functions) all_codes.add(Integer.parseInt(el.split(" ")[0]));
 

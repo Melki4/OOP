@@ -235,7 +235,7 @@ public class JdbcPointRepository implements PointRepository{
 
     public void deleteAllPoints(){
         LOGGER.info("Начинаем удаление всех точек");
-        String sql = loaderSQL.loadSQL("scripts\\points\\drop_table_points.sql");
+        String sql = loaderSQL.loadSQL("scripts\\points\\truncate_table_points.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
             statement.execute();
             LOGGER.info("все точки были удалены дропом таблицы и таблица была создана заново, но в транзакции");

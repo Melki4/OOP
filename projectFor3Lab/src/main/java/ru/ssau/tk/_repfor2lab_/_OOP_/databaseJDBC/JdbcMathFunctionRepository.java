@@ -217,7 +217,15 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository{
         LOGGER.info("Пробуем удалить все мат. ф-ции");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\delete_math_function.sql");
 
-        List<String> all_functions = selectAllMathFunctions();
+        List<String> all_functions;
+
+        try {
+            all_functions = selectAllMathFunctions();
+        } catch (DataDoesNotExistException e) {
+            LOGGER.info("И так всё удалено");
+            return;
+        }
+
         List<Integer> all_codes = new ArrayList<>();
         for (var el : all_functions) all_codes.add(Integer.parseInt(el.split(" ")[0]));
         try (var connection = connectionManager.open();

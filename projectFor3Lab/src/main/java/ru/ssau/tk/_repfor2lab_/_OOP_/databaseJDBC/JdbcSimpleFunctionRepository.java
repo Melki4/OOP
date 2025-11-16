@@ -161,10 +161,10 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
 
     public void deleteAllFunctions(){
         LOGGER.info("Начинаем удаление всех простых функций");
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\drop_table_simple_functions.sql");
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\truncate_table_simple_functions.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
             statement.execute();
-            LOGGER.info("Все простые функции успешно удалены, таблица пересоздана");
+            LOGGER.info("Все простые функции успешно удалены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении всех простых функций");
             throw new RuntimeException(e);
