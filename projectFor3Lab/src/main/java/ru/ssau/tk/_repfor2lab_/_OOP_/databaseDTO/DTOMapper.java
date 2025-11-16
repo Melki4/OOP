@@ -2,13 +2,15 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.simpleFunctionInterface;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DTOMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(DTOMapper.class);
     // Трансформация из данных интерфейса в UserDTO
     public static UserDTO toUserDTO(String dbData) {
-        LOGGER.info("Начинаем преобразовывать строку с данными о пользователе в UserDTO");
+        LOGGER.info("Начинаем преобразовывать строку с данными о пользователях в UserDTO");
         String[] parts = dbData.split(" ");
         return new UserDTO(
                 Long.parseLong(parts[0]),  // userId
@@ -21,7 +23,7 @@ public class DTOMapper {
 
     // Трансформация из данных интерфейса в PointDTO
     public static PointDTO toPointDTO(String dbData) {
-        LOGGER.info("Начинаем преобразовывать строку с данными о пользователе в PointDTO");
+        LOGGER.info("Начинаем преобразовывать строку с данными о точках в PointDTO");
         String[] parts = dbData.split(" ");
         return new PointDTO(
                 Long.parseLong(parts[0]),  // pointId
@@ -31,9 +33,28 @@ public class DTOMapper {
         );
     }
 
+    // Трансформация из данных интерфейса в PointDTO
+    public static List<PointDTO> toPointDTO(List<String> dbData) {
+        LOGGER.info("Начинаем преобразовывать список с данными о точках в список PointDTO");
+
+        List<PointDTO> pointDTOS = new ArrayList<>();
+
+        for (int i =0; i < dbData.size(); ++i){
+            String[] parts = dbData.get(i).split(" ");
+            pointDTOS.add(new PointDTO(
+                    Long.parseLong(parts[0]),  // pointId
+                    Double.parseDouble(parts[1]), // xValue
+                    Double.parseDouble(parts[2]), // yValue
+                    Long.parseLong(parts[3])   // functionId
+            ));
+        }
+
+        return pointDTOS;
+    }
+
     // Трансформация из данных интерфейса в MathFunctionDTO
     public static MathFunctionDTO toMathFunctionDTO(String dbData) {
-        LOGGER.info("Начинаем преобразовывать строку с данными о пользователе в MathFunctionsDTO");
+        LOGGER.info("Начинаем преобразовывать строку с данными о мат. ф-циях в MathFunctionsDTO");
         String[] parts = dbData.split(" ");
         return new MathFunctionDTO(
                 Long.parseLong(parts[0]),   // functionId
@@ -46,9 +67,31 @@ public class DTOMapper {
         );
     }
 
+    // Трансформация из данных интерфейса в MathFunctionDTO
+    public static List<MathFunctionDTO> toMathFunctionDTO(List<String> dbData) {
+        LOGGER.info("Начинаем преобразовывать список с данными о мат. ф-циях в MathFunctionsDTO");
+
+        List<MathFunctionDTO> mathFunctionDTOS = new ArrayList<>();
+
+        for (int i =0; i < dbData.size(); ++i){
+            String[] parts = dbData.get(i).split(" ");
+            mathFunctionDTOS.add(new MathFunctionDTO(
+                    Long.parseLong(parts[0]),   // functionId
+                    parts[1],                   // functionName
+                    Integer.parseInt(parts[2]), // amountOfDots
+                    Double.parseDouble(parts[3]), // leftBorder
+                    Double.parseDouble(parts[4]), // rightBorder
+                    Long.parseLong(parts[5]),   // ownerId
+                    parts[6]                    // functionType
+            ));
+        }
+
+        return mathFunctionDTOS;
+    }
+
     // Трансформация из данных интерфейса в SimpleFunctionDTO
     public static SimpleFunctionDTO toSimpleFunctionDTO(String dbData) {
-        LOGGER.info("Начинаем преобразовывать строку с данными о пользователе в SimpleFunctionDTO");
+        LOGGER.info("Начинаем преобразовывать строку с данными о простых ф-циях в SimpleFunctionDTO");
         String[] parts = dbData.split(" ");
 
         StringBuilder boof = new StringBuilder();
