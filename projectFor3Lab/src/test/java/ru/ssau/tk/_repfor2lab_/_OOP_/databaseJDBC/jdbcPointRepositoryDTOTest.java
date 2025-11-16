@@ -13,25 +13,25 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class pointsInterfaceDTOTest {
-    private pointsInterface pointsInterface;
-    private simpleFunctionInterface simpleFunctionInterface;
+class jdbcPointRepositoryDTOTest {
+    private JdbcPointRepository JdbcPointRepository;
+    private JdbcSimpleFunctionRepository JdbcSimpleFunctionRepository;
 
     @BeforeEach
     void setUp() {
-        pointsInterface = new pointsInterface();
-        simpleFunctionInterface = new simpleFunctionInterface();
+        JdbcPointRepository = new JdbcPointRepository();
+        JdbcSimpleFunctionRepository = new JdbcSimpleFunctionRepository();
 
         // таблица функций нужна, т.к. в points есть внешний ключ
-        simpleFunctionInterface.createTable();
-        pointsInterface.createTable();
+        JdbcSimpleFunctionRepository.createTable();
+        JdbcPointRepository.createTable();
     }
 
     @AfterEach
     void tearDown() {
-        pointsInterface.deleteAllPoints();
-        simpleFunctionInterface.deleteAllFunctions();
-        var boof_to_clear = new mathFunctionsInterface();
+        JdbcPointRepository.deleteAllPoints();
+        JdbcSimpleFunctionRepository.deleteAllFunctions();
+        var boof_to_clear = new JdbcMathFunctionRepository();
         boof_to_clear.deleteAllFunctions();
     }
 
@@ -46,19 +46,19 @@ class pointsInterfaceDTOTest {
             points.add(p);
         }
 
-        userInterface u = new userInterface();
+        JdbcUserRepository u = new JdbcUserRepository();
         u.addUser("array", "login", "hardpassword", "user");
         int user_id = u.selectIdByLogin("login");
 
-        mathFunctionsInterface m = new mathFunctionsInterface();
+        JdbcMathFunctionRepository m = new JdbcMathFunctionRepository();
         m.addMathFunction("x^2+2x+1", 1000, -100.0,
                 1, user_id, "SqrFunc");
 
         int function_id = Integer.parseInt(m.selectAllMathFunctions().get(0).split(" ")[0]);
 
-        pointsInterface.bulkInsertPointsDirect(points, function_id);
-        List<PointDTO> pointDTOS = pointsInterface.selectAllPointsAsDTO();
-        List<PointDTO> pointDTOS1 = pointsInterface.selectPointsByFunctionIdAsDTO(function_id);
+        JdbcPointRepository.bulkInsertPointsDirect(points, function_id);
+        List<PointDTO> pointDTOS = JdbcPointRepository.selectAllPointsAsDTO();
+        List<PointDTO> pointDTOS1 = JdbcPointRepository.selectPointsByFunctionIdAsDTO(function_id);
 
         for (int i =0; i< pointDTOS.size(); ++i){
             assertEquals(array.getX(i), pointDTOS.get(i).getXValue(), 0.000001);

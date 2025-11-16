@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class simpleFunctionInterface {
-    private static final Logger LOGGER = LoggerFactory.getLogger(simpleFunctionInterface.class);
+public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcSimpleFunctionRepository.class);
 
     public void createTable(){
         LOGGER.info("Начинаем создание таблицы простых ф-ций");

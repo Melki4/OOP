@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class userInterface {
-    private static final Logger LOGGER = LoggerFactory.getLogger(userInterface.class);
+public class JdbcUserRepository implements UserRepository{
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUserRepository.class);
 
     public void createTable(){
         LOGGER.info("Начинаем создание таблицы пользователей");

@@ -10,35 +10,35 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class pointsInterfaceTest {
+class jdbcPointRepositoryTest {
 
-    private pointsInterface pointsInterface;
-    private simpleFunctionInterface simpleFunctionInterface;
+    private JdbcPointRepository JdbcPointRepository;
+    private JdbcSimpleFunctionRepository JdbcSimpleFunctionRepository;
 
     @BeforeEach
     void setUp() {
-        pointsInterface = new pointsInterface();
-        simpleFunctionInterface = new simpleFunctionInterface();
+        JdbcPointRepository = new JdbcPointRepository();
+        JdbcSimpleFunctionRepository = new JdbcSimpleFunctionRepository();
 
         // таблица функций нужна, т.к. в points есть внешний ключ
-        simpleFunctionInterface.createTable();
-        pointsInterface.createTable();
+        JdbcSimpleFunctionRepository.createTable();
+        JdbcPointRepository.createTable();
     }
 
     @AfterEach
     void tearDown() {
-        pointsInterface.deleteAllPoints();
-        simpleFunctionInterface.deleteAllFunctions();
-        var boof_to_clear = new mathFunctionsInterface();
+        JdbcPointRepository.deleteAllPoints();
+        JdbcSimpleFunctionRepository.deleteAllFunctions();
+        var boof_to_clear = new JdbcMathFunctionRepository();
         boof_to_clear.deleteAllFunctions();
     }
 
     @Test
     @DisplayName("Полный CRUD для points")
     void testFullCrudForPoints() {
-        mathFunctionsInterface s = new mathFunctionsInterface();
+        JdbcMathFunctionRepository s = new JdbcMathFunctionRepository();
 
-        userInterface u = new userInterface();
+        JdbcUserRepository u = new JdbcUserRepository();
 
         u.addUser("array", "login", "hardpassword", "user");
 
@@ -50,23 +50,23 @@ class pointsInterfaceTest {
         int i = Integer.parseInt(s.selectAllMathFunctions().get(0).split(" ")[0]);
 
         // Добавляем базовую функцию, чтобы id подходил
-        simpleFunctionInterface.addSimpleFunction("TEST_FUNC", "Тестовая функция");
+        JdbcSimpleFunctionRepository.addSimpleFunction("TEST_FUNC", "Тестовая функция");
 
         // Выбираем id функции
-        String local = simpleFunctionInterface.selectSimpleFunctionNameByFunctionCode("TEST_FUNC");
+        String local = JdbcSimpleFunctionRepository.selectSimpleFunctionNameByFunctionCode("TEST_FUNC");
         assertEquals("Тестовая функция", local);
 
         // Добавляем точки
-        pointsInterface.addPoint(1.1, 2.2, i);
-        pointsInterface.addPoint(3.3, 4.4, i);
-        pointsInterface.addPoint(5.5, 6.6, i);
+        JdbcPointRepository.addPoint(1.1, 2.2, i);
+        JdbcPointRepository.addPoint(3.3, 4.4, i);
+        JdbcPointRepository.addPoint(5.5, 6.6, i);
 
-        List<String> allPoints = pointsInterface.selectAllPoints();
+        List<String> allPoints = JdbcPointRepository.selectAllPoints();
         assertFalse(allPoints.isEmpty());
         assertTrue(allPoints.size() >= 3);
 
         // Проверяем выборку по id функции
-        List<String> functionPoints = pointsInterface.selectPointsByFunctionId(i);
+        List<String> functionPoints = JdbcPointRepository.selectPointsByFunctionId(i);
         assertEquals(3, functionPoints.size());
 
         // Разбираем строку и проверяем корректность
@@ -81,10 +81,10 @@ class pointsInterfaceTest {
         assertEquals(2.2, y);
 
         // UPDATE X/Y
-        pointsInterface.updateXValueById(10.0, Integer.parseInt(parts[0]));
-        pointsInterface.updateYValueById(20.0, Integer.parseInt(parts[0]));
+        JdbcPointRepository.updateXValueById(10.0, Integer.parseInt(parts[0]));
+        JdbcPointRepository.updateYValueById(20.0, Integer.parseInt(parts[0]));
 
-        List<String> updated = pointsInterface.selectPointsByFunctionId(i);
+        List<String> updated = JdbcPointRepository.selectPointsByFunctionId(i);
         String updatedPointStr = updated.get(2).split(" ")[0];
         int updatedId = Integer.parseInt(updatedPointStr);
 
@@ -93,9 +93,9 @@ class pointsInterfaceTest {
         assertEquals(20.0, Double.parseDouble(updParts[2]));
 
         // DELETE
-        pointsInterface.deletePointById(updatedId);
+        JdbcPointRepository.deletePointById(updatedId);
 
-        List<String> afterDelete = pointsInterface.selectPointsByFunctionId(i);
+        List<String> afterDelete = JdbcPointRepository.selectPointsByFunctionId(i);
         assertEquals(2, afterDelete.size());
     }
 
@@ -103,8 +103,8 @@ class pointsInterfaceTest {
     @DisplayName("Добавление, выборка и массовое удаление точек")
     void testMassInsertAndDelete() {
 
-        mathFunctionsInterface s = new mathFunctionsInterface();
-        userInterface u = new userInterface();
+        JdbcMathFunctionRepository s = new JdbcMathFunctionRepository();
+        JdbcUserRepository u = new JdbcUserRepository();
 
         int user_id = u.selectIdByLogin("login");
 
@@ -113,20 +113,20 @@ class pointsInterfaceTest {
 
         int function_id = Integer.parseInt(s.selectAllMathFunctions().get(0).split(" ")[0]);
 
-        simpleFunctionInterface.addSimpleFunction("F", "Функция");
+        JdbcSimpleFunctionRepository.addSimpleFunction("F", "Функция");
 
         // Массовое добавление
         for (int i = 0; i < 10; i++) {
-            pointsInterface.addPoint((double) i, (double) (i * 2), function_id);
+            JdbcPointRepository.addPoint((double) i, (double) (i * 2), function_id);
         }
 
-        List<String> all = pointsInterface.selectAllPoints();
+        List<String> all = JdbcPointRepository.selectAllPoints();
         assertEquals(10, all.size());
 
         // deleteAllPoints
-        pointsInterface.deleteAllPoints();
+        JdbcPointRepository.deleteAllPoints();
 
-        List<String> empty = pointsInterface.selectAllPoints();
+        List<String> empty = JdbcPointRepository.selectAllPoints();
         assertTrue(empty.isEmpty());
     }
 
@@ -134,8 +134,8 @@ class pointsInterfaceTest {
     @DisplayName("Изменение X и Y по ID точки")
     void testUpdateOperations() {
 
-        mathFunctionsInterface ss = new mathFunctionsInterface();
-        userInterface u = new userInterface();
+        JdbcMathFunctionRepository ss = new JdbcMathFunctionRepository();
+        JdbcUserRepository u = new JdbcUserRepository();
 
         int user_id = u.selectIdByLogin("login");
 
@@ -144,19 +144,19 @@ class pointsInterfaceTest {
 
         int function_id = Integer.parseInt(ss.selectAllMathFunctions().get(0).split(" ")[0]);
 
-        simpleFunctionInterface.addSimpleFunction("F2", "Функция 2");
+        JdbcSimpleFunctionRepository.addSimpleFunction("F2", "Функция 2");
 
-        pointsInterface.addPoint(7.7, 8.8, function_id);
+        JdbcPointRepository.addPoint(7.7, 8.8, function_id);
 
-        List<String> before = pointsInterface.selectAllPoints();
+        List<String> before = JdbcPointRepository.selectAllPoints();
         assertEquals(1, before.size());
 
         int id = Integer.parseInt(before.get(0).split(" ")[0]);
 
-        pointsInterface.updateXValueById(100.0, id);
-        pointsInterface.updateYValueById(200.0, id);
+        JdbcPointRepository.updateXValueById(100.0, id);
+        JdbcPointRepository.updateYValueById(200.0, id);
 
-        List<String> after = pointsInterface.selectAllPoints().stream()
+        List<String> after = JdbcPointRepository.selectAllPoints().stream()
                 .filter(s -> Integer.parseInt(s.split(" ")[0]) == id)
                 .toList();
 
@@ -179,16 +179,16 @@ class pointsInterfaceTest {
             points.add(p);
         }
 
-        userInterface u = new userInterface();
+        JdbcUserRepository u = new JdbcUserRepository();
         u.addUser("array", "login", "hardpassword", "user");
         int user_id = u.selectIdByLogin("login");
 
-        mathFunctionsInterface m = new mathFunctionsInterface();
+        JdbcMathFunctionRepository m = new JdbcMathFunctionRepository();
         m.addMathFunction("x^2+2x+1", 100, -100.0,
                 1, user_id, "SqrFunc");
         int function_id = Integer.parseInt(m.selectAllMathFunctions().get(0).split(" ")[0]);
 
-        pointsInterface.bulkInsertPointsDirect(points, function_id);
+        JdbcPointRepository.bulkInsertPointsDirect(points, function_id);
 
         System.out.println("Done");
     }

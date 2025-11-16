@@ -8,53 +8,53 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class mathFunctionsInterfaceTest {
-    private mathFunctionsInterface mathFunctionsInterface;
+class jdbcMathFunctionRepositoryTest {
+    private JdbcMathFunctionRepository JdbcMathFunctionRepository;
 
     @BeforeEach
     void setUp() {
-        mathFunctionsInterface = new mathFunctionsInterface();
-        mathFunctionsInterface.createTable();
+        JdbcMathFunctionRepository = new JdbcMathFunctionRepository();
+        JdbcMathFunctionRepository.createTable();
     }
 
     @AfterEach
     void tearDown() {
-        var f = new mathFunctionsInterface();
+        var f = new JdbcMathFunctionRepository();
         f.deleteAllFunctions();
     }
 
     @Test
     void testFullCrudForMathFunctions() {
         // CREATE - Добавляем несколько функций
-        mathFunctionsInterface.createTable();
+        JdbcMathFunctionRepository.createTable();
 
         //INSERT
-        simpleFunctionInterface s = new simpleFunctionInterface();
+        JdbcSimpleFunctionRepository s = new JdbcSimpleFunctionRepository();
         s.addSimpleFunction("SqrFunc", "Квадратичная функция");
 
-        userInterface u = new userInterface();
+        JdbcUserRepository u = new JdbcUserRepository();
         u.addUser("array", "login", "hardpassword", "user");
         int id = u.selectIdByLogin("login");
 
-        mathFunctionsInterface.addMathFunction("x^2-1", 100, -42.2,
+        JdbcMathFunctionRepository.addMathFunction("x^2-1", 100, -42.2,
                 42.2, id, "SqrFunc");
-        mathFunctionsInterface.addMathFunction("x^3-1", 100, -42.2,
+        JdbcMathFunctionRepository.addMathFunction("x^3-1", 100, -42.2,
                 42.2, id, "SqrFunc");
-        mathFunctionsInterface.addMathFunction("x^4-1", 100, -42.2,
+        JdbcMathFunctionRepository.addMathFunction("x^4-1", 100, -42.2,
                 42.2, id, "SqrFunc");
 
         // READ - Получаем все функции
-        List<String> allFunctions = mathFunctionsInterface.selectAllMathFunctions();
+        List<String> allFunctions = JdbcMathFunctionRepository.selectAllMathFunctions();
         assertFalse(allFunctions.isEmpty());
 
-        List<String> sinLocalName = mathFunctionsInterface.selectMathFunctionsByUserId(id);
+        List<String> sinLocalName = JdbcMathFunctionRepository.selectMathFunctionsByUserId(id);
         assertNotNull(sinLocalName);
 
         // UPDATE - Обновляем локальное имя
-        mathFunctionsInterface.updateFunctionNameByFunctionId("dsdsd", 2);
+        JdbcMathFunctionRepository.updateFunctionNameByFunctionId("dsdsd", 2);
 
         // DELETE - Удаляем одну функцию
-        mathFunctionsInterface.deleteMathFunctionByFunctionId(2);
+        JdbcMathFunctionRepository.deleteMathFunctionByFunctionId(2);
         s.deleteAllFunctions();
     }
 }

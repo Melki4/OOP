@@ -16,20 +16,20 @@ import java.util.List;
 public class createAComparebleTable {
 
     public void testWithATF(){
-        simpleFunctionInterface simpleFunctionInterface = new simpleFunctionInterface();
-        simpleFunctionInterface.createTable();
+        JdbcSimpleFunctionRepository JdbcSimpleFunctionRepository = new JdbcSimpleFunctionRepository();
+        JdbcSimpleFunctionRepository.createTable();
 
-        userInterface userInterface = new userInterface();
-        userInterface.createTable();
+        JdbcUserRepository JdbcUserRepository = new JdbcUserRepository();
+        JdbcUserRepository.createTable();
 
-        mathFunctionsInterface m = new mathFunctionsInterface();
+        JdbcMathFunctionRepository m = new JdbcMathFunctionRepository();
         m.createTable();
 
-        pointsInterface pointsInterface = new pointsInterface();
-        pointsInterface.createTable();
+        JdbcPointRepository JdbcPointRepository = new JdbcPointRepository();
+        JdbcPointRepository.createTable();
 
         // таблица функций нужна, т.к. в points есть внешний ключ
-        simpleFunctionInterface.addSimpleFunction("SqrFunc", "Квадратичная ф-ция");
+        JdbcSimpleFunctionRepository.addSimpleFunction("SqrFunc", "Квадратичная ф-ция");
 
         MathFunction mathFunction = (double x)-> x*x + 2*x +1;
 
@@ -51,8 +51,8 @@ public class createAComparebleTable {
         fillArrays(array4, points4);
         fillArrays(array5, points5);
 
-        userInterface.addUser("array", "login", "hardpassword", "user");
-        int user_id = userInterface.selectIdByLogin("login");
+        JdbcUserRepository.addUser("array", "login", "hardpassword", "user");
+        int user_id = JdbcUserRepository.selectIdByLogin("login");
 
         m.addMathFunction("x^2+2x+1", 10000, -100.0,
                 1, user_id, "SqrFunc");
@@ -72,51 +72,51 @@ public class createAComparebleTable {
         int function_id5 = Integer.parseInt(m.selectAllMathFunctions().get(4).split(" ")[0]);
 
         long startTime1 = System.currentTimeMillis();
-        pointsInterface.bulkInsertPointsDirect(points1, function_id1);
+        JdbcPointRepository.bulkInsertPointsDirect(points1, function_id1);
         long endTime1 = System.currentTimeMillis();
 
         long startTime2 = System.currentTimeMillis();
-        pointsInterface.bulkInsertPointsDirect(points2, function_id2);
+        JdbcPointRepository.bulkInsertPointsDirect(points2, function_id2);
         long endTime2 = System.currentTimeMillis();
 
         long startTime3 = System.currentTimeMillis();
-        pointsInterface.bulkInsertPointsDirect(points3, function_id3);
+        JdbcPointRepository.bulkInsertPointsDirect(points3, function_id3);
         long endTime3 = System.currentTimeMillis();
 
         long startTime4 = System.currentTimeMillis();
-        pointsInterface.bulkInsertPointsDirect(points4, function_id4);
+        JdbcPointRepository.bulkInsertPointsDirect(points4, function_id4);
         long endTime4 = System.currentTimeMillis();
 
         long startTime5 = System.currentTimeMillis();
-        pointsInterface.bulkInsertPointsDirect(points5, function_id5);
+        JdbcPointRepository.bulkInsertPointsDirect(points5, function_id5);
         long endTime5 = System.currentTimeMillis();
 
         /*------------------------------------------------------------------*/
 
         long startTime1_1 = System.currentTimeMillis();
-        pointsInterface.selectAllPoints();
+        JdbcPointRepository.selectAllPoints();
         long endTime1_1 = System.currentTimeMillis();
 
         /*------------------------------------------------------------------*/
 
         long startTime1_2 = System.currentTimeMillis();
-        pointsInterface.selectPointsByFunctionId(function_id1);
+        JdbcPointRepository.selectPointsByFunctionId(function_id1);
         long endTime1_2 = System.currentTimeMillis();
 
         long startTime2_2 = System.currentTimeMillis();
-        pointsInterface.selectPointsByFunctionId(function_id2);
+        JdbcPointRepository.selectPointsByFunctionId(function_id2);
         long endTime2_2 = System.currentTimeMillis();
 
         long startTime3_2 = System.currentTimeMillis();
-        pointsInterface.selectPointsByFunctionId(function_id3);
+        JdbcPointRepository.selectPointsByFunctionId(function_id3);
         long endTime3_2 = System.currentTimeMillis();
 
         long startTime4_2 = System.currentTimeMillis();
-        pointsInterface.selectPointsByFunctionId(function_id4);
+        JdbcPointRepository.selectPointsByFunctionId(function_id4);
         long endTime4_2 = System.currentTimeMillis();
 
         long startTime5_2 = System.currentTimeMillis();
-        pointsInterface.selectPointsByFunctionId(function_id5);
+        JdbcPointRepository.selectPointsByFunctionId(function_id5);
         long endTime5_2 = System.currentTimeMillis();
 
         /*------------------------------------------------------------------*/
@@ -124,63 +124,63 @@ public class createAComparebleTable {
         long startTime1_3 = System.currentTimeMillis();
         for (int i = 0; i< 10;++i){
             double x = array1.getX(i);
-            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id1);
-            pointsInterface.updateYValueById(1.1, index_in_table);
+            int index_in_table = JdbcPointRepository.selectPointIdByXValueAndFunctionId(x, function_id1);
+            JdbcPointRepository.updateYValueById(1.1, index_in_table);
         }
         long endTime1_3 = System.currentTimeMillis();
 
         long startTime2_3 = System.currentTimeMillis();
         for (int i = 0; i< 10;++i){
             double x = array2.getX(i);
-            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id2);
-            pointsInterface.updateYValueById(1.1, index_in_table);
+            int index_in_table = JdbcPointRepository.selectPointIdByXValueAndFunctionId(x, function_id2);
+            JdbcPointRepository.updateYValueById(1.1, index_in_table);
         }
         long endTime2_3 = System.currentTimeMillis();
 
         long startTime3_3 = System.currentTimeMillis();
         for (int i = 0; i< 10;++i){
             double x = array3.getX(i);
-            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id3);
-            pointsInterface.updateYValueById(1.1, index_in_table);
+            int index_in_table = JdbcPointRepository.selectPointIdByXValueAndFunctionId(x, function_id3);
+            JdbcPointRepository.updateYValueById(1.1, index_in_table);
         }
         long endTime3_3 = System.currentTimeMillis();
 
         long startTime4_3 = System.currentTimeMillis();
         for (int i = 0; i< 10;++i){
             double x = array4.getX(i);
-            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id4);
-            pointsInterface.updateYValueById(1.1, index_in_table);
+            int index_in_table = JdbcPointRepository.selectPointIdByXValueAndFunctionId(x, function_id4);
+            JdbcPointRepository.updateYValueById(1.1, index_in_table);
         }
         long endTime4_3 = System.currentTimeMillis();
 
         long startTime5_3 = System.currentTimeMillis();
         for (int i = 0; i< 10;++i){
             double x = array5.getX(i);
-            int index_in_table = pointsInterface.selectPointIdByXValueAndFunctionId(x, function_id5);
-            pointsInterface.updateYValueById(1.1, index_in_table);
+            int index_in_table = JdbcPointRepository.selectPointIdByXValueAndFunctionId(x, function_id5);
+            JdbcPointRepository.updateYValueById(1.1, index_in_table);
         }
         long endTime5_3 = System.currentTimeMillis();
 
         /*------------------------------------------------------------------*/
 
         long startTime1_4 = System.currentTimeMillis();
-        pointsInterface.deleteAllPoints();
+        JdbcPointRepository.deleteAllPoints();
         long endTime1_4 = System.currentTimeMillis();
 
         long startTime2_4 = System.currentTimeMillis();
-        pointsInterface.deleteAllPoints();
+        JdbcPointRepository.deleteAllPoints();
         long endTime2_4 = System.currentTimeMillis();
 
         long startTime3_4 = System.currentTimeMillis();
-        pointsInterface.deleteAllPoints();
+        JdbcPointRepository.deleteAllPoints();
         long endTime3_4 = System.currentTimeMillis();
 
         long startTime4_4 = System.currentTimeMillis();
-        pointsInterface.deleteAllPoints();
+        JdbcPointRepository.deleteAllPoints();
         long endTime4_4 = System.currentTimeMillis();
 
         long startTime5_4 = System.currentTimeMillis();
-        pointsInterface.deleteAllPoints();
+        JdbcPointRepository.deleteAllPoints();
         long endTime5_4 = System.currentTimeMillis();
 
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -241,10 +241,10 @@ public class createAComparebleTable {
             throw new RuntimeException(e);
         }
 
-        pointsInterface.deleteAllPoints();
-        simpleFunctionInterface.deleteAllFunctions();
+        JdbcPointRepository.deleteAllPoints();
+        JdbcSimpleFunctionRepository.deleteAllFunctions();
         m.deleteAllFunctions();
-        userInterface.deleteAllUsers();
+        JdbcUserRepository.deleteAllUsers();
         System.out.println("Done");
     }
 

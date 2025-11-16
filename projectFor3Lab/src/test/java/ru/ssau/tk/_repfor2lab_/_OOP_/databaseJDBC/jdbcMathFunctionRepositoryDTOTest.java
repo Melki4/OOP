@@ -9,56 +9,56 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class mathFunctionsInterfaceDTOTest {
-    private mathFunctionsInterface mathFunctionsInterface;
+class jdbcMathFunctionRepositoryDTOTest {
+    private JdbcMathFunctionRepository JdbcMathFunctionRepository;
 
     @BeforeEach
     void setUp() {
-        mathFunctionsInterface = new mathFunctionsInterface();
-        mathFunctionsInterface.createTable();
+        JdbcMathFunctionRepository = new JdbcMathFunctionRepository();
+        JdbcMathFunctionRepository.createTable();
     }
 
     @AfterEach
     void tearDown() {
-        var f = new mathFunctionsInterface();
+        var f = new JdbcMathFunctionRepository();
         f.deleteAllFunctions();
-        simpleFunctionInterface s = new simpleFunctionInterface();
+        JdbcSimpleFunctionRepository s = new JdbcSimpleFunctionRepository();
         s.deleteAllFunctions();
-        userInterface u = new userInterface();
+        JdbcUserRepository u = new JdbcUserRepository();
         u.deleteAllUsers();
     }
 
     @Test
     void someTest(){
         // CREATE - Добавляем несколько функций
-        mathFunctionsInterface.createTable();
+        JdbcMathFunctionRepository.createTable();
 
         //INSERT
-        simpleFunctionInterface s = new simpleFunctionInterface();
+        JdbcSimpleFunctionRepository s = new JdbcSimpleFunctionRepository();
         s.addSimpleFunction("SqrFunc", "Квадратичная функция");
 
-        userInterface u = new userInterface();
+        JdbcUserRepository u = new JdbcUserRepository();
         u.addUser("array", "login", "hardpassword", "user");
         u.addUser("array", "login1", "hardpassword", "user");
         int id = u.selectIdByLogin("login");
         int id1 = u.selectIdByLogin("login1");
 
-        mathFunctionsInterface.addMathFunction("x^2-1", 100, -42.2,
+        JdbcMathFunctionRepository.addMathFunction("x^2-1", 100, -42.2,
                 42.2, id, "SqrFunc");
-        mathFunctionsInterface.addMathFunction("x^3-1", 100, -42.2,
+        JdbcMathFunctionRepository.addMathFunction("x^3-1", 100, -42.2,
                 42.2, id1, "SqrFunc");
-        mathFunctionsInterface.addMathFunction("x^4-1", 100, -42.2,
+        JdbcMathFunctionRepository.addMathFunction("x^4-1", 100, -42.2,
                 42.2, id1, "SqrFunc");
 
         // READ - Получаем все функции
-        List<String> allFunctions = mathFunctionsInterface.selectAllMathFunctions();
+        List<String> allFunctions = JdbcMathFunctionRepository.selectAllMathFunctions();
         assertFalse(allFunctions.isEmpty());
 
-        List<String> sinLocalName = mathFunctionsInterface.selectMathFunctionsByUserId(id1);
+        List<String> sinLocalName = JdbcMathFunctionRepository.selectMathFunctionsByUserId(id1);
         assertNotNull(sinLocalName);
 
-        List<MathFunctionDTO> mathFunctionDTOS = mathFunctionsInterface.selectAllMathFunctionsAsDTO();
-        List<MathFunctionDTO> mathFunctionDTOS1 = mathFunctionsInterface.selectMathFunctionsByUserIdAsDTO(id1);
+        List<MathFunctionDTO> mathFunctionDTOS = JdbcMathFunctionRepository.selectAllMathFunctionsAsDTO();
+        List<MathFunctionDTO> mathFunctionDTOS1 = JdbcMathFunctionRepository.selectMathFunctionsByUserIdAsDTO(id1);
 
         for (int i = 0; i<allFunctions.size();++i){
             String[] boof = allFunctions.get(i).split(" ");

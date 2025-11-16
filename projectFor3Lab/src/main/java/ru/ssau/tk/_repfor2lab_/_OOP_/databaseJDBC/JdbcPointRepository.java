@@ -14,8 +14,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class pointsInterface {
-    private static final Logger LOGGER = LoggerFactory.getLogger(pointsInterface.class);
+public class JdbcPointRepository implements PointRepository{
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcPointRepository.class);
 
     public void createTable(){
         LOGGER.info("Приступаем к созданию таблицы точек");
