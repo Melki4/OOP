@@ -28,8 +28,7 @@ public class Users {
     private List<MathFunctions> mathFunctions;
 
     public Users(){}
-    public Users(Long userID, String factoryType, String login, String password, String role){
-        this.userID = userID;
+    public Users(String factoryType, String login, String password, String role){
         this.factoryType = factoryType;
         this.login = login;
         this.password = password;

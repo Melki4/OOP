@@ -11,20 +11,21 @@ public class Points {
     private Integer pointID;
 
     @Column(name = "xValue", nullable = false)
-    private double xValue;
+    private Double xValue;
 
     @Column(name = "yValue", nullable = false)
-    private double yValue;
+    private Double yValue;
 
     @ManyToOne
     @JoinColumn(name = "functionID")
     private MathFunctions mathFunctions;
 
     public Points(){}
-    public Points(Integer pointID, double xValue, double yValue){
+    public Points(Integer pointID, double xValue, double yValue, MathFunctions mathFunctions){
         this.pointID = pointID;
         this.xValue = xValue;
         this.yValue = yValue;
+        this.mathFunctions = mathFunctions;
     }
 
     public Integer getPointID() {
