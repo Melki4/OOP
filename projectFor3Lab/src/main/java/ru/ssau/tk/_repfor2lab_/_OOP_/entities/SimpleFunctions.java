@@ -1,9 +1,5 @@
 package ru.ssau.tk._repfor2lab_._OOP_.entities;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "simplefunctions")

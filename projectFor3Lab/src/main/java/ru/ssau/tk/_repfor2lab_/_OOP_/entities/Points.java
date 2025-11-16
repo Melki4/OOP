@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.entities;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "points")
