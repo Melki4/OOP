@@ -1,6 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.junit.jupiter.api.*;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -16,10 +18,8 @@ class jdbcUserRepositoryTest {
     @BeforeEach
     void setUp() {
         JdbcUserRepository = new JdbcUserRepository();
-        JdbcUserRepository.deleteAllUsers();
         createdUserIds = new ArrayList<>();
         random = new Random();
-
         // Создаем таблицу перед каждым тестом
         JdbcUserRepository.createTable();
     }
@@ -162,8 +162,7 @@ class jdbcUserRepositoryTest {
 
         // Проверяем, что пользователи действительно удалены
         for (String login : testLogins) {
-            int userId = JdbcUserRepository.selectIdByLogin(login);
-            assertEquals(-1, userId);
+            assertThrows(DataDoesNotExistException.class, ()->{JdbcUserRepository.selectIdByLogin(login);});
         }
     }
 
@@ -231,7 +230,6 @@ class jdbcUserRepositoryTest {
         }
 
         // Пытаемся найти несуществующего пользователя
-        int nonExistentId = JdbcUserRepository.selectIdByLogin("nonexistent_user_xyz");
-        assertEquals(-1, nonExistentId);
+        assertThrows(DataDoesNotExistException.class, ()->{JdbcUserRepository.selectIdByLogin("nonexistent_user_xyz");});
     }
 }

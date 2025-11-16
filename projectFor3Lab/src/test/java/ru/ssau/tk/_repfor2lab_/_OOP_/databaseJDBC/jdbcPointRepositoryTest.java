@@ -1,6 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.junit.jupiter.api.*;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 
@@ -126,8 +127,7 @@ class jdbcPointRepositoryTest {
         // deleteAllPoints
         JdbcPointRepository.deleteAllPoints();
 
-        List<String> empty = JdbcPointRepository.selectAllPoints();
-        assertTrue(empty.isEmpty());
+        assertThrows(DataDoesNotExistException.class, ()->{JdbcPointRepository.selectAllPoints();});
     }
 
     @Test

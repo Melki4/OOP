@@ -7,6 +7,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
 import java.sql.ResultSet;
@@ -46,6 +47,12 @@ public class JdbcPointRepository implements PointRepository{
                 boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
+
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица пуста");
+                throw new DataDoesNotExistException();
+            }
+
             LOGGER.info("Всё корректно обработалось, возвращаем список");
             return list;
         } catch (SQLException e) {
@@ -66,6 +73,7 @@ public class JdbcPointRepository implements PointRepository{
             var resultSet = statement.executeQuery();
 
             StringBuilder boof;
+
             while(resultSet.next()){
                 boof = new StringBuilder();
                 boof.append(resultSet.getInt(1)).append(" ");
@@ -75,10 +83,48 @@ public class JdbcPointRepository implements PointRepository{
                 boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
+
+            if (list.isEmpty()){
+                LOGGER.warn("В ф-ции не были заданы точки");
+                throw new DataDoesNotExistException();
+            }
+
             LOGGER.info("Точки корректно нашлись");
             return list;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе точек по айди ф-ции {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String selectPointByPointId(int id) {
+        LOGGER.info("Начинаем поиск точки по её айди {}", id);
+        String sql = loaderSQL.loadSQL("scripts\\points\\select_point_by_point_id.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1, id);
+
+            var resultSet = statement.executeQuery();
+
+            StringBuilder boof;
+
+            if (!resultSet.next()){
+                LOGGER.warn("Точки с таким айди нет");
+                throw new DataDoesNotExistException();
+            }
+
+            boof = new StringBuilder();
+            boof.append(resultSet.getInt(1)).append(" ");
+            boof.append(resultSet.getDouble(2)).append(" ");
+            boof.append(resultSet.getDouble(3)).append(" ");
+            boof.append(resultSet.getInt(4)).append(" ");
+            boof.append(resultSet.getString(5)).append(" ");
+
+            LOGGER.info("Точка корректно нашлась");
+            return boof.toString();
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе точки по айди {}", id);
             throw new RuntimeException(e);
         }
     }
@@ -107,6 +153,16 @@ public class JdbcPointRepository implements PointRepository{
         return result;
     }
 
+    @Override
+    public PointDTO selectPointByPointIdAsDTO(int id) {
+        LOGGER.info("Начинаем поиск точки и вернём её как DTO");
+        String rawData = selectPointByPointId(id);
+        PointDTO result = DTOMapper.toPointDTO(rawData);
+
+        LOGGER.info("Возвращаем точку как DTO");
+        return result;
+    }
+
     public int selectPointIdByXValueAndFunctionId(double x, int function_id){
         LOGGER.info("Приступаем к поиску айди по значению икса и айди ф-ции");
         String sql = loaderSQL.loadSQL("scripts\\points\\select_point_by_x_value_and_point_id.sql");
@@ -116,7 +172,12 @@ public class JdbcPointRepository implements PointRepository{
             statement.setInt(2, function_id);
 
             var resultSet = statement.executeQuery();
-            resultSet.next();
+
+            if(!resultSet.next()){
+                LOGGER.warn("Такой точки нет");
+                throw new DataDoesNotExistException();
+            };
+
             LOGGER.info("Айди точки был найден");
             return resultSet.getInt(1);
         } catch (SQLException e) {

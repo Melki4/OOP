@@ -6,6 +6,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,6 +46,10 @@ public class JdbcUserRepository implements UserRepository{
                 boof.append(resultSet.getString(5)).append(" ");
                 list.add(boof.toString());
             }
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица пуста");
+                throw new DataDoesNotExistException();
+            }
             LOGGER.info("Все пользователи успешно получены");
             return list;
         } catch (SQLException e) {
@@ -55,6 +60,7 @@ public class JdbcUserRepository implements UserRepository{
 
     public String selectUserById(int id){
         LOGGER.info("Начинаем поиск пользователя по ID: {}", id);
+
         String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_id.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -65,7 +71,10 @@ public class JdbcUserRepository implements UserRepository{
 
             StringBuilder boof = new StringBuilder();
 
-            resultSet.next();
+            if (!resultSet.next()){
+                LOGGER.warn("Пользователя с таким айди нет");
+                throw new DataDoesNotExistException();
+            };
 
             boof.append(resultSet.getInt(1)).append(" ");
             boof.append(resultSet.getString(2)).append(" ");
@@ -76,7 +85,7 @@ public class JdbcUserRepository implements UserRepository{
             LOGGER.info("Пользователь с ID {} успешно найден", id);
             return boof.toString();
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске пользователя по ID: {}", id);
+            LOGGER.warn("Пользователя с таким айди не существует или произошла ошибка при поиске пользователя по ID: {}", id);
             throw new RuntimeException(e);
         }
     }
@@ -101,6 +110,7 @@ public class JdbcUserRepository implements UserRepository{
 
     public int selectIdByLogin(String login){
         LOGGER.info("Начинаем поиск ID пользователя по логину: {}", login);
+
         String sql = loaderSQL.loadSQL("scripts\\users\\select_id_by_login.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -109,12 +119,15 @@ public class JdbcUserRepository implements UserRepository{
 
             var resultSet = statement.executeQuery();
 
-            resultSet.next();
+            if (!resultSet.next()) {
+                LOGGER.warn("Пользователя с таким логином нет");
+                throw new DataDoesNotExistException();
+            }
 
             LOGGER.info("ID пользователя с логином {} успешно найден", login);
             return resultSet.getInt(1);
         } catch (SQLException e) {
-            LOGGER.warn("Пользователь с логином {} не найден", login);
+            LOGGER.warn("Пользователь с логином не найден или произошла непредвиденная ошибка");
             return -1;
         }
     }
@@ -244,6 +257,43 @@ public class JdbcUserRepository implements UserRepository{
             LOGGER.info("Пользователь с логином {} успешно добавлен", login);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении пользователя с логином: {}", login);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean existsUser(int id) {
+        LOGGER.info("Начинаем проверку на существование пользователя с айди {}", id);
+        String sql = loaderSQL.loadSQL("scripts\\users\\does_user_exists.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            var resultSet = statement.executeQuery();
+            resultSet.next();
+            boolean value = resultSet.getBoolean(1);
+            if (value) LOGGER.info("Пользователь существует");
+            else LOGGER.info("Пользователя не существует");
+            return value;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при проверке существования пользователя");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean existsUser(String login) {
+        LOGGER.info("Начинаем проверку на существование пользователя с логином {}", login);
+        String sql = loaderSQL.loadSQL("scripts\\users\\does_user_exists_by_login.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, login);
+
+            var resultSet = statement.executeQuery();
+            resultSet.next();
+            boolean value = resultSet.getBoolean(1);
+
+            if (value) LOGGER.info("Пользователь с таким логином существует");
+            else LOGGER.info("Пользователя с таким логином не существует");
+            return value;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при проверке существования пользователя с логином");
             throw new RuntimeException(e);
         }
     }

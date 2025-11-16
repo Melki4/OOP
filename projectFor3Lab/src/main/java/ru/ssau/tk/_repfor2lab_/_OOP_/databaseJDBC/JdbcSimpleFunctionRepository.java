@@ -6,6 +6,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,6 +44,12 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
                 boof.append(resultSet.getString(3)).append(" ");
                 list.add(boof.toString());
             }
+
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица пуста");
+                throw new DataDoesNotExistException();
+            }
+
             LOGGER.info("Все простые функции успешно получены");
             return list;
         } catch (SQLException e) {
@@ -53,6 +60,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
 
     public String selectSimpleFunctionByFunctionCode(String code){
         LOGGER.info("Начинаем поиск простой функции по коду: {}", code);
+
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_by_f_code.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -63,7 +71,10 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
 
             StringBuilder boof = new StringBuilder();
 
-            resultSet.next();
+            if(!resultSet.next()){
+                LOGGER.warn("Ф-ции с таким кодом нет");
+                throw new DataDoesNotExistException();
+            }
 
             boof.append(resultSet.getInt(1)).append(" ");
             boof.append(resultSet.getString(2)).append(" ");
@@ -72,7 +83,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
             LOGGER.info("Функция с кодом {} успешно найдена", code);
             return boof.toString();
         } catch (SQLException e) {
-            LOGGER.warn("Ф-ции с таким кодом нет или произошла ошибка при поиске функции по коду: {}", code);
+            LOGGER.warn("Произошла ошибка при поиске функции по коду: {}", code);
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +98,10 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
 
             var resultSet = statement.executeQuery();
 
-            resultSet.next();
+            if(!resultSet.next()){
+                LOGGER.warn("Ф-ции с таким кодом нет и имя не вернуть");
+                throw new DataDoesNotExistException();
+            };
 
             LOGGER.info("Имя функции с кодом {} успешно найдена", code);
             return resultSet.getString(1);
@@ -164,11 +178,27 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
             statement.setString(1, functionCode);
             statement.setString(2, localName);
-
             statement.execute();
             LOGGER.info("Простая функция с кодом {} успешно добавлена", functionCode);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении простой функции с кодом: {}", functionCode);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean existsSimpleFunction(String code) {
+        LOGGER.info("Начинаем проверку на существование ф-ции с кодом{}", code);
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\does_simple_function_exists.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+            statement.setString(1, code);
+            var resultSet = statement.executeQuery();
+            resultSet.next();
+            boolean value = resultSet.getBoolean(1);
+            if (value) LOGGER.info("Ф-ция существует");
+            else LOGGER.info("Ф-ции не существует");
+            return value;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при проверке существования простой функций");
             throw new RuntimeException(e);
         }
     }
