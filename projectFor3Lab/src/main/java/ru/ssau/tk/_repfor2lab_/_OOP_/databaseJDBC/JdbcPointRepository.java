@@ -129,6 +129,72 @@ public class JdbcPointRepository implements PointRepository{
         }
     }
 
+    public List<String> selectAllPointsSorted() {
+        LOGGER.info("Начинаем выбор всех отсортированных точек");
+        List<String> list = new ArrayList<>();
+        String sql = loaderSQL.loadSQL("scripts\\points\\select_all_sorted_points.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            StringBuilder boof;
+            while(resultSet.next()){
+                boof = new StringBuilder();
+                boof.append(resultSet.getInt(1)).append(" ");
+                boof.append(resultSet.getDouble(2)).append(" ");
+                boof.append(resultSet.getDouble(3)).append(" ");
+                boof.append(resultSet.getInt(4)).append(" ");
+                boof.append(resultSet.getString(5)).append(" ");
+                list.add(boof.toString());
+            }
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица с точками пуста");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Всё корректно обработалось, возвращаем список сортированных строк с точками");
+            return list;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка с выбором информации о сортированных точках");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> selectPointsByFunctionIdSorted(int id) {
+        LOGGER.info("Начинаем поиск сортированных точек по айди функции которой они принадлежат {}", id);
+        List<String> list = new ArrayList<>();
+        String sql = loaderSQL.loadSQL("scripts\\points\\select_sorted_points_by_function_id.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1, id);
+
+            var resultSet = statement.executeQuery();
+
+            StringBuilder boof;
+
+            while(resultSet.next()){
+                boof = new StringBuilder();
+                boof.append(resultSet.getInt(1)).append(" ");
+                boof.append(resultSet.getDouble(2)).append(" ");
+                boof.append(resultSet.getDouble(3)).append(" ");
+                boof.append(resultSet.getInt(4)).append(" ");
+                boof.append(resultSet.getString(5)).append(" ");
+                list.add(boof.toString());
+            }
+
+            if (list.isEmpty()){
+                LOGGER.warn("Для функции не были заданы точки");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Точки корректно нашлись и будет возвращены отсортированными списком строк");
+            return list;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе сортированных точек по айди ф-ции {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<PointDTO> selectAllPointsAsDTO() {
         LOGGER.info("Начинаем выбор всех точек и вернём их как лист DTO");
         List<String> rawData = selectAllPoints();
@@ -160,6 +226,30 @@ public class JdbcPointRepository implements PointRepository{
         PointDTO result = DTOMapper.toPointDTO(rawData);
 
         LOGGER.info("Возвращаем точку как DTO");
+        return result;
+    }
+
+    public List<PointDTO> selectAllPointsSortedAsDTO() {
+        LOGGER.info("Начинаем выбор всех сортированных точек и вернём их как лист DTO");
+        List<String> rawData = selectAllPointsSorted();
+        List<PointDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toPointDTO(data));
+        }
+        LOGGER.info("Возвращаем список сортированных точек как лист DTO");
+        return result;
+    }
+
+    public List<PointDTO> selectPointsByFunctionIdSortedAsDTO(int id) {
+        LOGGER.info("Начинаем выбор сортированных точек по айди ф-ции и вернём их как лист DTO, айди{}", id);
+        List<String> rawData = selectPointsByFunctionIdSorted(id);
+        List<PointDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toPointDTO(data));
+        }
+        LOGGER.info("Возвращаем список сортированных точек ф-ции как лист DTO");
         return result;
     }
 

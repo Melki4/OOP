@@ -1,0 +1,1 @@
+SELECT * FROM points where function_id = ? ORDER BY function_id ASC, xvalue ASC;

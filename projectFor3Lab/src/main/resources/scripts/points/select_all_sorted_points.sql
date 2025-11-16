@@ -1,0 +1,1 @@
+SELECT * FROM points ORDER BY function_id ASC, xvalue ASC;

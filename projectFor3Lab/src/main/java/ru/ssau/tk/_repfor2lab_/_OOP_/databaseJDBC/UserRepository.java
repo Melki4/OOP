@@ -8,8 +8,10 @@ public interface UserRepository {
     void createTable();
     List<String> selectAllUsers();
     String selectUserById(int id);
+    String selectUserByLogin(String Login);
     List<UserDTO> selectAllUsersAsDTO();
     UserDTO selectUserByIdAsDTO(int id);
+    UserDTO selectUserByLoginAsDTO(String Login);
     int selectIdByLogin(String login);
     void updateFactoryTypeById(String factoryType, int id);
     void updatePasswordById(String password, int id);

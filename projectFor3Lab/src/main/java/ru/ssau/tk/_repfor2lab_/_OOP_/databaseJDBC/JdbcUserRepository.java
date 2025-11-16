@@ -85,7 +85,39 @@ public class JdbcUserRepository implements UserRepository{
             LOGGER.info("Пользователь с ID {} успешно найден", id);
             return boof.toString();
         } catch (SQLException e) {
-            LOGGER.warn("Пользователя с таким айди не существует или произошла ошибка при поиске пользователя по ID: {}", id);
+            LOGGER.warn("Произошла ошибка при поиске пользователя по ID: {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String selectUserByLogin(String Login) {
+        LOGGER.info("Начинаем поиск пользователя по login: {}", Login);
+
+        String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_login.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, Login);
+
+            var resultSet = statement.executeQuery();
+
+            StringBuilder boof = new StringBuilder();
+
+            if (!resultSet.next()){
+                LOGGER.warn("Пользователя с таким логином нет при поиске пользователя");
+                throw new DataDoesNotExistException();
+            };
+
+            boof.append(resultSet.getInt(1)).append(" ");
+            boof.append(resultSet.getString(2)).append(" ");
+            boof.append(resultSet.getString(3)).append(" ");
+            boof.append(resultSet.getString(4)).append(" ");
+            boof.append(resultSet.getString(5)).append(" ");
+
+            LOGGER.info("Пользователь с login {} успешно найден", Login);
+            return boof.toString();
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при поиске пользователя по login: {}", Login);
             throw new RuntimeException(e);
         }
     }
@@ -105,6 +137,12 @@ public class JdbcUserRepository implements UserRepository{
     public UserDTO selectUserByIdAsDTO(int id) {
         LOGGER.info("Начинаем поиск пользователя по айди и вернём его как DTO, айди{}", id);
         String rawData = selectUserById(id);
+        return DTOMapper.toUserDTO(rawData);
+    }
+
+    public UserDTO selectUserByLoginAsDTO(String Login) {
+        LOGGER.info("Начинаем поиск пользователя по логину и вернём его как DTO, айди{}", Login);
+        String rawData = selectUserByLogin(Login);
         return DTOMapper.toUserDTO(rawData);
     }
 
