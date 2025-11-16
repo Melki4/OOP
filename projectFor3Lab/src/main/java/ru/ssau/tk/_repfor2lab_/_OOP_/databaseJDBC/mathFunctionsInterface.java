@@ -62,6 +62,7 @@ public class mathFunctionsInterface {
             throw new RuntimeException(e);
         }
     }
+
     public List<String> selectMathFunctionByUserId(int id){
         LOGGER.info("Начинаем поиск ф-ций пользователя по его айди");
         List<String> list = new ArrayList<>();
@@ -135,17 +136,25 @@ public class mathFunctionsInterface {
         List<String> all_functions = selectAllMathFunctions();
         List<Integer> all_codes = new ArrayList<>();
         for (var el : all_functions) all_codes.add(Integer.parseInt(el.split(" ")[0]));
+        try (var connection = connectionManager.open();
+             var statement = connection.prepareStatement(sql)) {
 
-        for(var el : all_codes) {
-            try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+            // Отключаем автокоммит для большей производительности
+            connection.setAutoCommit(false);
+
+            for(var el : all_codes) {
                 statement.setInt(1, el);
-                statement.execute();
-            } catch (SQLException e) {
-                LOGGER.warn("Произошла ошибка при обработке запроса по удалению какой-то мат ф.ции её айди: {}", el);
-                throw new RuntimeException(e);
+                statement.addBatch();
             }
+
+            statement.executeBatch();
+            connection.commit(); // Фиксируем все изменения
+
+            LOGGER.info("Удаление прошло успешно");
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при обработке запроса по удалению какой-то мат ф.ции");
+            throw new RuntimeException(e);
         }
-        LOGGER.info("Удаление прошло успешно");
     }
 
     public void addMathFunction(String function_name, int amount_of_dots, double left_boarder,

@@ -188,15 +188,26 @@ public class userInterface {
         List<Integer> all_codes = new ArrayList<>();
         for (var el : all_functions) all_codes.add(Integer.parseInt(el.split(" ")[0]));
 
-        for(var el : all_codes) {
-            try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+        try (var connection = connectionManager.open();
+             var statement = connection.prepareStatement(sql)) {
+
+            // Отключаем автокоммит для большей производительности
+            connection.setAutoCommit(false);
+
+            for(var el : all_codes) {
                 statement.setInt(1, el);
-                statement.execute();
-            } catch (SQLException e) {
-                LOGGER.warn("Произошла ошибка при удалении пользователя с ID: {}", el);
-                throw new RuntimeException(e);
+                statement.addBatch();
             }
+
+            statement.executeBatch();
+            connection.commit(); // Фиксируем все изменения
+
+            LOGGER.info("Удаление прошло успешно");
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при удалении пользователя");
+            throw new RuntimeException(e);
         }
+
         LOGGER.info("Все пользователи успешно удалены");
     }
 
