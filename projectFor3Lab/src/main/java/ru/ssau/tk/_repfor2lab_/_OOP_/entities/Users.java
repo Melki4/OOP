@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -28,8 +28,7 @@ public class Users {
     private List<MathFunctions> mathFunctions;
 
     public Users(){}
-    public Users(String factoryType, String login, String password, String role){
-        this.factoryType = factoryType;
+    public Users(String login, String password, String role){
         this.login = login;
         this.password = password;
         this.role = role;

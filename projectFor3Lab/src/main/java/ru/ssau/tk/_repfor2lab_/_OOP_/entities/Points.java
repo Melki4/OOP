@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "points")
@@ -8,7 +8,7 @@ public class Points {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pointID", nullable = false)
-    private Integer pointID;
+    private Long pointID;
 
     @Column(name = "xValue", nullable = false)
     private Double xValue;
@@ -21,34 +21,34 @@ public class Points {
     private MathFunctions mathFunctions;
 
     public Points(){}
-    public Points(Integer pointID, double xValue, double yValue, MathFunctions mathFunctions){
+    public Points(Long pointID, Double xValue, Double yValue, MathFunctions mathFunctions){
         this.pointID = pointID;
         this.xValue = xValue;
         this.yValue = yValue;
         this.mathFunctions = mathFunctions;
     }
 
-    public Integer getPointID() {
+    public Long getPointID() {
         return pointID;
     }
 
-    public void setPointID(Integer pointID) {
+    public void setPointID(Long pointID) {
         this.pointID = pointID;
     }
 
-    public double getxValue() {
+    public Double getxValue() {
         return xValue;
     }
 
-    public void setxValue(double xValue) {
+    public void setxValue(Double xValue) {
         this.xValue = xValue;
     }
 
-    public double getyValue() {
+    public Double getyValue() {
         return yValue;
     }
 
-    public void setyValue(double yValue) {
+    public void setyValue(Double yValue) {
         this.yValue = yValue;
     }
 
