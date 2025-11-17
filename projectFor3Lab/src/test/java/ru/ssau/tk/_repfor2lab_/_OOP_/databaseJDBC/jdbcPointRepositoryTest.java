@@ -74,7 +74,7 @@ class jdbcPointRepositoryTest {
         String pointString = functionPoints.get(0);
         String[] parts = pointString.split(" ");
 
-        assertEquals(5, parts.length);
+        assertEquals(4, parts.length);
         double x = Double.parseDouble(parts[1]);
         double y = Double.parseDouble(parts[2]);
 
@@ -112,7 +112,7 @@ class jdbcPointRepositoryTest {
         s.addMathFunction("x^2-1", 100, -42.2,
                 42.2, user_id, "SqrFunc");
 
-        int function_id = Integer.parseInt(s.selectAllMathFunctions().get(0).split(" ")[0]);
+        int function_id = Integer.parseInt(s.selectAllMathFunctionsSortedByUserLogins().get(0).split(" ")[0]);
 
         JdbcSimpleFunctionRepository.addSimpleFunction("F", "Функция");
 

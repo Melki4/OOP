@@ -21,6 +21,8 @@ class jdbcMathFunctionRepositoryTest {
     void tearDown() {
         var f = new JdbcMathFunctionRepository();
         f.deleteAllFunctions();
+        var u = new JdbcUserRepository();
+        u.deleteAllUsers();
     }
 
     @Test
@@ -44,7 +46,7 @@ class jdbcMathFunctionRepositoryTest {
                 42.2, id, "SqrFunc");
 
         // READ - Получаем все функции
-        List<String> allFunctions = JdbcMathFunctionRepository.selectAllMathFunctions();
+        List<String> allFunctions = JdbcMathFunctionRepository.selectAllMathFunctionsSortedByUserLogins();
         assertFalse(allFunctions.isEmpty());
 
         List<String> sinLocalName = JdbcMathFunctionRepository.selectMathFunctionsByUserId(id);

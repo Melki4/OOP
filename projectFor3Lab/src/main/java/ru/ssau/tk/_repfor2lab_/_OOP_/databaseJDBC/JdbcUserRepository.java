@@ -30,7 +30,7 @@ public class JdbcUserRepository implements UserRepository{
     }
 
     public List<String> selectAllUsers(){
-        LOGGER.info("Начинаем выбор всех пользователей");
+        LOGGER.info("Начинаем возврат списка всех пользователей как списка строк");
         List<String> list = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
 
@@ -54,6 +54,36 @@ public class JdbcUserRepository implements UserRepository{
             return list;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех пользователей");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> selectAllUsersSortedByLogin() {
+        LOGGER.info("Начинаем подготовку списка всех пользователей, отсортированных по логинам как списка строк");
+        List<String> list = new ArrayList<>();
+        String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users_sorted_by_login.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            StringBuilder boof;
+
+            while(resultSet.next()){
+                boof = new StringBuilder();
+                boof.append(resultSet.getInt(1)).append(" ");
+                boof.append(resultSet.getString(2)).append(" ");
+                boof.append(resultSet.getString(3)).append(" ");
+                boof.append(resultSet.getString(4)).append(" ");
+                boof.append(resultSet.getString(5)).append(" ");
+                list.add(boof.toString());
+            }
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица с пользователями пуста");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все сортированные пользователи успешно получены");
+            return list;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей");
             throw new RuntimeException(e);
         }
     }
@@ -123,7 +153,7 @@ public class JdbcUserRepository implements UserRepository{
     }
 
     public List<UserDTO> selectAllUsersAsDTO() {
-        LOGGER.info("Начинаем выбор всех пользователей и вернём их как лист DTO");
+        LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
         List<String> rawData = selectAllUsers();
         List<UserDTO> result = new ArrayList<>();
 
@@ -131,6 +161,18 @@ public class JdbcUserRepository implements UserRepository{
             result.add(DTOMapper.toUserDTO(data));
         }
         LOGGER.info("Возвращаем список пользователей как лист DTO");
+        return result;
+    }
+
+    public List<UserDTO> selectAllUsersSortedByLoginAsDTO() {
+        LOGGER.info("Начинаем возврат списка всех пользователей отсортированных по логинам и вернём их как лист DTO");
+        List<String> rawData = selectAllUsersSortedByLogin();
+        List<UserDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toUserDTO(data));
+        }
+        LOGGER.info("Возвращаем список отсортированных пользователей как лист DTO");
         return result;
     }
 

@@ -32,7 +32,7 @@ class jdbcSimpleFunctionRepositoryTest {
         JdbcSimpleFunctionRepository.addSimpleFunction("TAN", "Тангенс");
 
         // READ - Получаем все функции
-        List<String> allFunctions = JdbcSimpleFunctionRepository.selectAllSimpleFunctions();
+        List<String> allFunctions = JdbcSimpleFunctionRepository.selectAllSimpleFunctionsSortedByLocalName();
         assertFalse(allFunctions.isEmpty());
 
         // Ищем конкретную функцию по коду

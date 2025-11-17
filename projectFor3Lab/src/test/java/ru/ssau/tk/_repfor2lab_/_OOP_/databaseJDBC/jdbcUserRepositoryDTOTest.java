@@ -18,7 +18,7 @@ class jdbcUserRepositoryDTOTest {
         JdbcUserRepository.addUser("OrigFact", "updateuser1", "originalpass1", "user");
         JdbcUserRepository.addUser("OrigFact", "updateuser2", "originalpass2", "user");
 
-        List<String> list = JdbcUserRepository.selectAllUsers();
+        List<String> list = JdbcUserRepository.selectAllUsersSortedByLogin();
         List<UserDTO> userDTOList = JdbcUserRepository.selectAllUsersAsDTO();
 
         for (int i =0; i< list.size(); ++i){

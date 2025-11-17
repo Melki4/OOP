@@ -10,7 +10,7 @@ public class DTOMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(DTOMapper.class);
     // Трансформация из данных интерфейса в UserDTO
     public static UserDTO toUserDTO(String dbData) {
-        LOGGER.info("Начинаем преобразовывать строку с данными о пользователях в UserDTO");
+        LOGGER.info("Начинаем преобразовывать строку с данными о пользователях в UserDTO, пароль должен быть без пробелов");
         String[] parts = dbData.split(" ");
         return new UserDTO(
                 Long.parseLong(parts[0]),  // userId

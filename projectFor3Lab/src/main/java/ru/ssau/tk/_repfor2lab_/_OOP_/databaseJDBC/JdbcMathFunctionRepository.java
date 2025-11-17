@@ -72,6 +72,43 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository{
         }
     }
 
+    public List<String> selectAllMathFunctionsSortedByUserLogins() {
+        LOGGER.info("Выбор всех данных в таблице мат ф-ций отсортированных по логинам");
+        List<String> list = new ArrayList<>();
+        String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_all_m_f_sorted_by_logins.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            StringBuilder boof;
+            while(resultSet.next()){
+                boof = new StringBuilder();
+
+                boof.append(resultSet.getInt(1)).append(" ");
+                boof.append(resultSet.getString(2)).append(" ");
+                boof.append(resultSet.getInt(3)).append(" ");
+                boof.append(resultSet.getDouble(4)).append(" ");
+                boof.append(resultSet.getDouble(5)).append(" ");
+                boof.append(resultSet.getInt(6)).append(" ");
+                boof.append(resultSet.getString(7)).append(" ");
+                boof.append(resultSet.getString(8)).append(" ");
+                boof.append(resultSet.getString(9)).append(" ");
+
+                list.add(boof.toString());
+            }
+
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица мат. ф-ций пуста");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Отсортированные данные успешно получены");
+            return list;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех сортированных данных");
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<String> selectMathFunctionsByUserId(int id){
         LOGGER.info("Начинаем поиск ф-ций пользователя по его айди");
         List<String> list = new ArrayList<>();
@@ -159,6 +196,18 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository{
             result.add(DTOMapper.toMathFunctionDTO(data));
         }
         LOGGER.info("Возвращаем список ф-ций как лист DTO");
+        return result;
+    }
+
+    public List<MathFunctionDTO> selectAllMathFunctionsSortedByUserLoginsAsDTO() {
+        LOGGER.info("Начинаем выбор всех сортированных мат. ф-ций и вернём их как лист DTO");
+        List<String> rawData = selectAllMathFunctionsSortedByUserLogins();
+        List<MathFunctionDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toMathFunctionDTO(data));
+        }
+        LOGGER.info("Возвращаем список сортированных мат. ф-ций как лист DTO");
         return result;
     }
 

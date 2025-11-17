@@ -58,6 +58,35 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
         }
     }
 
+    public List<String> selectAllSimpleFunctionsSortedByLocalName() {
+        LOGGER.info("Начинаем выбор всех простых функций отсортированных по имени");
+        List<String> list = new ArrayList<>();
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_s_f_ordered_by_name.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            StringBuilder boof;
+            while(resultSet.next()){
+                boof = new StringBuilder();
+                boof.append(resultSet.getInt(1)).append(" ");
+                boof.append(resultSet.getString(2)).append(" ");
+                boof.append(resultSet.getString(3)).append(" ");
+                list.add(boof.toString());
+            }
+
+            if (list.isEmpty()){
+                LOGGER.warn("Таблица простых ф-ций пуста");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Все отсортированные простые функции успешно получены");
+            return list;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций");
+            throw new RuntimeException(e);
+        }
+    }
+
     public String selectSimpleFunctionByFunctionCode(String code){
         LOGGER.info("Начинаем поиск простой функции по коду: {}", code);
 
@@ -120,6 +149,18 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
             result.add(DTOMapper.toSimpleFunctionDTO(data));
         }
         LOGGER.info("Возвращаем список ф-ций как лист DTO");
+        return result;
+    }
+
+    public List<SimpleFunctionDTO> selectAllSimpleFunctionsSortedByLocalNameAsDTO() {
+        LOGGER.info("Начинаем выбор всех сортированных ф-ций и вернём их как лист DTO");
+        List<String> rawData = selectAllSimpleFunctionsSortedByLocalName();
+        List<SimpleFunctionDTO> result = new ArrayList<>();
+
+        for (String data : rawData) {
+            result.add(DTOMapper.toSimpleFunctionDTO(data));
+        }
+        LOGGER.info("Возвращаем список отсортированных простых ф-ций как лист DTO");
         return result;
     }
 
