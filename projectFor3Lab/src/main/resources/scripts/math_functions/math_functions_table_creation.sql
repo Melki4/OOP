@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS math_functions(
 	math_function_id SERIAL NOT NULL PRIMARY KEY,
-	function_name VARCHAR(128) NOT NULL,
+	function_name VARCHAR(128) UNIQUE NOT NULL,
 	amount_of_dots BIGINT NOT NULL,
 	left_boarder DECIMAL NOT NULL,
 	right_boarder DECIMAL NOT NULL,

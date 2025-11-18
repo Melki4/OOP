@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
 import java.util.List;
@@ -8,18 +8,11 @@ import java.util.List;
 public interface PointRepository {
     void createTable();
 
-    List<String> selectAllPoints();
-    List<String> selectPointsByFunctionId(int id);
-    String selectPointByPointId(int id);
-
-    List<String> selectAllPointsSorted();
-    List<String> selectPointsByFunctionIdSorted(int id);
-
-    List<PointDTO> selectAllPointsAsDTO();
-    List<PointDTO> selectPointsByFunctionIdAsDTO(int id);
-    PointDTO selectPointByPointIdAsDTO(int id);
-    List<PointDTO> selectAllPointsSortedAsDTO();
-    List<PointDTO> selectPointsByFunctionIdSortedAsDTO(int id);
+    List<Points> selectAllPoints();
+    List<Points> selectPointsByFunctionId(int id);
+    Points selectPointByPointId(int id);
+    List<Points> selectAllPointsSorted();
+    List<Points> selectPointsByFunctionIdSorted(int id);
 
     int selectPointIdByXValueAndFunctionId(double x, int function_id);
 

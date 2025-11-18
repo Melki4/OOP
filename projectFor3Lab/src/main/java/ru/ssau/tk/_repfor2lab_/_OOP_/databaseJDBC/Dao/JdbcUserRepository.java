@@ -1,9 +1,9 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
+package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.User;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.UserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcUserRepository implements UserRepository{
+public class JdbcUserRepository implements UserRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcUserRepository.class);
 
     public void createTable(){
@@ -29,68 +29,70 @@ public class JdbcUserRepository implements UserRepository{
         }
     }
 
-    public List<String> selectAllUsers(){
-        LOGGER.info("Начинаем возврат списка всех пользователей как списка строк");
-        List<String> list = new ArrayList<>();
+    public List<User> selectAllUsers() {
+        LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
+        List<User> result = new ArrayList<>();
+
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
-            StringBuilder boof;
+
+            User boof;
             while(resultSet.next()){
-                boof = new StringBuilder();
-                boof.append(resultSet.getInt(1)).append(" ");
-                boof.append(resultSet.getString(2)).append(" ");
-                boof.append(resultSet.getString(3)).append(" ");
-                boof.append(resultSet.getString(4)).append(" ");
-                boof.append(resultSet.getString(5)).append(" ");
-                list.add(boof.toString());
+                boof = new User(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(4),
+                        resultSet.getString(5));
+
+                result.add(boof);
             }
-            if (list.isEmpty()){
+            if (result.isEmpty()){
                 LOGGER.warn("Таблица пуста");
                 throw new DataDoesNotExistException();
             }
             LOGGER.info("Все пользователи успешно получены");
-            return list;
+            return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех пользователей");
             throw new RuntimeException(e);
         }
     }
 
-    public List<String> selectAllUsersSortedByLogin() {
-        LOGGER.info("Начинаем подготовку списка всех пользователей, отсортированных по логинам как списка строк");
-        List<String> list = new ArrayList<>();
+    public List<User> selectAllUsersSortedByLogin() {
+        LOGGER.info("Начинаем возврат списка всех пользователей отсортированных по логинам");
+
+        List<User> result = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users_sorted_by_login.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
-            StringBuilder boof;
+            User boof;
 
             while(resultSet.next()){
-                boof = new StringBuilder();
-                boof.append(resultSet.getInt(1)).append(" ");
-                boof.append(resultSet.getString(2)).append(" ");
-                boof.append(resultSet.getString(3)).append(" ");
-                boof.append(resultSet.getString(4)).append(" ");
-                boof.append(resultSet.getString(5)).append(" ");
-                list.add(boof.toString());
+                boof = new User(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(4),
+                        resultSet.getString(5));
+
+                result.add(boof);
             }
-            if (list.isEmpty()){
+            if (result.isEmpty()){
                 LOGGER.warn("Таблица с пользователями пуста");
                 throw new DataDoesNotExistException();
             }
             LOGGER.info("Все сортированные пользователи успешно получены");
-            return list;
+            return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей");
             throw new RuntimeException(e);
         }
     }
 
-    public String selectUserById(int id){
-        LOGGER.info("Начинаем поиск пользователя по ID: {}", id);
-
+    public User selectUserById(int id) {
+        LOGGER.info("Начинаем поиск пользователя по айди и вернём его как DTO, айди{}", id);
         String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_id.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -99,30 +101,27 @@ public class JdbcUserRepository implements UserRepository{
 
             var resultSet = statement.executeQuery();
 
-            StringBuilder boof = new StringBuilder();
-
             if (!resultSet.next()){
                 LOGGER.warn("Пользователя с таким айди нет");
                 throw new DataDoesNotExistException();
             };
 
-            boof.append(resultSet.getInt(1)).append(" ");
-            boof.append(resultSet.getString(2)).append(" ");
-            boof.append(resultSet.getString(3)).append(" ");
-            boof.append(resultSet.getString(4)).append(" ");
-            boof.append(resultSet.getString(5)).append(" ");
+            User boof = new User(resultSet.getLong(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getString(4),
+                    resultSet.getString(5));
 
             LOGGER.info("Пользователь с ID {} успешно найден", id);
-            return boof.toString();
+            return boof;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске пользователя по ID: {}", id);
             throw new RuntimeException(e);
         }
     }
 
-    public String selectUserByLogin(String Login) {
-        LOGGER.info("Начинаем поиск пользователя по login: {}", Login);
-
+    public User selectUserByLogin(String Login) {
+        LOGGER.info("Начинаем поиск пользователя по логину и вернём его как DTO, айди{}", Login);
         String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_login.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -131,61 +130,23 @@ public class JdbcUserRepository implements UserRepository{
 
             var resultSet = statement.executeQuery();
 
-            StringBuilder boof = new StringBuilder();
-
             if (!resultSet.next()){
                 LOGGER.warn("Пользователя с таким логином нет при поиске пользователя");
                 throw new DataDoesNotExistException();
             };
 
-            boof.append(resultSet.getInt(1)).append(" ");
-            boof.append(resultSet.getString(2)).append(" ");
-            boof.append(resultSet.getString(3)).append(" ");
-            boof.append(resultSet.getString(4)).append(" ");
-            boof.append(resultSet.getString(5)).append(" ");
+            User boof = new User(resultSet.getLong(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getString(4),
+                    resultSet.getString(5));
 
             LOGGER.info("Пользователь с login {} успешно найден", Login);
-            return boof.toString();
+            return boof;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске пользователя по login: {}", Login);
             throw new RuntimeException(e);
         }
-    }
-
-    public List<UserDTO> selectAllUsersAsDTO() {
-        LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
-        List<String> rawData = selectAllUsers();
-        List<UserDTO> result = new ArrayList<>();
-
-        for (String data : rawData) {
-            result.add(DTOMapper.toUserDTO(data));
-        }
-        LOGGER.info("Возвращаем список пользователей как лист DTO");
-        return result;
-    }
-
-    public List<UserDTO> selectAllUsersSortedByLoginAsDTO() {
-        LOGGER.info("Начинаем возврат списка всех пользователей отсортированных по логинам и вернём их как лист DTO");
-        List<String> rawData = selectAllUsersSortedByLogin();
-        List<UserDTO> result = new ArrayList<>();
-
-        for (String data : rawData) {
-            result.add(DTOMapper.toUserDTO(data));
-        }
-        LOGGER.info("Возвращаем список отсортированных пользователей как лист DTO");
-        return result;
-    }
-
-    public UserDTO selectUserByIdAsDTO(int id) {
-        LOGGER.info("Начинаем поиск пользователя по айди и вернём его как DTO, айди{}", id);
-        String rawData = selectUserById(id);
-        return DTOMapper.toUserDTO(rawData);
-    }
-
-    public UserDTO selectUserByLoginAsDTO(String Login) {
-        LOGGER.info("Начинаем поиск пользователя по логину и вернём его как DTO, айди{}", Login);
-        String rawData = selectUserByLogin(Login);
-        return DTOMapper.toUserDTO(rawData);
     }
 
     public int selectIdByLogin(String login){
@@ -295,40 +256,17 @@ public class JdbcUserRepository implements UserRepository{
 
     public void deleteAllUsers(){
         LOGGER.info("Начинаем удаление всех пользователей");
-        String sql = loaderSQL.loadSQL("scripts\\users\\delete_user_by_id.sql");
-        List<String> all_functions;
 
-        try {
-            all_functions = selectAllUsers();
-        } catch (DataDoesNotExistException e) {
-            LOGGER.info("И так всё удалено");
-            return;
-        }
-
-        List<Integer> all_codes = new ArrayList<>();
-        for (var el : all_functions) all_codes.add(Integer.parseInt(el.split(" ")[0]));
+        String sql = loaderSQL.loadSQL("scripts\\users\\truncate_all_users.sql");
 
         try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(sql)) {
-
-            // Отключаем автокоммит для большей производительности
-            connection.setAutoCommit(false);
-
-            for(var el : all_codes) {
-                statement.setInt(1, el);
-                statement.addBatch();
-            }
-
-            statement.executeBatch();
-            connection.commit(); // Фиксируем все изменения
-
-            LOGGER.info("Удаление прошло успешно");
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+            LOGGER.info("Все пользователи успешно удалены");
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при удалении пользователя");
+            LOGGER.warn("Произошла ошибка при удалении пользователей");
             throw new RuntimeException(e);
         }
-
-        LOGGER.info("Все пользователи успешно удалены");
     }
 
     public void addUser(String factoryType, String login, String password, String role){

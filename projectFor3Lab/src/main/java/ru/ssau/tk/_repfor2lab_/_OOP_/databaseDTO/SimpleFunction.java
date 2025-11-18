@@ -1,14 +1,14 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
-public class SimpleFunctionDTO {
+public class SimpleFunction {
     private Long functionId;
     private String functionCode;
     private String localName;
 
     // Конструкторы
-    public SimpleFunctionDTO() {}
+    public SimpleFunction() {}
 
-    public SimpleFunctionDTO(Long functionId, String functionCode, String localName) {
+    public SimpleFunction(Long functionId, String functionCode, String localName) {
         this.functionId = functionId;
         this.functionCode = functionCode;
         this.localName = localName;

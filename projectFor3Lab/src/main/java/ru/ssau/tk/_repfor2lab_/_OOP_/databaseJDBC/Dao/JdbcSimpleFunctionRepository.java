@@ -1,9 +1,9 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
+package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.DTOMapper;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.SimpleFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
+public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcSimpleFunctionRepository.class);
 
     public void createTable(){
@@ -25,94 +25,6 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
             LOGGER.info("Таблица создана");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при создании таблицы");
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<String> selectAllSimpleFunctions(){
-        LOGGER.info("Начинаем выбор всех простых функций");
-        List<String> list = new ArrayList<>();
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_simple_functions.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
-            ResultSet resultSet = statement.executeQuery(sql);
-            StringBuilder boof;
-            while(resultSet.next()){
-                boof = new StringBuilder();
-                boof.append(resultSet.getInt(1)).append(" ");
-                boof.append(resultSet.getString(2)).append(" ");
-                boof.append(resultSet.getString(3)).append(" ");
-                list.add(boof.toString());
-            }
-
-            if (list.isEmpty()){
-                LOGGER.warn("Таблица пуста");
-                throw new DataDoesNotExistException();
-            }
-
-            LOGGER.info("Все простые функции успешно получены");
-            return list;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при выборе всех простых функций");
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<String> selectAllSimpleFunctionsSortedByLocalName() {
-        LOGGER.info("Начинаем выбор всех простых функций отсортированных по имени");
-        List<String> list = new ArrayList<>();
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_s_f_ordered_by_name.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
-            ResultSet resultSet = statement.executeQuery(sql);
-            StringBuilder boof;
-            while(resultSet.next()){
-                boof = new StringBuilder();
-                boof.append(resultSet.getInt(1)).append(" ");
-                boof.append(resultSet.getString(2)).append(" ");
-                boof.append(resultSet.getString(3)).append(" ");
-                list.add(boof.toString());
-            }
-
-            if (list.isEmpty()){
-                LOGGER.warn("Таблица простых ф-ций пуста");
-                throw new DataDoesNotExistException();
-            }
-
-            LOGGER.info("Все отсортированные простые функции успешно получены");
-            return list;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций");
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String selectSimpleFunctionByFunctionCode(String code){
-        LOGGER.info("Начинаем поиск простой функции по коду: {}", code);
-
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_by_f_code.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setString(1, code);
-
-            var resultSet = statement.executeQuery();
-
-            StringBuilder boof = new StringBuilder();
-
-            if(!resultSet.next()){
-                LOGGER.warn("Ф-ции с таким кодом нет");
-                throw new DataDoesNotExistException();
-            }
-
-            boof.append(resultSet.getInt(1)).append(" ");
-            boof.append(resultSet.getString(2)).append(" ");
-            boof.append(resultSet.getString(3)).append(" ");
-
-            LOGGER.info("Функция с кодом {} успешно найдена", code);
-            return boof.toString();
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске функции по коду: {}", code);
             throw new RuntimeException(e);
         }
     }
@@ -140,34 +52,91 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository{
         }
     }
 
-    public List<SimpleFunctionDTO> selectAllSimpleFunctionsAsDTO() {
-        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист DTO");
-        List<String> rawData = selectAllSimpleFunctions();
-        List<SimpleFunctionDTO> result = new ArrayList<>();
+    public List<SimpleFunction> selectAllSimpleFunctions() {
 
-        for (String data : rawData) {
-            result.add(DTOMapper.toSimpleFunctionDTO(data));
+        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист");
+        List<SimpleFunction> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_simple_functions.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            SimpleFunction boof;
+
+            while(resultSet.next()){
+                boof = new SimpleFunction(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3));
+
+                result.add(boof);
+            }
+            if (result.isEmpty()){
+                LOGGER.warn("Таблица пуста");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все простые функции успешно получены");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех простых функций");
+            throw new RuntimeException(e);
         }
-        LOGGER.info("Возвращаем список ф-ций как лист DTO");
-        return result;
     }
 
-    public List<SimpleFunctionDTO> selectAllSimpleFunctionsSortedByLocalNameAsDTO() {
-        LOGGER.info("Начинаем выбор всех сортированных ф-ций и вернём их как лист DTO");
-        List<String> rawData = selectAllSimpleFunctionsSortedByLocalName();
-        List<SimpleFunctionDTO> result = new ArrayList<>();
+    public List<SimpleFunction> selectAllSimpleFunctionsSortedByLocalName() {
+        LOGGER.info("Начинаем выбор всех сортированных ф-ций и вернём их как лист");
+        List<SimpleFunction> result = new ArrayList<>();
 
-        for (String data : rawData) {
-            result.add(DTOMapper.toSimpleFunctionDTO(data));
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_s_f_ordered_by_name.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            SimpleFunction boof;
+            while(resultSet.next()){
+                boof = new SimpleFunction(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3));
+
+                result.add(boof);
+            }
+            if (result.isEmpty()){
+                LOGGER.warn("Таблица простых ф-ций пуста");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все отсортированные простые функции успешно получены");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций");
+            throw new RuntimeException(e);
         }
-        LOGGER.info("Возвращаем список отсортированных простых ф-ций как лист DTO");
-        return result;
     }
 
-    public SimpleFunctionDTO selectSimpleFunctionByFunctionCodeAsDTO(String code) {
-        LOGGER.info("Начинаем поиск ф-ции по коду и вернём её как DTO, код{}", code);
-        String rawData = selectSimpleFunctionByFunctionCode(code);
-        return DTOMapper.toSimpleFunctionDTO(rawData);
+    public SimpleFunction selectSimpleFunctionByFunctionCode(String code) {
+        LOGGER.info("Начинаем поиск ф-ции по коду, код{}", code);
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_by_f_code.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, code);
+
+            var resultSet = statement.executeQuery();
+
+            if(!resultSet.next()){
+                LOGGER.warn("Ф-ции с таким кодом нет");
+                throw new DataDoesNotExistException();
+            }
+
+            SimpleFunction boof = new SimpleFunction(resultSet.getLong(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3));
+
+
+            LOGGER.info("Функция с кодом {} успешно найдена", code);
+            return boof;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при поиске функции по коду: {}", code);
+            throw new RuntimeException(e);
+        }
     }
 
     public void updateLocalNameByFunctionCode(String localName, String code){

@@ -3,6 +3,11 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcUserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
@@ -70,9 +75,9 @@ public class PointsSortingPerformanceTest {
         }
 
         // Получаем ID функций
-        List<String> functions = mathRepo.selectAllMathFunctions();
+        List<MathFunctions> functions = mathRepo.selectAllMathFunctions();
         for (int i = 0; i < FUNCTION_COUNT; i++) {
-            functionIds[i] = Integer.parseInt(functions.get(i).split(" ")[0]);
+            functionIds[i] = functions.get(i).getFunctionId().intValue();
         }
 
         // Массивы для хранения времени выполнения
@@ -116,7 +121,7 @@ public class PointsSortingPerformanceTest {
 
             // Выборка DTO с сортировкой
             long sortedDTOStart = System.currentTimeMillis();
-            pointRepo.selectPointsByFunctionIdSortedAsDTO(functionIds[i]);
+            pointRepo.selectPointsByFunctionIdSorted(functionIds[i]);
             long sortedDTOEnd = System.currentTimeMillis();
             sortedDTOSelectTimes[i] = sortedDTOEnd - sortedDTOStart;
 

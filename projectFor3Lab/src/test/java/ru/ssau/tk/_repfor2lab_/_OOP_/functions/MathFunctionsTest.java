@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MathFunctionTest {
+class MathFunctionsTest {
     @Test
     void MathFTest(){
         MathFunction f = new IdentityFunction();

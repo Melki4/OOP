@@ -1,20 +1,17 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunction;
 
 import java.util.List;
 
 public interface SimpleFunctionRepository {
     void createTable();
 
-    List<String> selectAllSimpleFunctions();
-    List<String> selectAllSimpleFunctionsSortedByLocalName();
-    String selectSimpleFunctionByFunctionCode(String code);
     String selectSimpleFunctionNameByFunctionCode(String code);
 
-    List<SimpleFunctionDTO> selectAllSimpleFunctionsAsDTO();
-    List<SimpleFunctionDTO> selectAllSimpleFunctionsSortedByLocalNameAsDTO();
-    SimpleFunctionDTO selectSimpleFunctionByFunctionCodeAsDTO(String code);
+    List<SimpleFunction> selectAllSimpleFunctions();
+    List<SimpleFunction> selectAllSimpleFunctionsSortedByLocalName();
+    SimpleFunction selectSimpleFunctionByFunctionCode(String code);
 
     void updateLocalNameByFunctionCode(String localName, String code);
 

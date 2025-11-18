@@ -1,15 +1,15 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
-public class PointDTO {
+public class Points {
     private Long pointId;
     private Double xValue;
     private Double yValue;
     private Long functionId;
 
     // Конструкторы
-    public PointDTO() {}
+    public Points() {}
 
-    public PointDTO(Long pointId, Double xValue, Double yValue, Long functionId) {
+    public Points(Long pointId, Double xValue, Double yValue, Long functionId) {
         this.pointId = pointId;
         this.xValue = xValue;
         this.yValue = yValue;

@@ -1,21 +1,16 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.User;
 
 import java.util.List;
 
 public interface UserRepository {
     void createTable();
 
-    List<String> selectAllUsers();
-    List<String> selectAllUsersSortedByLogin();
-    String selectUserById(int id);
-    String selectUserByLogin(String Login);
-
-    List<UserDTO> selectAllUsersAsDTO();
-    List<UserDTO> selectAllUsersSortedByLoginAsDTO();
-    UserDTO selectUserByIdAsDTO(int id);
-    UserDTO selectUserByLoginAsDTO(String Login);
+    List<User> selectAllUsers();
+    List<User> selectAllUsersSortedByLogin();
+    User selectUserById(int id);
+    User selectUserByLogin(String Login);
 
     int selectIdByLogin(String login);
 

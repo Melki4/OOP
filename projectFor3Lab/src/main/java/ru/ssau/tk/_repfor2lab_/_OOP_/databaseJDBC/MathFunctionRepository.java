@@ -1,20 +1,15 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctions;
 import java.util.List;
 
 public interface MathFunctionRepository {
     void createTable();
 
-    List<String> selectAllMathFunctions();
-    List<String> selectAllMathFunctionsSortedByUserLogins();
-    List<String> selectMathFunctionsByUserId(int id);
-    String selectMathFunctionsByName(String name);
-
-    List<MathFunctionDTO> selectAllMathFunctionsAsDTO();
-    List<MathFunctionDTO> selectAllMathFunctionsSortedByUserLoginsAsDTO();
-    List<MathFunctionDTO> selectMathFunctionsByUserIdAsDTO(int id);
-    MathFunctionDTO selectMathFunctionsByNameAsDTO(String name);
+    List<MathFunctions> selectAllMathFunctions();
+    List<MathFunctions> selectAllMathFunctionsSortedByUserLogins();
+    List<MathFunctions> selectMathFunctionsByUserId(int id);
+    MathFunctions selectMathFunctionsByName(String name);
 
     void updateFunctionNameByFunctionId(String name, int id);
 

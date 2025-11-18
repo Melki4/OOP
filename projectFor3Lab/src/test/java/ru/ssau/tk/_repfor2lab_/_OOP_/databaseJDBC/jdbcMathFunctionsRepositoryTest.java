@@ -3,12 +3,16 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcUserRepository;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class jdbcMathFunctionRepositoryTest {
+class jdbcMathFunctionsRepositoryTest {
     private JdbcMathFunctionRepository JdbcMathFunctionRepository;
 
     @BeforeEach
@@ -46,10 +50,10 @@ class jdbcMathFunctionRepositoryTest {
                 42.2, id, "SqrFunc");
 
         // READ - Получаем все функции
-        List<String> allFunctions = JdbcMathFunctionRepository.selectAllMathFunctionsSortedByUserLogins();
+        List<MathFunctions> allFunctions = JdbcMathFunctionRepository.selectAllMathFunctionsSortedByUserLogins();
         assertFalse(allFunctions.isEmpty());
 
-        List<String> sinLocalName = JdbcMathFunctionRepository.selectMathFunctionsByUserId(id);
+        List<MathFunctions> sinLocalName = JdbcMathFunctionRepository.selectMathFunctionsByUserId(id);
         assertNotNull(sinLocalName);
 
         // UPDATE - Обновляем локальное имя

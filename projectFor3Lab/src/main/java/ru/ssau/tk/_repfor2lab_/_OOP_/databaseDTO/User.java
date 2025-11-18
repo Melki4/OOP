@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
-public class UserDTO {
+public class User {
     private Long userId;
     private String factoryType;
     private String login;
@@ -8,9 +8,9 @@ public class UserDTO {
     private String role;
 
     // Конструкторы
-    public UserDTO() {}
+    public User() {}
 
-    public UserDTO(Long userId, String factoryType, String login, String password, String role) {
+    public User(Long userId, String factoryType, String login, String password, String role) {
         this.userId = userId;
         this.factoryType = factoryType;
         this.login = login;

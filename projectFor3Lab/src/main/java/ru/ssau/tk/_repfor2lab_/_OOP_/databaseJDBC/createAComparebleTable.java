@@ -4,6 +4,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcUserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
@@ -54,22 +58,22 @@ public class createAComparebleTable {
         JdbcUserRepository.addUser("array", "login", "hardpassword", "user");
         int user_id = JdbcUserRepository.selectIdByLogin("login");
 
-        m.addMathFunction("x^2+2x+1", 10000, -100.0,
+        m.addMathFunction("x^2+2x+1_0", 10000, -100.0,
                 1, user_id, "SqrFunc");
-        m.addMathFunction("x^2+2x+1", 20000, -100.0,
+        m.addMathFunction("x^2+2x+1_1", 20000, -100.0,
                 1, user_id, "SqrFunc");
-        m.addMathFunction("x^2+2x+1", 40000, -100.0,
+        m.addMathFunction("x^2+2x+1_2", 40000, -100.0,
                 1, user_id, "SqrFunc");
-        m.addMathFunction("x^2+2x+1", 80000, -100.0,
+        m.addMathFunction("x^2+2x+1_3", 80000, -100.0,
                 1, user_id, "SqrFunc");
-        m.addMathFunction("x^2+2x+1", 100000, -100.0,
+        m.addMathFunction("x^2+2x+1_4", 100000, -100.0,
                 1, user_id, "SqrFunc");
 
-        int function_id1 = Integer.parseInt(m.selectAllMathFunctions().get(0).split(" ")[0]);
-        int function_id2 = Integer.parseInt(m.selectAllMathFunctions().get(1).split(" ")[0]);
-        int function_id3 = Integer.parseInt(m.selectAllMathFunctions().get(2).split(" ")[0]);
-        int function_id4 = Integer.parseInt(m.selectAllMathFunctions().get(3).split(" ")[0]);
-        int function_id5 = Integer.parseInt(m.selectAllMathFunctions().get(4).split(" ")[0]);
+        int function_id1 = m.selectMathFunctionsByName("x^2+2x+1_0").getFunctionId().intValue();
+        int function_id2 = m.selectMathFunctionsByName("x^2+2x+1_1").getFunctionId().intValue();
+        int function_id3 = m.selectMathFunctionsByName("x^2+2x+1_2").getFunctionId().intValue();
+        int function_id4 = m.selectMathFunctionsByName("x^2+2x+1_3").getFunctionId().intValue();
+        int function_id5 = m.selectMathFunctionsByName("x^2+2x+1_4").getFunctionId().intValue();
 
         long startTime1 = System.currentTimeMillis();
         JdbcPointRepository.bulkInsertPointsDirect(points1, function_id1);

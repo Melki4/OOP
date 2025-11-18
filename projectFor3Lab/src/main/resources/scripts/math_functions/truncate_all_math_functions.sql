@@ -1,0 +1,1 @@
+TRUNCATE TABLE math_functions CASCADE;
