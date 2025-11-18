@@ -25,11 +25,11 @@ public class MathFunctions {
     @Column(name = "rightBoarder", nullable = false)
     private Double rightBoarder;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "typeOfFunction")
     private SimpleFunctions simpleFunctions;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ownerID", nullable = false)
     private Users users;
 

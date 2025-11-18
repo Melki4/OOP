@@ -16,7 +16,7 @@ public class Points {
     @Column(name = "yValue", nullable = false)
     private Double yValue;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "functionID")
     private MathFunctions mathFunctions;
 
