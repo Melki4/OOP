@@ -1,1 +1,1 @@
-DELETE FROM points WHERE point_id = ?
+DELETE FROM points WHERE function_id = ?

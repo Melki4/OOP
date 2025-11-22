@@ -1,1 +1,0 @@
-UPDATE points SET xvalue = ? WHERE point_id = ?

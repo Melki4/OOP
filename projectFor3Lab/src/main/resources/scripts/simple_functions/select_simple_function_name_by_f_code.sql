@@ -1,1 +1,0 @@
-select local_name from simple_functions where function_code = ?

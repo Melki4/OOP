@@ -1,1 +1,0 @@
-UPDATE points SET yvalue = ? WHERE point_id = ?

@@ -2,8 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.SimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.SimpleFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
@@ -29,45 +29,20 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
         }
     }
 
-    public String selectSimpleFunctionNameByFunctionCode(String code){
-        LOGGER.info("Начинаем поиск имени простой функции по коду: {}", code);
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_name_by_f_code.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setString(1, code);
-
-            var resultSet = statement.executeQuery();
-
-            if(!resultSet.next()){
-                LOGGER.warn("Ф-ции с таким кодом нет и имя не вернуть");
-                throw new DataDoesNotExistException();
-            };
-
-            LOGGER.info("Имя функции с кодом {} успешно найдена", code);
-            return resultSet.getString(1);
-        } catch (SQLException e) {
-            LOGGER.warn("Ф-ции с таким кодом нет или произошла ошибка при поиске имени функции по коду: {}", code);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<SimpleFunction> selectAllSimpleFunctions() {
+    public List<SimpleFunctions> findAllSimpleFunctions() {
 
         LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист");
-        List<SimpleFunction> result = new ArrayList<>();
+        List<SimpleFunctions> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_simple_functions.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
 
-            SimpleFunction boof;
+            SimpleFunctions boof;
 
             while(resultSet.next()){
-                boof = new SimpleFunction(resultSet.getLong(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
+                boof = new SimpleFunctions(resultSet.getString(1));
 
                 result.add(boof);
             }
@@ -83,19 +58,17 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
         }
     }
 
-    public List<SimpleFunction> selectAllSimpleFunctionsSortedByLocalName() {
+    public List<SimpleFunctions> findAllSimpleFunctionsSortedByLocalName() {
         LOGGER.info("Начинаем выбор всех сортированных ф-ций и вернём их как лист");
-        List<SimpleFunction> result = new ArrayList<>();
+        List<SimpleFunctions> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_s_f_ordered_by_name.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
-            SimpleFunction boof;
+            SimpleFunctions boof;
             while(resultSet.next()){
-                boof = new SimpleFunction(resultSet.getLong(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
+                boof = new SimpleFunctions(resultSet.getString(1));
 
                 result.add(boof);
             }
@@ -111,60 +84,32 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
         }
     }
 
-    public SimpleFunction selectSimpleFunctionByFunctionCode(String code) {
-        LOGGER.info("Начинаем поиск ф-ции по коду, код{}", code);
-        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_simple_function_by_f_code.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setString(1, code);
-
-            var resultSet = statement.executeQuery();
-
-            if(!resultSet.next()){
-                LOGGER.warn("Ф-ции с таким кодом нет");
-                throw new DataDoesNotExistException();
-            }
-
-            SimpleFunction boof = new SimpleFunction(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3));
-
-
-            LOGGER.info("Функция с кодом {} успешно найдена", code);
-            return boof;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске функции по коду: {}", code);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void updateLocalNameByFunctionCode(String localName, String code){
-        LOGGER.info("Начинаем обновление локального имени для функции с кодом: {}", code);
+    public void updateSimpleFunctionName(String oldName, String newName){
+        LOGGER.info("Начинаем обновление локального имени для функции с именем: {}", oldName);
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\local_name_update.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
-            statement.setString(1, localName);
-            statement.setString(2, code);
+            statement.setString(1, newName);
+            statement.setString(2, oldName);
 
             statement.executeUpdate();
-            LOGGER.info("Локальное имя для функции с кодом {} успешно обновлено", code);
+            LOGGER.info("Локальное имя для функции со старым именем {} успешно обновлено", oldName);
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при обновлении локального имени для функции с кодом: {}", code);
+            LOGGER.warn("Произошла ошибка при обновлении локального имени для функции с именем: {}", oldName);
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteSimpleFunctionByFunctionCode(String code){
-        LOGGER.info("Начинаем удаление простой функции с кодом: {}", code);
+    public void deleteSimpleFunctionByName(String localName){
+        LOGGER.info("Начинаем удаление простой функции с кодом: {}", localName);
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\delete_simple_function.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-            statement.setString(1, code);
+            statement.setString(1, localName);
             statement.execute();
-            LOGGER.info("Функция с кодом {} успешно удалена", code);
+            LOGGER.info("Функция с кодом {} успешно удалена", localName);
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при удалении функции с кодом: {}", code);
+            LOGGER.warn("Произошла ошибка при удалении функции с кодом: {}", localName);
             throw new RuntimeException(e);
         }
     }
@@ -182,25 +127,24 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
         createTable();
     }
 
-    public void addSimpleFunction(String functionCode, String localName){
-        LOGGER.info("Начинаем добавление простой функции с кодом: {}", functionCode);
+    public void createSimpleFunction(String localName){
+        LOGGER.info("Начинаем добавление простой функции с именем: {}", localName);
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\insert_simple_function.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
-            statement.setString(1, functionCode);
-            statement.setString(2, localName);
+            statement.setString(1, localName);
             statement.execute();
-            LOGGER.info("Простая функция с кодом {} успешно добавлена", functionCode);
+            LOGGER.info("Простая функция с именем {} успешно добавлена", localName);
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при добавлении простой функции с кодом: {}", functionCode);
+            LOGGER.warn("Произошла ошибка при добавлении простой функции с именем: {}", localName);
             throw new RuntimeException(e);
         }
     }
 
-    public boolean existsSimpleFunction(String code) {
-        LOGGER.info("Начинаем проверку на существование ф-ции с кодом{}", code);
+    public boolean existSimpleFunction(String localName) {
+        LOGGER.info("Начинаем проверку на существование ф-ции с именем{}", localName);
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\does_simple_function_exists.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
-            statement.setString(1, code);
+            statement.setString(1, localName);
             var resultSet = statement.executeQuery();
             resultSet.next();
             boolean value = resultSet.getBoolean(1);

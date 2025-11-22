@@ -1,5 +1,6 @@
 SELECT EXISTS (
     SELECT 1
     FROM math_functions
-    WHERE function_name = ?
+    where left_boarder = ? and right_boarder = ? and amount_of_dots = ?
+     and function_name = ? and function_type != 'Табулированная'
 );

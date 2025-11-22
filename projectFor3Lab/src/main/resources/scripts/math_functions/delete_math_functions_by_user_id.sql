@@ -1,0 +1,1 @@
+DELETE FROM math_functions WHERE owner_id = ?

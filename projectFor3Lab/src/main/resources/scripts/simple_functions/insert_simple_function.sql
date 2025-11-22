@@ -1,1 +1,1 @@
-insert into simple_functions(function_code, local_name) values (?, ?)
+insert into simple_functions(local_name) values (?)

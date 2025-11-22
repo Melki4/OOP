@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Points;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.PointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.PointRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
@@ -30,37 +30,7 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public List<Points> selectAllPoints() {
-        LOGGER.info("Начинаем выбор всех точек и вернём их как лист");
-        List<Points> result = new ArrayList<>();
-        String sql = loaderSQL.loadSQL("scripts\\points\\select_all_points.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
-            ResultSet resultSet = statement.executeQuery(sql);
-            Points boof;
-            while(resultSet.next()){
-                boof = new Points(resultSet.getLong(1),
-                        resultSet.getDouble(2),
-                        resultSet.getDouble(3),
-                        resultSet.getLong(4));
-
-                result.add(boof);
-            }
-
-            if (result.isEmpty()){
-                LOGGER.warn("Таблица пуста");
-                throw new DataDoesNotExistException();
-            }
-
-            LOGGER.info("Всё корректно обработалось, возвращаем список");
-            return result;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка с выбором информации о точках");
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Points> selectPointsByFunctionId(int id) {
+    public List<Points> findPointsByFunctionId(int id) {
         LOGGER.info("Начинаем выбор точек по айди ф-ции и вернём их как лист, айди{}", id);
         List<Points> result = new ArrayList<>();
 
@@ -75,10 +45,9 @@ public class JdbcPointRepository implements PointRepository {
             Points boof;
 
             while(resultSet.next()){
-                boof = new Points(resultSet.getLong(1),
+                boof = new Points(resultSet.getDouble(1),
                         resultSet.getDouble(2),
-                        resultSet.getDouble(3),
-                        resultSet.getLong(4));
+                        resultSet.getInt(3));
 
                 result.add(boof);
             }
@@ -96,66 +65,7 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public Points selectPointByPointId(int id) {
-        LOGGER.info("Начинаем поиск точки и вернём её как DTO");
-        String sql = loaderSQL.loadSQL("scripts\\points\\select_point_by_point_id.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setInt(1, id);
-
-            var resultSet = statement.executeQuery();
-
-            if (!resultSet.next()){
-                LOGGER.warn("Точки с таким айди нет");
-                throw new DataDoesNotExistException();
-            }
-
-            Points boof = new Points(resultSet.getLong(1),
-                    resultSet.getDouble(2),
-                    resultSet.getDouble(3),
-                    resultSet.getLong(4));
-
-            LOGGER.info("Точка корректно нашлась");
-            return boof;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при выборе точки по айди {}", id);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Points> selectAllPointsSorted() {
-        LOGGER.info("Начинаем выбор всех сортированных точек и вернём их как лист");
-        List<Points> result = new ArrayList<>();
-
-        String sql = loaderSQL.loadSQL("scripts\\points\\select_all_sorted_points.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
-            ResultSet resultSet = statement.executeQuery(sql);
-            Points boof;
-            while(resultSet.next()){
-                boof = new Points(resultSet.getLong(1),
-                        resultSet.getDouble(2),
-                        resultSet.getDouble(3),
-                        resultSet.getLong(4));
-
-                result.add(boof);
-            }
-
-            if (result.isEmpty()){
-                LOGGER.warn("Таблица с точками пуста");
-                throw new DataDoesNotExistException();
-            }
-
-            LOGGER.info("Всё корректно обработалось, возвращаем список сортированных строк с точками");
-            return result;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка с выбором информации о сортированных точках");
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Points> selectPointsByFunctionIdSorted(int id) {
+    public List<Points> findPointsByFunctionIdSorted(int id) {
         LOGGER.info("Начинаем выбор сортированных точек по айди ф-ции и вернём их как лист, айди{}", id);
         List<Points> result = new ArrayList<>();
 
@@ -170,10 +80,9 @@ public class JdbcPointRepository implements PointRepository {
             Points boof;
 
             while(resultSet.next()){
-                boof = new Points(resultSet.getLong(1),
+                boof = new Points(resultSet.getDouble(1),
                         resultSet.getDouble(2),
-                        resultSet.getDouble(3),
-                        resultSet.getLong(4));
+                        resultSet.getInt(3));
 
                 result.add(boof);
             }
@@ -191,37 +100,15 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public int selectPointIdByXValueAndFunctionId(double x, int function_id){
-        LOGGER.info("Приступаем к поиску айди по значению икса и айди ф-ции");
-        String sql = loaderSQL.loadSQL("scripts\\points\\select_point_by_x_value_and_point_id.sql");
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setDouble(1, x);
-            statement.setInt(2, function_id);
-
-            var resultSet = statement.executeQuery();
-
-            if(!resultSet.next()){
-                LOGGER.warn("Такой точки нет");
-                throw new DataDoesNotExistException();
-            };
-
-            LOGGER.info("Айди точки был найден");
-            return resultSet.getInt(1);
-        } catch (SQLException e) {
-            LOGGER.info("Айди не был найден");
-            return -1;
-        }
-    }
-
-    public void updateXValueById(Double x_value, int id){
+    public void updateXValueByFunctionIdAndOldX(Double x_value_old, int id, Double x_value_new){
         LOGGER.info("Обновить x для точки с айди {}", id);
-        String sql = loaderSQL.loadSQL("scripts\\points\\x_value_update_by_id.sql");
+        String sql = loaderSQL.loadSQL("scripts\\points\\x_value_update_by_function_id_and_old_x_value.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
-            statement.setDouble(1, x_value);
+            statement.setDouble(1, x_value_old);
             statement.setInt(2, id);
+            statement.setDouble(3, x_value_new);
 
             statement.executeUpdate();
             LOGGER.info("Обновление для X прошло успешно");
@@ -231,14 +118,15 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public void updateYValueById(Double y_value, int id){
+    public void updateYValueByFunctionIdAndOldY(Double y_value_old, int id, Double y_value_new){
         LOGGER.info("Начинаем обновление Y для точки с айди {}", id);
-        String sql = loaderSQL.loadSQL("scripts\\points\\y_value_update_by_id.sql");
+        String sql = loaderSQL.loadSQL("scripts\\points\\y_value_update_by_function_id_and_old_y_value.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
-            statement.setDouble(1, y_value);
+            statement.setDouble(1, y_value_old);
             statement.setInt(2, id);
+            statement.setDouble(3, y_value_new);
 
             statement.executeUpdate();
             LOGGER.info("Обновление прошло успешно");
@@ -248,11 +136,11 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public void deletePointById(int id){
-        LOGGER.info("Начинаем удаление точки с айди {}", id);
+    public void deletePointsByFunctionId(int functionId){
+        LOGGER.info("Начинаем удаление точки с айди функции {}", functionId);
         String sql = loaderSQL.loadSQL("scripts\\points\\delete_point_by_id.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-            statement.setInt(1, id);
+            statement.setInt(1, functionId);
             statement.execute();
             LOGGER.info("Удаление прошло успешно");
         } catch (SQLException e) {
@@ -273,7 +161,7 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public void addPoint(Double x_value, Double y_value, int id){
+    public void createPoint(Double x_value, Double y_value, int id){
         LOGGER.info("начинаем добавление одной точки");
         String sql = loaderSQL.loadSQL("scripts\\points\\insert_point.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
@@ -289,7 +177,7 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public void bulkInsertPointsDirect(List<Point> points, int function_id) {
+    public void addManyPoints(List<Point> points, int function_id) {
         LOGGER.info("Добавляем в таблицу {} точек", points.size());
         String sql = loaderSQL.loadSQL("scripts\\points\\insert_point.sql");
 

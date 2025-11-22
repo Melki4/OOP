@@ -1,1 +1,1 @@
-DELETE FROM simple_functions WHERE function_code = ?
+DELETE FROM simple_functions WHERE local_name = ?

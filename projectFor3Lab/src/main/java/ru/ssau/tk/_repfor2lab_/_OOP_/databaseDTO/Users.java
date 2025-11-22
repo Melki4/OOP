@@ -1,16 +1,16 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
-public class User {
-    private Long userId;
+public class Users {
+    private Integer userId;
     private String factoryType;
     private String login;
     private String password;
     private String role;
 
     // Конструкторы
-    public User() {}
+    public Users() {}
 
-    public User(Long userId, String factoryType, String login, String password, String role) {
+    public Users(Integer userId, String factoryType, String login, String password, String role) {
         this.userId = userId;
         this.factoryType = factoryType;
         this.login = login;
@@ -19,8 +19,8 @@ public class User {
     }
 
     // Геттеры и сеттеры
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 
     public String getFactoryType() { return factoryType; }
     public void setFactoryType(String factoryType) { this.factoryType = factoryType; }

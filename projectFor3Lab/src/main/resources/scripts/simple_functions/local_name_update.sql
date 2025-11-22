@@ -1,1 +1,1 @@
-UPDATE simple_functions SET local_name = ? WHERE function_code = ?
+UPDATE simple_functions SET local_name = ? WHERE local_name = ?

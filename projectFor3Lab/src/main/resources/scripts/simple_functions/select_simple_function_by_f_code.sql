@@ -1,1 +1,0 @@
-select * from simple_functions where function_code = ?

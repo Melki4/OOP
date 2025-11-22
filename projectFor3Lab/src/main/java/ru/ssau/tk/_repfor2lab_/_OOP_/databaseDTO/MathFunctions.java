@@ -1,42 +1,37 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
 public class MathFunctions {
-    private Long functionId;
+    private Integer functionId;
     private String functionName;
-    private Long amountOfDots;
+    private Integer amountOfDots;
     private Double leftBorder;
     private Double rightBorder;
-    private Long ownerId;
-    private String ownerLogin;
+    private Integer ownerId;
     private String functionType;
-    private String functionTypeLocalName;
 
     // Конструкторы
     public MathFunctions() {}
 
-    public MathFunctions(Long functionId, String functionName, Long amountOfDots,
-                         Double leftBorder, Double rightBorder, Long ownerId, String ownerLogin,
-                         String functionType, String functionTypeLocalName) {
+    public MathFunctions(Integer functionId, String functionName, Integer amountOfDots,
+                         Double leftBorder, Double rightBorder, Integer ownerId, String functionType) {
         this.functionId = functionId;
         this.functionName = functionName;
         this.amountOfDots = amountOfDots;
         this.leftBorder = leftBorder;
         this.rightBorder = rightBorder;
         this.ownerId = ownerId;
-        this.ownerLogin = ownerLogin;
         this.functionType = functionType;
-        this.functionTypeLocalName = functionTypeLocalName;
     }
 
     // Геттеры и сеттеры
-    public Long getFunctionId() { return functionId; }
-    public void setFunctionId(Long functionId) { this.functionId = functionId; }
+    public Integer getFunctionId() { return functionId; }
+    public void setFunctionId(Integer functionId) { this.functionId = functionId; }
 
     public String getFunctionName() { return functionName; }
     public void setFunctionName(String functionName) { this.functionName = functionName; }
 
-    public Long getAmountOfDots() { return amountOfDots; }
-    public void setAmountOfDots(Long amountOfDots) { this.amountOfDots = amountOfDots; }
+    public Integer getAmountOfDots() { return amountOfDots; }
+    public void setAmountOfDots(Integer amountOfDots) { this.amountOfDots = amountOfDots; }
 
     public Double getLeftBorder() { return leftBorder; }
     public void setLeftBorder(Double leftBorder) { this.leftBorder = leftBorder; }
@@ -44,15 +39,9 @@ public class MathFunctions {
     public Double getRightBorder() { return rightBorder; }
     public void setRightBorder(Double rightBorder) { this.rightBorder = rightBorder; }
 
-    public Long getOwnerId() { return ownerId; }
-    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
-
-    public String getOwnerLogin() { return ownerLogin; }
-    public void setOwnerLogin(String ownerLogin) { this.ownerLogin = ownerLogin; }
+    public Integer getOwnerId() { return ownerId; }
+    public void setOwnerId(Integer ownerId) { this.ownerId = ownerId; }
 
     public String getFunctionType() { return functionType; }
     public void setFunctionType(String functionType) { this.functionType = functionType; }
-
-    public String getFunctionTypeLocalName() { return functionType; }
-    public void setFunctionTypeLocalName(String functionTypeLocalName) { this.functionTypeLocalName = functionTypeLocalName; }
 }

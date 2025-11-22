@@ -2,8 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.User;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.UserRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.UserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
@@ -29,18 +29,18 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public List<User> selectAllUsers() {
+    public List<Users> findAllUsers() {
         LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
-        List<User> result = new ArrayList<>();
+        List<Users> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
 
-            User boof;
+            Users boof;
             while(resultSet.next()){
-                boof = new User(resultSet.getLong(1),
+                boof = new Users(resultSet.getInt(1),
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getString(4),
@@ -60,18 +60,18 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public List<User> selectAllUsersSortedByLogin() {
+    public List<Users> findAllUsersSortedByLogin() {
         LOGGER.info("Начинаем возврат списка всех пользователей отсортированных по логинам");
 
-        List<User> result = new ArrayList<>();
+        List<Users> result = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users_sorted_by_login.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
-            User boof;
+            Users boof;
 
             while(resultSet.next()){
-                boof = new User(resultSet.getLong(1),
+                boof = new Users(resultSet.getInt(1),
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getString(4),
@@ -87,64 +87,6 @@ public class JdbcUserRepository implements UserRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей");
-            throw new RuntimeException(e);
-        }
-    }
-
-    public User selectUserById(int id) {
-        LOGGER.info("Начинаем поиск пользователя по айди и вернём его как DTO, айди{}", id);
-        String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_id.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setInt(1, id);
-
-            var resultSet = statement.executeQuery();
-
-            if (!resultSet.next()){
-                LOGGER.warn("Пользователя с таким айди нет");
-                throw new DataDoesNotExistException();
-            };
-
-            User boof = new User(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3),
-                    resultSet.getString(4),
-                    resultSet.getString(5));
-
-            LOGGER.info("Пользователь с ID {} успешно найден", id);
-            return boof;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске пользователя по ID: {}", id);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public User selectUserByLogin(String Login) {
-        LOGGER.info("Начинаем поиск пользователя по логину и вернём его как DTO, айди{}", Login);
-        String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_login.sql");
-
-        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
-
-            statement.setString(1, Login);
-
-            var resultSet = statement.executeQuery();
-
-            if (!resultSet.next()){
-                LOGGER.warn("Пользователя с таким логином нет при поиске пользователя");
-                throw new DataDoesNotExistException();
-            };
-
-            User boof = new User(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3),
-                    resultSet.getString(4),
-                    resultSet.getString(5));
-
-            LOGGER.info("Пользователь с login {} успешно найден", Login);
-            return boof;
-        } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске пользователя по login: {}", Login);
             throw new RuntimeException(e);
         }
     }
@@ -269,7 +211,7 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public void addUser(String factoryType, String login, String password, String role){
+    public void createUser(String factoryType, String login, String password, String role){
         LOGGER.info("Начинаем добавление нового пользователя с логином: {}", login);
         String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
@@ -286,7 +228,7 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public boolean existsUser(int id) {
+    public boolean existsUserById(int id) {
         LOGGER.info("Начинаем проверку на существование пользователя с айди {}", id);
         String sql = loaderSQL.loadSQL("scripts\\users\\does_user_exists.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
@@ -303,7 +245,7 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public boolean existsUser(String login) {
+    public boolean existsUserByLogin(String login) {
         LOGGER.info("Начинаем проверку на существование пользователя с логином {}", login);
         String sql = loaderSQL.loadSQL("scripts\\users\\does_user_exists_by_login.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
