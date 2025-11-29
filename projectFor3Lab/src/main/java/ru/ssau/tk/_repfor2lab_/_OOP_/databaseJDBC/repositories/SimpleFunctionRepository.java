@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.SimpleFunctions;
 
 import java.util.List;
 

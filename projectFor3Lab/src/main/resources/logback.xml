@@ -29,7 +29,7 @@
     <logger name = "ru.ssau.tk._repfor2lab_._OOP_.concurrent" level = "WARN"/>
     <logger name = "ru.ssau.tk._repfor2lab_._OOP_.concurrent" level = "WARN"/>
     <logger name = "ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC" level = "WARN"/>
-    <logger name = "ru.ssau.tk._repfor2lab_._OOP_.databaseDTO" level = "WARN"/>
+    <logger name = "ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties" level = "WARN"/>
 
     <root level = "INFO">
         <appender-ref ref = "Console" />

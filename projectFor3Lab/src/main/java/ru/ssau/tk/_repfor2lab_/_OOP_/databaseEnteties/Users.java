@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
+package ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties;
 
 public class Users {
     private Integer userId;
@@ -20,7 +20,7 @@ public class Users {
 
     // Геттеры и сеттеры
     public Integer getUserId() { return userId; }
-    public void setUserId(Integer userId) { this.userId = userId; }
+//    public void setUserId(Integer userId) { this.userId = userId; }
 
     public String getFactoryType() { return factoryType; }
     public void setFactoryType(String factoryType) { this.factoryType = factoryType; }

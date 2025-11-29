@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import java.util.List;
 
 public interface MathFunctionRepository {

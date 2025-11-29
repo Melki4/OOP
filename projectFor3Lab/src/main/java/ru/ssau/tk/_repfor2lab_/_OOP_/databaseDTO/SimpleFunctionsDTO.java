@@ -1,12 +1,12 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
-public class SimpleFunctions {
+public class SimpleFunctionsDTO {
     private String localName;
 
     // Конструкторы
-    public SimpleFunctions() {}
+    public SimpleFunctionsDTO() {}
 
-    public SimpleFunctions(String localName) {
+    public SimpleFunctionsDTO(String localName) {
         this.localName = localName;
     }
 

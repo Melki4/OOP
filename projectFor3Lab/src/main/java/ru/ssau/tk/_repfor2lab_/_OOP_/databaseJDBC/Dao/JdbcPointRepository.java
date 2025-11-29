@@ -3,14 +3,14 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Points;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.PointRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +45,10 @@ public class JdbcPointRepository implements PointRepository {
             Points boof;
 
             while(resultSet.next()){
-                boof = new Points(resultSet.getDouble(1),
+                boof = new Points(resultSet.getInt(1),
                         resultSet.getDouble(2),
-                        resultSet.getInt(3));
+                        resultSet.getDouble(3),
+                        resultSet.getInt(4));
 
                 result.add(boof);
             }
@@ -61,6 +62,41 @@ public class JdbcPointRepository implements PointRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе точек по айди ф-ции {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<PointsDTO> findPointsByFunctionIdAsDTO(int id) {
+        LOGGER.info("Начинаем выбор точек по айди ф-ции и вернём их как лист dto, айди{}", id);
+        List<PointsDTO> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\points\\select_points_by_function_id.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1, id);
+
+            var resultSet = statement.executeQuery();
+
+            PointsDTO boof;
+
+            while(resultSet.next()){
+                boof = new PointsDTO(resultSet.getDouble(2),
+                        resultSet.getDouble(3),
+                        resultSet.getInt(4));
+
+                result.add(boof);
+            }
+
+            if (result.isEmpty()){
+                LOGGER.warn("В функции не были заданы точки");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Точки корректно нашлись ");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе точек по айди функции {}", id);
             throw new RuntimeException(e);
         }
     }
@@ -80,9 +116,10 @@ public class JdbcPointRepository implements PointRepository {
             Points boof;
 
             while(resultSet.next()){
-                boof = new Points(resultSet.getDouble(1),
+                boof = new Points(resultSet.getInt(1),
                         resultSet.getDouble(2),
-                        resultSet.getInt(3));
+                        resultSet.getDouble(3),
+                        resultSet.getInt(4));
 
                 result.add(boof);
             }
@@ -100,15 +137,50 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
+    public List<PointsDTO> findPointsByFunctionIdSortedAsDTO(int id) {
+        LOGGER.info("Начинаем выбор сортированных точек по айди ф-ции и вернём их как лист dto, айди{}", id);
+        List<PointsDTO> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\points\\select_sorted_points_by_function_id.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1, id);
+
+            var resultSet = statement.executeQuery();
+
+            PointsDTO boof;
+
+            while(resultSet.next()){
+                boof = new PointsDTO(resultSet.getDouble(2),
+                        resultSet.getDouble(3),
+                        resultSet.getInt(4));
+
+                result.add(boof);
+            }
+
+            if (result.isEmpty()){
+                LOGGER.warn("Для ф-ции не были заданы точки");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Точки корректно нашлись и будет возвращены отсортированными списком dto строк");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе сортированных точек по айди функции {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
     public void updateXValueByFunctionIdAndOldX(Double x_value_old, int id, Double x_value_new){
         LOGGER.info("Обновить x для точки с айди {}", id);
         String sql = loaderSQL.loadSQL("scripts\\points\\x_value_update_by_function_id_and_old_x_value.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
-            statement.setDouble(1, x_value_old);
+            statement.setDouble(1, x_value_new);
             statement.setInt(2, id);
-            statement.setDouble(3, x_value_new);
+            statement.setDouble(3, x_value_old);
 
             statement.executeUpdate();
             LOGGER.info("Обновление для X прошло успешно");
@@ -124,9 +196,9 @@ public class JdbcPointRepository implements PointRepository {
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
 
-            statement.setDouble(1, y_value_old);
+            statement.setDouble(1, y_value_new);
             statement.setInt(2, id);
-            statement.setDouble(3, y_value_new);
+            statement.setDouble(3, y_value_old);
 
             statement.executeUpdate();
             LOGGER.info("Обновление прошло успешно");

@@ -1,7 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.junit.jupiter.api.*;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.SimpleFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
 import java.util.ArrayList;

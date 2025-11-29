@@ -2,7 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.SimpleFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.SimpleFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
@@ -58,6 +59,35 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
         }
     }
 
+    public List<SimpleFunctionsDTO> findAllSimpleFunctionsAsDTO() {
+
+        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист dto");
+        List<SimpleFunctionsDTO> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_simple_functions.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            SimpleFunctionsDTO boof;
+
+            while(resultSet.next()){
+                boof = new SimpleFunctionsDTO(resultSet.getString(1));
+
+                result.add(boof);
+            }
+            if (result.isEmpty()){
+                LOGGER.warn("Таблица пуста ");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все простые функции успешно получены ");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех простых функций ");
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<SimpleFunctions> findAllSimpleFunctionsSortedByLocalName() {
         LOGGER.info("Начинаем выбор всех сортированных ф-ций и вернём их как лист");
         List<SimpleFunctions> result = new ArrayList<>();
@@ -80,6 +110,32 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<SimpleFunctionsDTO> findAllSimpleFunctionsSortedByLocalNameAsDTO() {
+        LOGGER.info("Начинаем выбор всех сортированных ф-ций и вернём их как лист dto");
+        List<SimpleFunctionsDTO> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_s_f_ordered_by_name.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            SimpleFunctionsDTO boof;
+            while(resultSet.next()){
+                boof = new SimpleFunctionsDTO(resultSet.getString(1));
+
+                result.add(boof);
+            }
+            if (result.isEmpty()){
+                LOGGER.warn("Таблица простых функций пуста");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все отсортированные простые функции успешно получены ");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций ");
             throw new RuntimeException(e);
         }
     }

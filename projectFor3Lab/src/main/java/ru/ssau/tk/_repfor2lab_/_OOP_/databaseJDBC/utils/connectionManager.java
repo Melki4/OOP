@@ -8,21 +8,34 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class connectionManager {
-
-    private final static String URL_KEY = "db.url";
-    private final static String LOGIN_KEY = "db.login";
-    private final static String PASSWORD_KEY = "db.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(connectionManager.class);
 
-    public static Connection open(){
+    static {
         try {
-            LOGGER.info("Начинаем устанавливать связь с бд");
-            var To_return = DriverManager.getConnection(propertiesUtil.get(URL_KEY),
-                    propertiesUtil.get(LOGIN_KEY), propertiesUtil.get(PASSWORD_KEY));
-            LOGGER.info("Связь установлена");
-            return To_return;
+            // ЯВНАЯ загрузка драйвера
+            Class.forName("org.postgresql.Driver");
+            LOGGER.info("✅ PostgreSQL Driver loaded successfully");
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("❌ PostgreSQL Driver not found!", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Connection open(){
+        String url = "jdbc:postgresql://localhost:5432/test_postgre";
+        String user = "postgres";
+        String password = "4sfl8gpassword";
+
+        try {
+            LOGGER.info("🔗 Подключаемся к: {}", url);
+            LOGGER.info("👤 Логин: {}", user);
+
+            Connection connection = DriverManager.getConnection(url, user, password);
+            LOGGER.info("✅ Связь с БД установлена успешно");
+            return connection;
+
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при подключении к бд");
+            LOGGER.error("❌ Ошибка при подключении к бд: {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

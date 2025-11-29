@@ -1,14 +1,13 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.junit.jupiter.api.*;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Points;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 

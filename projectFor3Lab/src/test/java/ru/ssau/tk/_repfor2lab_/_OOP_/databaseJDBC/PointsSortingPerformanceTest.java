@@ -3,7 +3,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;

@@ -2,7 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserReturnDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.UserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
@@ -60,6 +61,36 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
+    public List<UserReturnDTO> findAllUsersAsDTO() {
+        LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
+        List<UserReturnDTO> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            UserReturnDTO boof;
+            while(resultSet.next()){
+                boof = new UserReturnDTO(resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(5));
+
+                result.add(boof);
+            }
+            if (result.isEmpty()){
+                LOGGER.warn("Таблица пуста");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все пользователи успешно получены");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех пользователей");
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Users> findAllUsersSortedByLogin() {
         LOGGER.info("Начинаем возврат списка всех пользователей отсортированных по логинам");
 
@@ -87,6 +118,36 @@ public class JdbcUserRepository implements UserRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<UserReturnDTO> findAllUsersSortedByLoginAsDTO() {
+        LOGGER.info("Начинаем возврат списка dto всех пользователей отсортированных по логинам");
+
+        List<UserReturnDTO> result = new ArrayList<>();
+        String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users_sorted_by_login.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.createStatement()){
+            ResultSet resultSet = statement.executeQuery(sql);
+            UserReturnDTO boof;
+
+            while(resultSet.next()){
+                boof = new UserReturnDTO(resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(5));
+
+                result.add(boof);
+            }
+            if (result.isEmpty()){
+                LOGGER.warn("Таблица с пользователями пуста ");
+                throw new DataDoesNotExistException();
+            }
+            LOGGER.info("Все сортированные пользователи успешно получены ");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей ");
             throw new RuntimeException(e);
         }
     }

@@ -2,7 +2,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.MathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
@@ -35,7 +36,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
     }
 
     public List<MathFunctions> findMathFunctionsByUserId(int id) {
-        LOGGER.info("Начинаем выбор ф-ций по айди владельца и вернём их как лист DTO, айди{}", id);
+        LOGGER.info("Начинаем выбор ф-ций по айди владельца и вернём их как лист, айди{}", id);
         List<MathFunctions> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_user_id.sql");
@@ -60,7 +61,45 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             }
 
             if (result.isEmpty()){
-                LOGGER.warn("У пользователя нет ф-ций");
+                LOGGER.warn("У пользователя нет ф-ций для возврата");
+                throw new DataDoesNotExistException();
+            }
+
+            LOGGER.info("Возвращаем список функций");
+            return result;
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при поиске функций пользователя с айди {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<MathFunctionsDTO> findMathFunctionsByUserIdAsDTO(int id) {
+        LOGGER.info("Начинаем выбор ф-ций по айди владельца и вернём их как лист DTO, айди{}", id);
+        List<MathFunctionsDTO> result = new ArrayList<>();
+
+        String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_user_id.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1, id);
+
+            var resultSet = statement.executeQuery();
+
+            MathFunctionsDTO boof;
+            while(resultSet.next()){
+                boof = new MathFunctionsDTO(resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getInt(3),
+                        resultSet.getDouble(4),
+                        resultSet.getDouble(5),
+                        resultSet.getInt(6),
+                        resultSet.getString(7));
+
+                result.add(boof);
+            }
+
+            if (result.isEmpty()){
+                LOGGER.warn("У пользователя нету ф-ций");
                 throw new DataDoesNotExistException();
             }
 
@@ -94,6 +133,11 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
                         resultSet.getString(7));
 
                 result.add(boof);
+            }
+
+            if (result.isEmpty()){
+                LOGGER.warn("У пользователя нет ф-ций");
+                throw new DataDoesNotExistException();
             }
 
             LOGGER.info("Возвращаем ф-цию");

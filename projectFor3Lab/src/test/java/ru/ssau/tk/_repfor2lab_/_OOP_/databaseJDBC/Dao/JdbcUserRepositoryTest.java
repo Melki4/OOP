@@ -1,7 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.junit.jupiter.api.*;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 
 import java.util.ArrayList;
 import java.util.Comparator;

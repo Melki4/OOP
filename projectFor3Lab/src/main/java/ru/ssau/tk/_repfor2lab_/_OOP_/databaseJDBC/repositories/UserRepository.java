@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 
 import java.util.List;
 

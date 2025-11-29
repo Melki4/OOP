@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
 
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.Points;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
 import java.util.List;

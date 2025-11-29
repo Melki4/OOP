@@ -1,6 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseDTO;
 
-public class MathFunctions {
+public class MathFunctionsDTO {
     private Integer functionId;
     private String functionName;
     private Integer amountOfDots;
@@ -10,9 +10,9 @@ public class MathFunctions {
     private String functionType;
 
     // Конструкторы
-    public MathFunctions() {}
+    public MathFunctionsDTO() {}
 
-    public MathFunctions(Integer functionId, String functionName, Integer amountOfDots,
+    public MathFunctionsDTO(Integer functionId, String functionName, Integer amountOfDots,
                          Double leftBorder, Double rightBorder, Integer ownerId, String functionType) {
         this.functionId = functionId;
         this.functionName = functionName;

@@ -1,0 +1,38 @@
+method,url,time,api_name
+POST,localhost:8080/projectFor3Lab/users,339,Users Api Test
+GET,localhost:8080/projectFor3Lab/users,183,Users Api Test
+GET,localhost:8080/projectFor3Lab/users/sorted,188,Users Api Test
+GET,localhost:8080/projectFor3Lab/users/check/id/88,72,Users Api Test
+GET,localhost:8080/projectFor3Lab/users/check/login/ivanov_ii,87,Users Api Test
+PUT,localhost:8080/projectFor3Lab/users/88/factoryType,111,Users Api Test
+PUT,localhost:8080/projectFor3Lab/users/88/password,73,Users Api Test
+PUT,localhost:8080/projectFor3Lab/users/88/login,66,Users Api Test
+PUT,localhost:8080/projectFor3Lab/users/88/login,191,Users Api Test
+DELETE,localhost:8080/projectFor3Lab/users/88,138,Users Api Test
+DELETE,localhost:8080/projectFor3Lab/users,178,Users Api Test
+POST,localhost:8080/projectFor3Lab/simple-functions,97,SimpleFunctions Api Test
+GET,localhost:8080/projectFor3Lab/simple-functions,115,SimpleFunctions Api Test
+GET,localhost:8080/projectFor3Lab/simple-functions/sorted,203,SimpleFunctions Api Test
+GET,localhost:8080/projectFor3Lab/simple-functions/check/Квадратичная функция,99,SimpleFunctions Api Test
+PUT,localhost:8080/projectFor3Lab/simple-functions,130,SimpleFunctions Api Test
+DELETE,localhost:8080/projectFor3Lab/simple-functions,246,SimpleFunctions Api Test
+DELETE,localhost:8080/projectFor3Lab/simple-functions/name/Квадратичная фунцкия,152,SimpleFunctions Api Test
+POST,localhost:8080/projectFor3Lab/points/single,92,Points Api Test
+POST,localhost:8080/projectFor3Lab/points/bulk,204,Points Api Test
+GET,localhost:8080/projectFor3Lab/points/function/65,99,Points Api Test
+GET,localhost:8080/projectFor3Lab/points/function/65/sorted,83,Points Api Test
+PUT,localhost:8080/projectFor3Lab/points/x,125,Points Api Test
+PUT,localhost:8080/projectFor3Lab/points/y,89,Points Api Test
+DELETE,localhost:8080/projectFor3Lab/points/function/65,92,Points Api Test
+DELETE,localhost:8080/projectFor3Lab/points,76,Points Api Test
+POST,localhost:8080/projectFor3Lab/math-functions,120,MathFunctions Api Test
+GET,localhost:8080/projectFor3Lab/math-functions/user/91,72,MathFunctions Api Test
+GET,localhost:8080/projectFor3Lab/math-functions/name/cos(x),69,MathFunctions Api Test
+GET,http://localhost:8080/projectFor3Lab/math-functions/complex/find?leftBoard=-1.0&rightBoard=1.0&amountOfDots=100&functionName=cos(x),68,MathFunctions Api Test
+GET,localhost:8080/projectFor3Lab/math-functions/complex/id?leftBoard=-1.0&rightBoard=1.0&amountOfDots=100&functionName=cos(x),71,MathFunctions Api Test
+GET,localhost:8080/projectFor3Lab/math-functions/check-complex,85,MathFunctions Api Test
+GET,localhost:8080/projectFor3Lab/math-functions/complex-search,172,MathFunctions Api Test
+PUT,localhost:8080/projectFor3Lab/math-functions/function/55,82,MathFunctions Api Test
+DELETE,localhost:8080/projectFor3Lab/math-functions/function/55,67,MathFunctions Api Test
+DELETE,localhost:8080/projectFor3Lab/math-functions/user/91,77,MathFunctions Api Test
+DELETE,localhost:8080/projectFor3Lab/math-functions,199,MathFunctions Api Test
