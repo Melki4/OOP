@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    <display-name>Math Functions Web Application</display-name>
+
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/users/*</url-pattern>
+        <url-pattern>/points/*</url-pattern>
+        <url-pattern>/simple-functions/*</url-pattern>
+        <url-pattern>/math-functions/*</url-pattern>
+    </filter-mapping>
+</web-app>
