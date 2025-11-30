@@ -20,7 +20,7 @@ public class Users {
 
     // Геттеры и сеттеры
     public Integer getUserId() { return userId; }
-//    public void setUserId(Integer userId) { this.userId = userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 
     public String getFactoryType() { return factoryType; }
     public void setFactoryType(String factoryType) { this.factoryType = factoryType; }

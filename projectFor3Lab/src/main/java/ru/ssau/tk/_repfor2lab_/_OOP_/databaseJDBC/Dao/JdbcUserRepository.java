@@ -306,6 +306,50 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
+    public boolean authenticateUser(String login, String password) {
+        String sql = loaderSQL.loadSQL("scripts\\users\\select_password_where_login_equals.sql");
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String storedPassword = resultSet.getString("password");
+                // Сравниваем пароли (в реальном приложении - хэши!)
+                System.out.println(login + " " + password + " " + storedPassword);
+                return password.equals(storedPassword);
+            }
+            return false;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Authentication error", e);
+        }
+    }
+
+    public Users findByLogin(String login) {
+        String sql = loaderSQL.loadSQL("scripts\\users\\select_user_by_login.sql");
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                Users user = new Users();
+                user.setUserId(resultSet.getInt("user_id"));
+                user.setLogin(resultSet.getString("login"));
+                user.setPassword(resultSet.getString("password"));
+                user.setRole(resultSet.getString("role"));
+                user.setFactoryType(resultSet.getString("factory_type"));
+                return user;
+            }
+            return null;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding user by login", e);
+        }
+    }
+
     public boolean existsUserByLogin(String login) {
         LOGGER.info("Начинаем проверку на существование пользователя с логином {}", login);
         String sql = loaderSQL.loadSQL("scripts\\users\\does_user_exists_by_login.sql");
