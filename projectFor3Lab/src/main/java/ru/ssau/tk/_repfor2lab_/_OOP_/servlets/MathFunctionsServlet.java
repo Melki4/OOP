@@ -4,7 +4,6 @@ import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.MathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
@@ -15,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -89,7 +89,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                     if (!currentUser.getRole().equals("admin")){
                         for (var el : functions){
-                            if (el.getOwnerId() == currentUser.getUserId()) returnable_array.add(el);
+                            if (Objects.equals(el.getOwnerId(), currentUser.getUserId())) returnable_array.add(el);
                         }
                     } else{
                         returnable_array = functions;
@@ -120,7 +120,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
 
-                    if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
                         System.out.println(currentUser.getRole());
                         logger.severe("Математические функции не найдена: ");
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -143,7 +143,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
 
-                    if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
                         logger.severe("Математические функции не найдена: ");
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         response.getWriter().write("{\"error\": \"Функция не найдена\"}");
@@ -174,7 +174,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
 
-                    if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
                         logger.severe("Математическая функция не найдена: ");
                         response.setStatus(HttpServletResponse.SC_OK);
                         exists = false;
@@ -201,7 +201,7 @@ public class MathFunctionsServlet extends HttpServlet {
                 MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                         leftBoard, rightBoard, amountOfDots, functionName);
 
-                if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
                     logger.severe("Математические функции не найдена: ");
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     response.getWriter().write("{\"error\": \"Функция не найдена\"}");
@@ -323,7 +323,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     logger.info("PUT запрос: обновление имени функции ID: " + functionId + " на: " + newName);
                     MathFunctionsDTO n = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                    if(n.getOwnerId()!=currentUser.getUserId()){
+                    if(!Objects.equals(n.getOwnerId(), currentUser.getUserId())){
                         logger.severe("Вы пытаетесь изменить ф-цию другому пользователю: ");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
@@ -390,7 +390,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                     MathFunctionsDTO n = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                    if(n.getOwnerId()!=currentUser.getUserId()){
+                    if(!Objects.equals(n.getOwnerId(), currentUser.getUserId())){
                         logger.severe("Вы пытаетесь удалить ф-цию другому пользователю: ");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Ошибка доступа\"}");

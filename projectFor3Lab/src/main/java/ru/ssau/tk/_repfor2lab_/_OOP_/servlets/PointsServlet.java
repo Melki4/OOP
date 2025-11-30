@@ -1,6 +1,11 @@
 package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 
+import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
@@ -11,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,12 +24,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 @WebServlet("/points/*")
 public class PointsServlet extends HttpServlet {
     private JdbcPointRepository pointRepository;
+    private JdbcMathFunctionRepository mathFunctionRepository;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(PointsServlet.class.getName());
 
     @Override
     public void init() {
         this.pointRepository = new JdbcPointRepository();
+        this.mathFunctionRepository = new JdbcMathFunctionRepository();
         this.mapper = new ObjectMapper();
         logger.info("Сервлет PointsServlet успешно инициализирован");
     }
@@ -32,6 +40,21 @@ public class PointsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
+
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
+        // Проверяем авторизацию
+        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+            return;
+        }
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
@@ -47,6 +70,16 @@ public class PointsServlet extends HttpServlet {
                     if (pathParts.length >= 4 && "sorted".equals(pathParts[3])) {
                         // GET /points/function/{functionId}/sorted - получить точки по ID функции (отсортированные)
                         logger.info("GET запрос: получение отсортированных точек для функции ID: " + functionId);
+
+                        MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+
+                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                            logger.severe("Точки для функции не найдены: ");
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            response.getWriter().write("{\"error\": \"Точки для функции не найдены\"}");
+                            return;
+                        }
+
                         List<PointsDTO> points = pointRepository.findPointsByFunctionIdSortedAsDTO(functionId);
                         String json = mapper.writeValueAsString(points);
                         response.getWriter().write(json);
@@ -55,6 +88,16 @@ public class PointsServlet extends HttpServlet {
                     } else {
                         // GET /points/function/{functionId} - получить точки по ID функции
                         logger.info("GET запрос: получение точек для функции ID: " + functionId);
+
+                        MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+
+                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                            logger.severe("Точки для функции не найдены: ");
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            response.getWriter().write("{\"error\": \"Точки для функции не найдены\"}");
+                            return;
+                        }
+
                         List<PointsDTO> points = pointRepository.findPointsByFunctionIdAsDTO(functionId);
                         String json = mapper.writeValueAsString(points);
                         response.getWriter().write(json);
@@ -89,6 +132,14 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -103,6 +154,14 @@ public class PointsServlet extends HttpServlet {
                 double yValue = jsonNode.get("y_value").asDouble();
                 int functionId = jsonNode.get("function_id").asInt();
 
+                MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    logger.severe("Вы пытаетесь создать точку не для своей ф-ции: ");
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"error\": \"Вы пытаетесь создать точку не для своей ф-ции\"}");
+                    return;
+                }
+
                 logger.info("POST запрос: создание точки для функции ID: " + functionId + " с координатами (" + xValue + ", " + yValue + ")");
 
                 pointRepository.createPoint(xValue, yValue, functionId);
@@ -115,12 +174,21 @@ public class PointsServlet extends HttpServlet {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
+                int functionId = jsonNode.get("function_id").asInt();
+
+                MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    logger.severe("Вы пытаетесь создать точки не дял своей ф-ции: ");
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"error\": \"Вы пытаетесь создать точки не дял своей ф-ции\"}");
+                    return;
+                }
+
                 List<Point> points = mapper.readValue(
                         jsonNode.get("points").toString(),
                         new TypeReference<>(){}
                 );
-
-                int functionId = jsonNode.get("function_id").asInt();
 
                 logger.info("POST запрос: создание " + points.size() + " точек для функции ID: " + functionId);
 
@@ -146,6 +214,14 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -164,6 +240,14 @@ public class PointsServlet extends HttpServlet {
                 int functionId = jsonNode.get("id").asInt();
                 double oldValue = jsonNode.get("oldValue").asDouble();
                 double newValue = jsonNode.get("newValue").asDouble();
+
+                MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    logger.severe("Вы пытаетесь обновить значение точки не дял своей ф-ции: ");
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"error\": \"Вы пытаетесь обновить значение точки не дял своей ф-ции\"}");
+                    return;
+                }
 
                 switch (variable) {
                     case "x":
@@ -203,9 +287,25 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // DELETE /points - удалить все точки
+
+                // Проверяем авторизацию
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    return;
+                }
+
                 logger.warning("DELETE запрос: удаление всех точек");
                 pointRepository.deleteAllPoints();
                 response.getWriter().write("{\"status\": \"Все точки успешно удалены\"}");
@@ -217,6 +317,14 @@ public class PointsServlet extends HttpServlet {
                 if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
                     int functionId = Integer.parseInt(pathParts[2]);
                     logger.info("DELETE запрос: удаление точек для функции ID: " + functionId);
+
+                    MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                        logger.severe("Вы пытаетесь удалить точки не для своей ф-ции: ");
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.getWriter().write("{\"error\": \"Вы пытаетесь удалить точки не для своей ф-ции\"}");
+                        return;
+                    }
 
                     pointRepository.deletePointsByFunctionId(functionId);
                     response.getWriter().write("{\"status\": \"Точки для функции успешно удалены\"}");

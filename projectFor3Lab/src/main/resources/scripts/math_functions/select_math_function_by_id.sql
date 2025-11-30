@@ -1,0 +1,1 @@
+select * from math_functions where math_function_id = ?
