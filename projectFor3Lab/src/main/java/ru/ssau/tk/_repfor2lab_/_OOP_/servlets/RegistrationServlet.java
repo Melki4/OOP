@@ -20,7 +20,7 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     public void init() {
-        logger.info("RegistrationServlet initialized");
+        logger.info("Сервлет регистрации успешно инициализирован");
     }
 
     @Override
@@ -30,25 +30,25 @@ public class RegistrationServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try {
-            logger.info("Starting user creation process");
+            logger.info("Начало процесса создания пользователя");
 
-            // Читаем данные пользователя из тела запроса
+            // Чтение данных пользователя из тела запроса
             String requestBody = request.getReader().lines().reduce("", String::concat);
-            logger.info("Request body: " + requestBody);
+            logger.info("Тело запроса: " + requestBody);
 
             if (requestBody == null || requestBody.trim().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\": \"Empty request body\"}");
+                response.getWriter().write("{\"error\": \"Пустое тело запроса\"}");
                 return;
             }
 
-            // Парсим JSON
+            // Парсинг JSON
             var jsonNode = mapper.readTree(requestBody);
 
-            // Проверяем обязательные поля
+            // Проверка обязательных полей
             if (!jsonNode.has("login") || !jsonNode.has("password")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\": \"Login and password are required\"}");
+                response.getWriter().write("{\"error\": \"Логин и пароль обязательны\"}");
                 return;
             }
 
@@ -58,11 +58,11 @@ public class RegistrationServlet extends HttpServlet {
 
             if (login.isEmpty() || password.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\": \"Login and password cannot be empty\"}");
+                response.getWriter().write("{\"error\": \"Логин и пароль не могут быть пустыми\"}");
                 return;
             }
 
-            logger.info("Parsed user data - login: " + login + ", factoryType: " + factoryType);
+            logger.info("Получены данные пользователя - логин: " + login + ", тип фабрики: " + factoryType);
 
             String authHeader = request.getHeader("Authorization");
             String role = "user"; // Роль по умолчанию
@@ -80,39 +80,39 @@ public class RegistrationServlet extends HttpServlet {
                             if (jsonNode.has("role")) {
                                 role = jsonNode.get("role").asText();
                             }
-                            logger.info("Admin creating user with role: " + role);
+                            logger.info("Администратор создает пользователя с ролью: " + role);
                         }
                     }
                 } catch (Exception e) {
-                    logger.warning("Error processing Authorization header: " + e.getMessage());
+                    logger.warning("Ошибка обработки заголовка Authorization: " + e.getMessage());
                     // Продолжаем с ролью по умолчанию
                 }
             }
 
-            // Проверяем, существует ли пользователь
+            // Проверка существования пользователя
             if (userRepository.existsUserByLogin(login)) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getWriter().write("{\"error\": \"User already exists\"}");
+                response.getWriter().write("{\"error\": \"Пользователь уже существует\"}");
                 return;
             }
 
-            // Создаем пользователя
+            // Создание пользователя
             userRepository.createUser(factoryType, login, password, role);
 
             // Успешный ответ
             response.setStatus(HttpServletResponse.SC_CREATED);
-            String successResponse = "{\"status\": \"User created successfully\", \"role\": \"" + role + "\"}";
+            String successResponse = "{\"status\": \"Пользователь успешно создан\", \"role\": \"" + role + "\"}";
             response.getWriter().write(successResponse);
-            logger.info("User created successfully: " + login + " with role: " + role);
+            logger.info("Пользователь успешно создан: " + login + " с ролью: " + role);
 
         } catch (Exception e) {
-            logger.severe("Error in user registration: " + e.getMessage());
+            logger.severe("Ошибка при регистрации пользователя: " + e.getMessage());
             e.printStackTrace();
 
-            // Более информативная ошибка
-            String errorMessage = e.getMessage() != null ? e.getMessage() : "Unknown error";
+            // Более информативное сообщение об ошибке
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "Неизвестная ошибка";
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\": \"Registration failed: " + errorMessage + "\"}");
+            response.getWriter().write("{\"error\": \"Ошибка регистрации: " + errorMessage + "\"}");
         }
     }
 }

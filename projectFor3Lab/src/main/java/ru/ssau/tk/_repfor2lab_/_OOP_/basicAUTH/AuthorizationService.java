@@ -12,7 +12,7 @@ public class AuthorizationService {
 
         // ADMIN - полный доступ
         if ("admin".equals(userRole)) {
-            logger.info("Admin " + user.getLogin() + " access granted for " + method + " " + path);
+            logger.info("Администратору " + user.getLogin() + " предоставлен доступ для " + method + " " + path);
             return true;
         }
 
@@ -21,7 +21,7 @@ public class AuthorizationService {
             return checkUserAccess(user, method, path);
         }
 
-        logger.warning("Access denied for role " + userRole + " to " + method + " " + path);
+        logger.warning("Доступ запрещен для роли " + userRole + " к " + method + " " + path);
         return false;
     }
 
@@ -30,11 +30,11 @@ public class AuthorizationService {
 
         // ADMIN - полный доступ
         if ("admin".equals(userRole)) {
-            logger.info("Admin " + user.getLogin() + " access granted for " + method + " " + path);
+            logger.info("Администратору " + user.getLogin() + " предоставлен доступ для " + method + " " + path);
             return true;
         }
 
-        logger.warning("Access denied for role " + userRole + " to " + method + " " + path);
+        logger.warning("Доступ запрещен для роли " + userRole + " к " + method + " " + path);
         return false;
     }
 
@@ -43,7 +43,7 @@ public class AuthorizationService {
         if ("GET".equals(method)) {
             if (path.matches("/(users|math-functions|points|simple-functions).*") ||
                     path.matches("/projectFor3Lab/(users|math-functions|points|simple-functions).*")) {
-                logger.info("User " + user.getLogin() + " GET access granted for: " + path);
+                logger.info("Пользователю " + user.getLogin() + " предоставлен GET доступ к: " + path);
                 return true;
             }
         }
@@ -52,7 +52,7 @@ public class AuthorizationService {
         if ("PUT".equals(method)) {
             if (path.matches("/users/\\d+/(password|login|factoryType|role)") ||
                     path.matches("/projectFor3Lab/users/\\d+/(password|login|factoryType|role)")) {
-                logger.info("User " + user.getLogin() + " PUT access granted for: " + path);
+                logger.info("Пользователю " + user.getLogin() + " предоставлен PUT доступ к: " + path);
                 return true;
             }
         }
@@ -61,22 +61,22 @@ public class AuthorizationService {
         if ("DELETE".equals(method)) {
             if (path.matches("/users/\\d+") ||
                     path.matches("/projectFor3Lab/users/\\d+")) {
-                logger.info("User " + user.getLogin() + " DELETE access granted for: " + path);
+                logger.info("Пользователю " + user.getLogin() + " предоставлен DELETE доступ к: " + path);
                 return true;
             }
         }
 
-        logger.warning("User " + user.getLogin() + " access denied for " + method + " " + path);
+        logger.warning("Пользователю " + user.getLogin() + " запрещен доступ для " + method + " " + path);
         return false;
     }
 
     public static boolean canAccessUserData(Users currentUser, Integer targetUserId, String targetLogin) {
-        // ADMIN может доступ ко всем данным
+        // ADMIN имеет доступ ко всем данным
         if ("admin".equals(currentUser.getRole())) {
             return true;
         }
 
-        // USER может доступ только к своим данным
+        // USER имеет доступ только к своим данным
         if (targetUserId != null && targetUserId.equals(currentUser.getUserId())) {
             return true;
         }
@@ -85,12 +85,12 @@ public class AuthorizationService {
             return true;
         }
 
-        logger.warning("User " + currentUser.getLogin() + " access denied to data: userId=" + targetUserId + ", login=" + targetLogin);
+        logger.warning("Пользователю " + currentUser.getLogin() + " запрещен доступ к данным: userId=" + targetUserId + ", login=" + targetLogin);
         return false;
     }
 
     public static boolean canAccessUserDataByLogin(Users currentUser, String targetLogin) {
-        // ADMIN может доступ ко всем данным
+        // ADMIN имеет доступ ко всем данным
         if ("admin".equals(currentUser.getRole())) {
             return true;
         }
@@ -99,22 +99,22 @@ public class AuthorizationService {
             return true;
         }
 
-        logger.warning("User " + currentUser.getLogin() + " access denied to data: login=" + targetLogin);
+        logger.warning("Пользователю " + currentUser.getLogin() + " запрещен доступ к данным: login=" + targetLogin);
         return false;
     }
 
     public static boolean canAccessUserDataById(Users currentUser, Integer targetUserId) {
-        // ADMIN может доступ ко всем данным
+        // ADMIN имеет доступ ко всем данным
         if ("admin".equals(currentUser.getRole())) {
             return true;
         }
 
-        // USER может доступ только к своим данным
+        // USER имеет доступ только к своим данным
         if (targetUserId != null && targetUserId.equals(currentUser.getUserId())) {
             return true;
         }
 
-        logger.warning("User " + currentUser.getLogin() + " access denied to data: userId=" + targetUserId);
+        logger.warning("Пользователю " + currentUser.getLogin() + " запрещен доступ к данным: userId=" + targetUserId);
         return false;
     }
 }

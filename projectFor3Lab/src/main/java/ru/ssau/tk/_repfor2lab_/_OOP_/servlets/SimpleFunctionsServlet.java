@@ -33,24 +33,24 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверяем аутентификацию
+        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
             return;
         }
 
-        // Проверяем авторизацию
+        // Проверка авторизации
         if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
             return;
         }
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
-                // GET /simple-functions - получить все простые функции
+                // GET /simple-functions - получение всех простых функций
                 logger.info("GET запрос: получение всех простых функций");
                 List<SimpleFunctionsDTO> functions = simpleFunctionRepository.findAllSimpleFunctionsAsDTO();
                 String json = mapper.writeValueAsString(functions);
@@ -58,7 +58,7 @@ public class SimpleFunctionsServlet extends HttpServlet {
                 logger.info("Успешно возвращено " + functions.size() + " простых функций");
 
             } else if (pathInfo.equals("/sorted")) {
-                // GET /simple-functions/sorted - получить функции отсортированные по имени
+                // GET /simple-functions/sorted - получение функций отсортированных по имени
                 logger.info("GET запрос: получение всех простых функций отсортированных по имени");
                 List<SimpleFunctionsDTO> functions = simpleFunctionRepository.findAllSimpleFunctionsSortedByLocalNameAsDTO();
                 String json = mapper.writeValueAsString(functions);
@@ -66,7 +66,7 @@ public class SimpleFunctionsServlet extends HttpServlet {
                 logger.info("Успешно возвращено " + functions.size() + " отсортированных простых функций");
 
             } else if (pathInfo.startsWith("/check/")) {
-                // GET /simple-functions/check/{name} - проверить существование функции по имени
+                // GET /simple-functions/check/{name} - проверка существования функции по имени
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length >= 3) {
                     String functionName = pathParts[2];
@@ -87,7 +87,7 @@ public class SimpleFunctionsServlet extends HttpServlet {
         } catch (DataDoesNotExistException e) {
             logger.severe("Таблица с простыми функциями пуста: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("{\"error\": \"Данных в таблице нет\"}");
+            response.getWriter().write("{\"error\": \"Таблица простых функций пуста\"}");
         } catch (Exception e) {
             logger.severe("Ошибка при выполнении GET запроса простых функций: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -100,11 +100,11 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверяем аутентификацию
+        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
             return;
         }
 
@@ -112,10 +112,10 @@ public class SimpleFunctionsServlet extends HttpServlet {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // POST /simple-functions - создание новой простой функции
 
-                // Проверяем авторизацию
+                // Проверка авторизации
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
                     return;
                 }
 
@@ -146,22 +146,22 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверяем аутентификацию
+        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
             return;
         }
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
-                // PUT /simple-functions - обновление имени функции (старый вариант)
+                // PUT /simple-functions - обновление имени функции
 
-                // Проверяем авторизацию
+                // Проверка авторизации
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
                     return;
                 }
 
@@ -194,22 +194,22 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверяем аутентификацию
+        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
             return;
         }
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
-                // DELETE /simple-functions - удалить все простые функции
+                // DELETE /simple-functions - удаление всех простых функций
 
-                // Проверяем авторизацию
+                // Проверка авторизации
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
                     return;
                 }
 
@@ -219,12 +219,12 @@ public class SimpleFunctionsServlet extends HttpServlet {
                 logger.warning("Успешно удалены все простые функции");
 
             } else if (pathInfo.startsWith("/name/")) {
-                // DELETE /simple-functions/name/{name} - удалить функцию по имени
+                // DELETE /simple-functions/name/{name} - удаление функции по имени
 
-                // Проверяем авторизацию
+                // Проверка авторизации
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
                     return;
                 }
 
