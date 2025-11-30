@@ -1,7 +1,9 @@
 package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 
+import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.MathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,17 +36,37 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
+        // Проверяем авторизацию
+        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Укажите параметры поиска\"}");
-
             } else if (pathInfo.startsWith("/user/")) {
                 // GET /math-functions/user/{userId} - получить функции по ID пользователя
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
                     int userId = Integer.parseInt(pathParts[2]);
                     logger.info("GET запрос: получение математических функций для пользователя с ID: " + userId);
+
+                    if (!AuthorizationService.canAccessUserDataById(currentUser, userId)) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("{\"error\": \"Access denied to this user data\"}");
+                        return;
+                    }
 
                     List<MathFunctionsDTO> functions = mathFunctionRepository.findMathFunctionsByUserIdAsDTO(userId);
                     String json = mapper.writeValueAsString(functions);
@@ -62,9 +85,19 @@ public class MathFunctionsServlet extends HttpServlet {
                     logger.info("GET запрос: поиск математических функций с именем: " + functionName);
 
                     List<MathFunctions> functions = mathFunctionRepository.findMathFunctionsByName(functionName);
-                    String json = mapper.writeValueAsString(functions);
+                    List<MathFunctions> returnable_array = new ArrayList<>();
+
+                    if (!currentUser.getRole().equals("admin")){
+                        for (var el : functions){
+                            if (el.getOwnerId() == currentUser.getUserId()) returnable_array.add(el);
+                        }
+                    } else{
+                        returnable_array = functions;
+                    }
+
+                    String json = mapper.writeValueAsString(returnable_array);
                     response.getWriter().write(json);
-                    logger.info("Успешно возвращено " + functions.size() + " функций с именем: " + functionName);
+                    logger.info("Успешно возвращено " + returnable_array.size() + " функций с именем: " + functionName);
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write("{\"error\": \"Неверный формат имени функции\"}");
@@ -86,10 +119,18 @@ public class MathFunctionsServlet extends HttpServlet {
 
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
+
+                    if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                        System.out.println(currentUser.getRole());
+                        logger.severe("Математические функции не найдена: ");
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.getWriter().write("{\"error\": \"Функция не найдена\"}");
+                        return;
+                    }
+
                     String json = mapper.writeValueAsString(function);
                     response.getWriter().write(json);
                     logger.info("Успешно выполнена сложный поиск функции");
-
                 } else if (pathParts.length >= 3 && "id".equals(pathParts[2])) {
                     // GET /math-functions/complex/id - сложный поиск ID функции (через query parameters)
                     double leftBoard = Double.parseDouble(request.getParameter("leftBoard"));
@@ -99,8 +140,17 @@ public class MathFunctionsServlet extends HttpServlet {
 
                     logger.info("GET запрос: сложный поиск ID функции с параметрами: name=" + functionName);
 
-                    Integer functionId = mathFunctionRepository.findMathFunctionIdComplex(
+                    MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
+
+                    if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                        logger.severe("Математические функции не найдена: ");
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.getWriter().write("{\"error\": \"Функция не найдена\"}");
+                        return;
+                    }
+
+                    Integer functionId = function.getFunctionId();
                     response.getWriter().write("{\"functionId\": " + functionId + "}");
                     logger.info("Успешно найден ID функции: " + functionId);
                 }
@@ -119,6 +169,20 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 boolean exists = mathFunctionRepository.existsFunctionComplex(
                         leftBoard, rightBoard, amountOfDots, functionName);
+
+                if (exists){
+                    MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
+                            leftBoard, rightBoard, amountOfDots, functionName);
+
+                    if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                        logger.severe("Математическая функция не найдена: ");
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        exists = false;
+                        response.getWriter().write("{\"exists\": " + exists + "}");
+                        return;
+                    }
+                }
+
                 response.getWriter().write("{\"exists\": " + exists + "}");
                 logger.info("Результат сложной проверки существования функции '" + functionName + "': " + exists);
 
@@ -136,6 +200,14 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                         leftBoard, rightBoard, amountOfDots, functionName);
+
+                if (function.getOwnerId() != currentUser.getUserId() && !currentUser.getRole().equals("admin")){
+                    logger.severe("Математические функции не найдена: ");
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"error\": \"Функция не найдена\"}");
+                    return;
+                }
+
                 String json = mapper.writeValueAsString(function);
                 response.getWriter().write(json);
                 logger.info("Успешно выполнен сложный поиск функции");
@@ -165,6 +237,14 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // POST /math-functions - создание математической функции
@@ -177,6 +257,13 @@ public class MathFunctionsServlet extends HttpServlet {
                 double rightBorder = jsonNode.get("right_border").asDouble();
                 int ownerId = jsonNode.get("owner_id").asInt();
                 String functionType = jsonNode.get("function_type").asText();
+
+                if(ownerId!=currentUser.getUserId()) {
+                    logger.severe("Вы пытаетесь создать ф-цию другому пользователю: ");
+                    response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+                    response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
+                    return;
+                }
 
                 logger.info("POST запрос: создание математической функции: " + functionName + " для пользователя ID: " + ownerId);
 
@@ -209,6 +296,14 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -226,6 +321,14 @@ public class MathFunctionsServlet extends HttpServlet {
                     String newName = mapper.readTree(requestBody).get("function_name").asText();
 
                     logger.info("PUT запрос: обновление имени функции ID: " + functionId + " на: " + newName);
+                    MathFunctionsDTO n = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+
+                    if(n.getOwnerId()!=currentUser.getUserId()){
+                        logger.severe("Вы пытаетесь изменить ф-цию другому пользователю: ");
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
+                        return;
+                    }
 
                     mathFunctionRepository.updateFunctionNameByFunctionId(newName, functionId);
                     response.getWriter().write("{\"status\": \"Имя функции успешно обновлено\"}");
@@ -255,9 +358,25 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // DELETE /math-functions - удалить все функции
+
+                // Проверяем авторизацию
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    return;
+                }
+
                 logger.warning("DELETE запрос: удаление всех математических функций");
                 mathFunctionRepository.deleteAllFunctions();
                 response.getWriter().write("{\"status\": \"Все математические функции успешно удалены\"}");
@@ -268,6 +387,16 @@ public class MathFunctionsServlet extends HttpServlet {
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
                     int functionId = Integer.parseInt(pathParts[2]);
+
+                    MathFunctionsDTO n = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+
+                    if(n.getOwnerId()!=currentUser.getUserId()){
+                        logger.severe("Вы пытаетесь удалить ф-цию другому пользователю: ");
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
+                        return;
+                    }
+
                     logger.info("DELETE запрос: удаление математической функции с ID: " + functionId);
 
                     mathFunctionRepository.deleteMathFunctionByFunctionId(functionId);
@@ -283,6 +412,14 @@ public class MathFunctionsServlet extends HttpServlet {
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
                     int userId = Integer.parseInt(pathParts[2]);
+
+                    if(userId!=currentUser.getUserId()){
+                        logger.severe("Вы пытаетесь удалить ф-ции другому пользователю: ");
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
+                        return;
+                    }
+
                     logger.info("DELETE запрос: удаление математических функций для пользователя ID: " + userId);
 
                     mathFunctionRepository.deleteMathFunctionsByUserId(userId);

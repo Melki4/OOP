@@ -148,6 +148,35 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
         }
     }
 
+    public MathFunctionsDTO findMathFunctionByFunctionId(int id) {
+        LOGGER.info("Начинаем поиск ф-ции по айди, {}", id);
+        String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_function_by_id.sql");
+        List<MathFunctions> result = new ArrayList<>();
+
+        try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
+            statement.setInt(1, id);
+            var resultSet = statement.executeQuery();
+            MathFunctionsDTO boof;
+            if(resultSet.next()){
+                boof = new MathFunctionsDTO(resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getInt(3),
+                        resultSet.getDouble(4),
+                        resultSet.getDouble(5),
+                        resultSet.getInt(6),
+                        resultSet.getString(7));
+                return boof;
+            } else {
+            LOGGER.warn("Ф-ции с таким айди нет");
+                throw new DataDoesNotExistException();
+            }
+
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при поиске ф-ций с айди {}", id);
+            throw new RuntimeException(e);
+        }
+    }
+
     public MathFunctions findMathFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
                                                  String functionName){
         LOGGER.info("Начинаем сложный поиск по ф-ции");
