@@ -316,7 +316,6 @@ public class JdbcUserRepository implements UserRepository {
             if (resultSet.next()) {
                 String storedPassword = resultSet.getString("password");
                 // Сравниваем пароли (в реальном приложении - хэши!)
-                System.out.println(login + " " + password + " " + storedPassword);
                 return password.equals(storedPassword);
             }
             return false;
