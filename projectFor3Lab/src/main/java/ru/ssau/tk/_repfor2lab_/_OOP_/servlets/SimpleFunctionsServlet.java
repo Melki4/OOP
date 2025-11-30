@@ -1,8 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 
+import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionsDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.SimpleFunctions;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.SimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -32,6 +32,21 @@ public class SimpleFunctionsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
+
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
+        // Проверяем авторизацию
+        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+            return;
+        }
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
@@ -85,9 +100,25 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // POST /simple-functions - создание новой простой функции
+
+                // Проверяем авторизацию
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    return;
+                }
+
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 String localName = mapper.readTree(requestBody).get("value").asText();
 
@@ -115,9 +146,25 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // PUT /simple-functions - обновление имени функции (старый вариант)
+
+                // Проверяем авторизацию
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    return;
+                }
+
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
@@ -147,9 +194,25 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
+        // Проверяем аутентификацию
+        Users currentUser = (Users) request.getAttribute("currentUser");
+        if (currentUser == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Authentication required\"}");
+            return;
+        }
+
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 // DELETE /simple-functions - удалить все простые функции
+
+                // Проверяем авторизацию
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    return;
+                }
+
                 logger.warning("DELETE запрос: удаление всех простых функций");
                 simpleFunctionRepository.deleteAllFunctions();
                 response.getWriter().write("{\"status\": \"Все простые функции успешно удалены\"}");
@@ -157,6 +220,14 @@ public class SimpleFunctionsServlet extends HttpServlet {
 
             } else if (pathInfo.startsWith("/name/")) {
                 // DELETE /simple-functions/name/{name} - удалить функцию по имени
+
+                // Проверяем авторизацию
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Insufficient permissions\"}");
+                    return;
+                }
+
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length >= 3) {
                     String functionName = pathParts[2];
