@@ -3,7 +3,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointsDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;

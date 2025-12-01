@@ -50,14 +50,15 @@ public class UsersServlet extends HttpServlet {
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
-                // Проверка авторизации
+                logger.info("GET запрос: получение всех пользователей пользователем " + currentUser.getLogin());
+
+                // Проверка, что пользователь - админ
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
                     return;
                 }
 
-                logger.info("GET запрос: получение всех пользователей пользователем " + currentUser.getLogin());
                 List<UserReturnDTO> users = userRepository.findAllUsersAsDTO();
                 String json = mapper.writeValueAsString(users);
                 response.getWriter().write(json);
@@ -68,7 +69,7 @@ public class UsersServlet extends HttpServlet {
                 // GET /users/get - получение пользователя по логину из тела запроса
                 logger.info("GET запрос: получение пользователя по логину пользователем " + currentUser.getLogin());
 
-                // Проверка авторизации
+                // Проверка, что пользователь - админ
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
@@ -101,6 +102,7 @@ public class UsersServlet extends HttpServlet {
                     response.getWriter().write("{\"error\": \"Пользователь не найден\"}");
                     return;
                 }
+
                 // Создание DTO для возврата (без пароля)
                 UserReturnDTO userDTO = new UserReturnDTO();
                 userDTO.setUserId(user.getUserId());
@@ -111,8 +113,8 @@ public class UsersServlet extends HttpServlet {
                 String json = mapper.writeValueAsString(userDTO);
                 response.getWriter().write(json);
                 logger.info("Успешно возвращен пользователь по логину: " + login);
-
             }
+
 
             else if (pathInfo.equals("/id/login")) {
                 // GET /users/id/login - получение ID пользователя по логину из тела запроса
@@ -152,10 +154,11 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.startsWith("/by-login/")) {
+                // GET /users/by-login - получение пользователя по логину из урла
                 String login = pathInfo.substring(10); // Убираем "/by-login/"
 
                 // Проверка доступа к данным
-                if (!AuthorizationService.canAccessUserData(currentUser, userRepository.selectIdByLogin(login), login)) {
+                if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                     return;
@@ -179,7 +182,6 @@ public class UsersServlet extends HttpServlet {
                 response.getWriter().write(json);
                 logger.info("Успешно возвращен пользователь по логину: " + login);
             }
-
             else if (pathInfo.equals("/sorted")) {
                 // GET /users/sorted - получение пользователей отсортированных по логину (только для ADMIN)
 
@@ -195,17 +197,18 @@ public class UsersServlet extends HttpServlet {
                 String json = mapper.writeValueAsString(users);
                 response.getWriter().write(json);
                 logger.info("Успешно возвращено " + users.size() + " отсортированных пользователей");
-
             }
 
             else if (pathInfo.startsWith("/check/")) {
+
                 String[] pathParts = pathInfo.split("/");
+
                 if (pathParts.length == 4 && "id".equals(pathParts[2])) {
                     // GET /users/check/id/{id} - проверка существования пользователя по ID
                     int userId = Integer.parseInt(pathParts[3]);
 
                     // Проверка доступа к данным (USER может проверять только себя)
-                    if (!AuthorizationService.canAccessUserData(currentUser, userId, null)) {
+                    if (!AuthorizationService.canAccessUserDataById(currentUser, userId)) {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                         return;
@@ -221,7 +224,7 @@ public class UsersServlet extends HttpServlet {
                     String login = pathParts[3];
 
                     // Проверка доступа к данным (USER может проверять только себя)
-                    if (!AuthorizationService.canAccessUserData(currentUser, null, login)) {
+                    if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                         return;
@@ -281,7 +284,7 @@ public class UsersServlet extends HttpServlet {
                 String action = pathParts[2];
 
                 // Проверка доступа к данным (USER может обновлять только себя)
-                if (!AuthorizationService.canAccessUserData(currentUser, userId, null)) {
+                if (!AuthorizationService.canAccessUserDataById(currentUser, userId)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Можно обновлять только свои данные\"}");
                     return;
@@ -315,10 +318,10 @@ public class UsersServlet extends HttpServlet {
                         userRepository.updateLoginById(newValue, userId);
                         break;
                     case "role":
-                        // Только ADMIN может менять роли
-                        if (!"ADMIN".equals(currentUser.getRole())) {
+                        // Только admin может менять роли
+                        if (!"admin".equals(currentUser.getRole())) {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write("{\"error\": \"Только ADMIN может изменять роли\"}");
+                            response.getWriter().write("{\"error\": \"Только admin может изменять роли\"}");
                             return;
                         }
                         logger.info("PUT запрос: обновление роли для пользователя ID: " + userId + " пользователем " + currentUser.getLogin());
@@ -382,7 +385,7 @@ public class UsersServlet extends HttpServlet {
                 int userId = Integer.parseInt(pathInfo.substring(1));
 
                 // Проверка доступа к данным (USER может удалять только себя)
-                if (!AuthorizationService.canAccessUserData(currentUser, userId, null)) {
+                if (!AuthorizationService.canAccessUserDataById(currentUser, userId)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Можно удалять только свой аккаунт\"}");
                     return;

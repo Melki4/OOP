@@ -131,7 +131,8 @@ public class MathFunctionsServlet extends HttpServlet {
                     String json = mapper.writeValueAsString(function);
                     response.getWriter().write(json);
                     logger.info("Успешно выполнен расширенный поиск функции");
-                } else if (pathParts.length >= 3 && "id".equals(pathParts[2])) {
+                }
+                else if (pathParts.length >= 3 && "id".equals(pathParts[2])) {
                     // GET /math-functions/complex/id - расширенный поиск ID функции (через параметры запроса)
                     double leftBoard = Double.parseDouble(request.getParameter("leftBoard"));
                     double rightBoard = Double.parseDouble(request.getParameter("rightBoard"));
@@ -186,7 +187,8 @@ public class MathFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"exists\": " + exists + "}");
                 logger.info("Результат расширенной проверки существования функции '" + functionName + "': " + exists);
 
-            } else if (pathInfo.equals("/complex-search")) {
+            }
+            else if (pathInfo.equals("/complex-search")) {
                 // POST /math-functions/complex-search - расширенный поиск (через тело запроса)
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
