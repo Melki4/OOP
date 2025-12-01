@@ -72,7 +72,7 @@ public class PointsServlet extends HttpServlet {
 
                         MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                             logger.severe("Доступ к точкам функции запрещен");
                             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                             response.getWriter().write("{\"error\": \"Точки для функции не найдены\"}");
@@ -90,7 +90,7 @@ public class PointsServlet extends HttpServlet {
 
                         MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                             logger.severe("Доступ к точкам функции запрещен");
                             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                             response.getWriter().write("{\"error\": \"Точки для функции не найдены\"}");
@@ -154,7 +154,7 @@ public class PointsServlet extends HttpServlet {
                 int functionId = jsonNode.get("function_id").asInt();
 
                 MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                     logger.severe("Попытка создания точки для чужой функции");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к созданию точек для этой функции запрещен\"}");
@@ -177,7 +177,7 @@ public class PointsServlet extends HttpServlet {
 
                 MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                     logger.severe("Попытка создания точек для чужой функции");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к созданию точек для этой функции запрещен\"}");
@@ -241,7 +241,7 @@ public class PointsServlet extends HttpServlet {
                 double newValue = jsonNode.get("newValue").asDouble();
 
                 MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                     logger.severe("Попытка обновления точек чужой функции");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к обновлению точек этой функции запрещен\"}");
@@ -318,7 +318,7 @@ public class PointsServlet extends HttpServlet {
                     logger.info("DELETE запрос: удаление точек для функции ID: " + functionId);
 
                     MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                         logger.severe("Попытка удаления точек чужой функции");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Доступ к удалению точек этой функции запрещен\"}");

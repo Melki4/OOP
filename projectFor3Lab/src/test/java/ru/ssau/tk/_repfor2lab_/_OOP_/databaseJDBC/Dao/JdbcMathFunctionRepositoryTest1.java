@@ -118,10 +118,10 @@ class JdbcMathFunctionRepositoryTest1 {
     @Order(4)
     @Test
     void findMathFunctionsByName_WithNonExistentName_ShouldReturnEmptyList() {
-        List<MathFunctions> nonExistentFunctions = mathFunctionRepository.findMathFunctionsByName("nonexistent_function");
 
-        assertNotNull(nonExistentFunctions, "Результат не должен быть null");
-        assertTrue(nonExistentFunctions.isEmpty(), "Список должен быть пустым для несуществующего имени");
+        assertThrows(DataDoesNotExistException.class,
+                () -> mathFunctionRepository.findMathFunctionsByName("nonexistent_function"),
+                "Должно бросаться исключение для несуществующих параметров");
     }
 
     @Order(5)

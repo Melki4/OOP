@@ -319,9 +319,9 @@ public class UsersServlet extends HttpServlet {
                         break;
                     case "role":
                         // Только admin может менять роли
-                        if (!"admin".equals(currentUser.getRole())) {
+                        if (!"Admin".equals(currentUser.getRole())) {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write("{\"error\": \"Только admin может изменять роли\"}");
+                            response.getWriter().write("{\"error\": \"Только Admin может изменять роли\"}");
                             return;
                         }
                         logger.info("PUT запрос: обновление роли для пользователя ID: " + userId + " пользователем " + currentUser.getLogin());

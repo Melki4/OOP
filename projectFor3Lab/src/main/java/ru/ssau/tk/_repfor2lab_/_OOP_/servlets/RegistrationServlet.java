@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.logging.Logger;
 
-@WebServlet("/auth/register")
+@WebServlet("/user/auth/register")
 public class RegistrationServlet extends HttpServlet {
     private JdbcUserRepository userRepository = new JdbcUserRepository();
     private static final Logger logger = Logger.getLogger(RegistrationServlet.class.getName());
@@ -75,7 +75,7 @@ public class RegistrationServlet extends HttpServlet {
 
                     if (values.length == 2) {
                         Users currentUser = userRepository.findByLogin(values[0]);
-                        if (currentUser != null && "admin".equals(currentUser.getRole())) {
+                        if (currentUser != null && "Admin".equals(currentUser.getRole())) {
                             // ADMIN может задавать любую роль
                             if (jsonNode.has("role")) {
                                 role = jsonNode.get("role").asText();

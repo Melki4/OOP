@@ -87,7 +87,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     List<MathFunctions> functions = mathFunctionRepository.findMathFunctionsByName(functionName);
                     List<MathFunctions> returnable_array = new ArrayList<>();
 
-                    if (!currentUser.getRole().equals("admin")){
+                    if (!currentUser.getRole().equals("Admin")){
                         for (var el : functions){
                             if (Objects.equals(el.getOwnerId(), currentUser.getUserId())) returnable_array.add(el);
                         }
@@ -120,7 +120,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
 
-                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                         System.out.println(currentUser.getRole());
                         logger.severe("Математическая функция не найдена");
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -144,7 +144,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
 
-                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                         logger.severe("Математическая функция не найдена");
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         response.getWriter().write("{\"error\": \"Функция не найдена\"}");
@@ -175,7 +175,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                             leftBoard, rightBoard, amountOfDots, functionName);
 
-                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                         logger.severe("Математическая функция не найдена");
                         response.setStatus(HttpServletResponse.SC_OK);
                         exists = false;
@@ -203,7 +203,7 @@ public class MathFunctionsServlet extends HttpServlet {
                 MathFunctions function = mathFunctionRepository.findMathFunctionComplex(
                         leftBoard, rightBoard, amountOfDots, functionName);
 
-                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("admin")){
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                     logger.severe("Математическая функция не найдена");
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     response.getWriter().write("{\"error\": \"Функция не найдена\"}");
@@ -269,6 +269,12 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 logger.info("POST запрос: создание математической функции: " + functionName + " для пользователя ID: " + ownerId);
 
+                if (mathFunctionRepository.existsFunctionComplex(leftBorder, rightBorder, amountOfDots, functionName)){
+                    logger.info("Функция уже существует: ");
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.getWriter().write("{\"error\": \"Функция уже существует\"}");
+                    return;
+                }
                 mathFunctionRepository.createMathFunction(
                         functionName, amountOfDots, leftBorder, rightBorder, ownerId, functionType
                 );

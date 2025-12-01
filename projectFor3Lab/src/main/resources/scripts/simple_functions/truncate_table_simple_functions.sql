@@ -1,1 +1,1 @@
-TRUNCATE TABLE simple_functions
+TRUNCATE TABLE simple_functions CASCADE

@@ -11,13 +11,13 @@ public class AuthorizationService {
         String userRole = user.getRole();
 
         // ADMIN - полный доступ
-        if ("admin".equals(userRole)) {
+        if ("Admin".equals(userRole)) {
             logger.info("Администратору " + user.getLogin() + " предоставлен доступ для " + method + " " + path);
             return true;
         }
 
         // USER - ограниченный доступ
-        if ("user".equals(userRole)) {
+        if ("User".equals(userRole)) {
             return checkUserAccess(user, method, path);
         }
 
@@ -29,7 +29,7 @@ public class AuthorizationService {
         String userRole = user.getRole();
 
         // ADMIN - полный доступ
-        if ("admin".equals(userRole)) {
+        if ("Admin".equals(userRole)) {
             logger.info("Администратору " + user.getLogin() + " предоставлен доступ для " + method + " " + path);
             return true;
         }
@@ -72,7 +72,7 @@ public class AuthorizationService {
 
     public static boolean canAccessUserData(Users currentUser, Integer targetUserId, String targetLogin) {
         // ADMIN имеет доступ ко всем данным
-        if ("admin".equals(currentUser.getRole())) {
+        if ("Admin".equals(currentUser.getRole())) {
             return true;
         }
 
@@ -91,7 +91,7 @@ public class AuthorizationService {
 
     public static boolean canAccessUserDataByLogin(Users currentUser, String targetLogin) {
         // ADMIN имеет доступ ко всем данным
-        if ("admin".equals(currentUser.getRole())) {
+        if ("Admin".equals(currentUser.getRole())) {
             return true;
         }
 
@@ -105,7 +105,7 @@ public class AuthorizationService {
 
     public static boolean canAccessUserDataById(Users currentUser, Integer targetUserId) {
         // ADMIN имеет доступ ко всем данным
-        if ("admin".equals(currentUser.getRole())) {
+        if ("Admin".equals(currentUser.getRole())) {
             return true;
         }
 
