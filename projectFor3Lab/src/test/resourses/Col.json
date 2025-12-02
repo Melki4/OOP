@@ -1,0 +1,1718 @@
+{
+	"info": {
+		"_postman_id": "f9c7b791-d053-4aa0-aeb3-f11507112796",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50463298",
+		"_collection_link": "https://melki4-6956473.postman.co/workspace/Nickolay's-Workspace~6a983df2-fb83-45b9-8975-c217277e19cc/collection/50463298-f9c7b791-d053-4aa0-aeb3-f11507112796?action=share&source=collection_link&creator=50463298"
+	},
+	"item": [
+		{
+			"name": "MathFunctions",
+			"item": [
+				{
+					"name": "Create math function",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"function_name\": \"cos(x)\",\r\n  \"amount_of_dots\": 100,\r\n  \"left_border\": -1,\r\n  \"right_border\": 1,\r\n  \"owner_id\": 1,\r\n  \"function_type\": \"Квадратичная функция\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get users functions",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/user/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get functions by name",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/name/cos(x)",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"name",
+								"cos(x)"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complex function search",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/math-functions/complex/find?leftBoard=-1.0&rightBoard=1.0&amountOfDots=100&functionName=cos(x)",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"complex",
+								"find"
+							],
+							"query": [
+								{
+									"key": "leftBoard",
+									"value": "-1.0"
+								},
+								{
+									"key": "rightBoard",
+									"value": "1.0"
+								},
+								{
+									"key": "amountOfDots",
+									"value": "100"
+								},
+								{
+									"key": "functionName",
+									"value": "cos(x)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complex id search",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user1",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/complex/id?leftBoard=-1.0&rightBoard=1.0&amountOfDots=100&functionName=cos(x)",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"complex",
+								"id"
+							],
+							"query": [
+								{
+									"key": "leftBoard",
+									"value": "-1.0"
+								},
+								{
+									"key": "rightBoard",
+									"value": "1.0"
+								},
+								{
+									"key": "amountOfDots",
+									"value": "100"
+								},
+								{
+									"key": "functionName",
+									"value": "cos(x)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complex existance with body",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"leftBoard\": -1,\r\n  \"rightBoard\": 1,\r\n  \"amountOfDots\": 100,\r\n  \"functionName\": \"new_sin_function\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/check-complex",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"check-complex"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complex search with body",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"leftBoard\": -1,\r\n  \"rightBoard\": 1,\r\n  \"amountOfDots\": 100,\r\n  \"functionName\": \"cos(x)\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/complex-search",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"complex-search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change function name",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"function_name\": \"new_sin_function\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/function/107",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"function",
+								"107"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete function by function id",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/function/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"function",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all user functions",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "mySecretPassword123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user7",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions/user/112",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions",
+								"user",
+								"112"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all functions",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/math-functions",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"math-functions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Points",
+			"item": [
+				{
+					"name": "Create point for function",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"x_value\": 123.3, \r\n    \"y_value\": 233.4, \r\n    \"function_id\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/single",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"single"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create points for function",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"function_id\": 2,\r\n  \"points\": [\r\n    {\r\n      \"x\": 1.0,\r\n      \"y\": 1.0\r\n    },\r\n    {\r\n      \"x\": 2.0,\r\n      \"y\": 4.0\r\n    },\r\n    {\r\n      \"x\": 3.0,\r\n      \"y\": 9.0\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/bulk",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all points for math function",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/function/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"function",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all points for math function sorted",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/function/2/sorted",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"function",
+								"2",
+								"sorted"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update x",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"id\": 2,\r\n    \"oldValue\": 1,\r\n    \"newValue\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/x",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"x"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update y",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"id\": 2,\r\n    \"oldValue\": 1,\r\n    \"newValue\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/y",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"y"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete points for function",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points/function/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points",
+								"function",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all points",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/points",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"points"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SimpleFunctions",
+			"item": [
+				{
+					"name": "Create SimpleFunction",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"value\": \"Квадратичная функция\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all simple functions",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all simple functions sorted",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions/sorted",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions",
+								"sorted"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check if simple function exists",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions/check/Квадратичная функция",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions",
+								"check",
+								"Квадратичная функция"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update SimpleFunction Name",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"oldName\": \"Квадратичная функция\",\r\n    \"newName\": \"Постоянная единичная функция\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create SimpleFunction Copy",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"value\": \"Квадратичная функция\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all SimpleFunctions",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete SimpleFunction by name",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/simple-functions/name/Квадратичная функция",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"simple-functions",
+								"name",
+								"Квадратичная функция"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users Sorted",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/sorted",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"sorted"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check if user exists by id",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/check/id/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"check",
+								"id",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check if user exists by login",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/check/login/kate",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"check",
+								"login",
+								"kate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/by-login/qwerty",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"by-login",
+								"qwerty"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user id by login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"value\": \"user\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/id/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"id",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"login\": \"liza\",\r\n  \"password\": \"mySecretPassword\",\r\n  \"factoryType\": \"list\",\r\n  \"role\": \"USER\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/projectFor3Lab/user/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"user",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update FactoryType for user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful PUT request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"value\": \"array\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/3/factoryType",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"3",
+								"factoryType"
+							]
+						},
+						"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Update password for user",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"value\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/3/password",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"3",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update login for user",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"value\": \"newlogin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/3/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"3",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update role for user",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"value\": \"ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/3/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"3",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users",
+								"3"
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all users",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "pass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "qwerty",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/projectFor3Lab/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"projectFor3Lab",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
