@@ -1,28 +1,20 @@
 package ru.ssau.tk._repfor2lab_._OOP_.entities;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
-@Table(name = "simplefunctions")
+@Table(name = "simple_functions")
 public class SimpleFunctions {
     @Id
-    @Column(name = "functionCode", length = 32, nullable = false)
-    private String functionCode;
-
-    @Column(name = "localName", length = 64, nullable = false)
+    @Column(name = "local_name", length = 128, nullable = false)
     private String localName;
+    @OneToMany(mappedBy = "simpleFunctions")
+    private List<MathFunctions> mathFunctions;
 
     public SimpleFunctions(){}
-    public SimpleFunctions(String functionCode, String localName){
-        this.functionCode = functionCode;
+    public SimpleFunctions(String localName){
         this.localName = localName;
-    }
-
-    public String getFunctionCode() {
-        return functionCode;
-    }
-
-    public void setFunctionCode(String functionCode) {
-        this.functionCode = functionCode;
     }
 
     public String getLocalName() {

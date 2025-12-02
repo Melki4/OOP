@@ -6,31 +6,31 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "mathfunctions")
+@Table(name = "math_functions")
 public class MathFunctions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mathFunctionsID", nullable = false)
+    @Column(name = "math_function_id", nullable = false)
     private Long mathFunctionsID;
 
-    @Column(name = "nameOfFunction", length = 128, nullable = false)
+    @Column(name = "function_name", length = 128, nullable = false)
     private String nameOfFunction;
 
-    @Column(name = "amountOfDots", nullable = false)
+    @Column(name = "amount_of_dots", nullable = false)
     private Long amountOfDots;
 
-    @Column(name = "leftBoarder", nullable = false)
+    @Column(name = "left_boarder", nullable = false)
     private Double leftBoarder;
 
-    @Column(name = "rightBoarder", nullable = false)
+    @Column(name = "right_boarder", nullable = false)
     private Double rightBoarder;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "typeOfFunction")
+    @JoinColumn(name = "function_type")
     private SimpleFunctions simpleFunctions;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ownerID", nullable = false)
+    @JoinColumn(name = "owner_id", nullable = false)
     private Users users;
 
     @OneToMany(mappedBy = "mathFunctions")

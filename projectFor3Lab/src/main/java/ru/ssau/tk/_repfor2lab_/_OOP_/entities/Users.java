@@ -9,13 +9,13 @@ import java.util.List;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userID")
+    @Column(name = "user_id")
     private Long userID;
 
-    @Column(name = "factoryType", nullable = false, length = 16)
-    private String factoryType = "Array";
+    @Column(name = "factory_type", nullable = false, length = 16)
+    private String factoryType = "array";
 
-    @Column(name = "login", nullable = false, length = 32)
+    @Column(name = "login", nullable = false, length = 32, unique = true)
     private String login;
 
     @Column(name = "password", nullable = false, length = 256)

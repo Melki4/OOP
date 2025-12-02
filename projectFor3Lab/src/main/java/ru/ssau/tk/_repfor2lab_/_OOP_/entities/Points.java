@@ -7,22 +7,20 @@ import jakarta.persistence.*;
 public class Points {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pointID", nullable = false)
+    @Column(name = "point_id", nullable = false)
     private Long pointID;
-
-    @Column(name = "xValue", nullable = false)
+    @Column(name = "x_value", nullable = false)
     private Double xValue;
 
-    @Column(name = "yValue", nullable = false)
+    @Column(name = "y_value", nullable = false)
     private Double yValue;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "functionID")
+    @JoinColumn(name = "function_id")
     private MathFunctions mathFunctions;
 
     public Points(){}
-    public Points(Long pointID, Double xValue, Double yValue, MathFunctions mathFunctions){
-        this.pointID = pointID;
+    public Points(Double xValue, Double yValue, MathFunctions mathFunctions){
         this.xValue = xValue;
         this.yValue = yValue;
         this.mathFunctions = mathFunctions;
@@ -51,6 +49,7 @@ public class Points {
     public void setyValue(Double yValue) {
         this.yValue = yValue;
     }
+
 
     public MathFunctions getMathFunctions() {
         return mathFunctions;
