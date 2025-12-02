@@ -15,7 +15,6 @@ import ru.ssau.tk._repfor2lab_._OOP_.repositories.*;
 import java.util.*;
 
 @Service
-@Transactional(readOnly = true)
 public class DataSearch {
     private static final Logger logger = LoggerFactory.getLogger(DataSearch.class);
     @Autowired
@@ -38,17 +37,6 @@ public class DataSearch {
         return user;
     }
 
-    public Optional<MathFunctions> findSingleMathFunction(Long functionId) {
-        logger.info("Одиночный поиск математической функции по ID: {}", functionId);
-
-        Optional<MathFunctions> function = mathFunctionsRepository.findByMathFunctionsID(functionId);
-        if (function.isPresent()) {
-            logger.info("Математическая функция '{}' найдена", function.get().getNameOfFunction());
-        } else {
-            logger.warn("Математическая функция с ID {} не найдена", functionId);
-        }
-        return function;
-    }
 
     public Optional<MathFunctions> findSingleMathFunctionByName(String name) {
         logger.info("Одиночный поиск математической функции по имени: {}", name);

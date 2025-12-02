@@ -2,15 +2,23 @@ package ru.ssau.tk._repfor2lab_._OOP_.util;
 
 import java.sql.*;
 import java.util.concurrent.TimeUnit;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class DataSearchSpeedBenchmark {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/math_functions_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "lera2006";
-
     public static void main(String[] args) {
         System.out.println("Сравнение скорости выполнения SQL запросов...");
+
+        Properties props = loadProperties();
+
+        String URL = props.getProperty("spring.datasource.url");
+        String USER = props.getProperty("spring.datasource.username");
+        String PASSWORD = props.getProperty("spring.datasource.password");
+
+        System.out.println("URL: " + URL);
+        System.out.println("User: " + USER);
 
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             measureSqlSearchSpeed(connection);
@@ -18,6 +26,30 @@ public class DataSearchSpeedBenchmark {
             System.err.println("Ошибка подключения к БД:");
             e.printStackTrace();
         }
+    }
+
+    private static Properties loadProperties() {
+        Properties props = new Properties();
+
+        // Прямой путь к файлу
+        String filePath = "projectFor3Lab/src/main/resources/application.properties";
+
+        try (InputStream is = new FileInputStream(filePath)) {
+            props.load(is);
+            System.out.println("Файл конфигурации найден: " + filePath);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось найти application.properties по пути: " + filePath, e);
+        }
+
+        // Проверяем обязательные параметры
+        if (!props.containsKey("spring.datasource.url") ||
+                !props.containsKey("spring.datasource.username") ||
+                !props.containsKey("spring.datasource.password")) {
+            throw new RuntimeException("В application.properties не найдены настройки БД.\n" +
+                    "Должны быть указаны: spring.datasource.url, spring.datasource.username, spring.datasource.password");
+        }
+
+        return props;
     }
 
     private static void measureSqlSearchSpeed(Connection connection) throws SQLException {
@@ -67,7 +99,7 @@ public class DataSearchSpeedBenchmark {
     private static long measureSingleFunctionByIdSearch(Connection connection) throws SQLException {
         long totalTime = 0;
         int iterations = 500;
-        String sql = "SELECT * FROM mathfunctions WHERE mathFunctionsID = ?";
+        String sql = "SELECT * FROM math_functions WHERE math_function_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, 1);
@@ -87,7 +119,7 @@ public class DataSearchSpeedBenchmark {
     private static long measureUserFunctionsSearch(Connection connection) throws SQLException {
         long totalTime = 0;
         int iterations = 200;
-        String sql = "SELECT * FROM mathfunctions WHERE ownerID = ?";
+        String sql = "SELECT * FROM math_functions WHERE owner_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, 1);
@@ -107,7 +139,7 @@ public class DataSearchSpeedBenchmark {
     private static long measureFunctionPointsSearch(Connection connection) throws SQLException {
         long totalTime = 0;
         int iterations = 200;
-        String sql = "SELECT * FROM points WHERE functionID = ?";
+        String sql = "SELECT * FROM points WHERE function_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, 1);
