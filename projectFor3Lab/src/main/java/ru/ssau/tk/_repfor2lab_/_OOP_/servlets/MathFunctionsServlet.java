@@ -260,7 +260,7 @@ public class MathFunctionsServlet extends HttpServlet {
                 int ownerId = jsonNode.get("owner_id").asInt();
                 String functionType = jsonNode.get("function_type").asText();
 
-                if(ownerId != currentUser.getUserId()) {
+                if(ownerId != currentUser.getUserId() && !currentUser.getRole().equals("Admin")) {
                     logger.severe("Попытка создания функции для другого пользователя");
                     response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
                     response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
@@ -331,7 +331,7 @@ public class MathFunctionsServlet extends HttpServlet {
                     logger.info("PUT запрос: обновление имени функции ID: " + functionId + " на: " + newName);
                     MathFunctionsDTO n = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                    if(!Objects.equals(n.getOwnerId(), currentUser.getUserId())){
+                    if(!Objects.equals(n.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                         logger.severe("Попытка изменения функции другого пользователя");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
@@ -398,7 +398,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                     MathFunctionsDTO n = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
 
-                    if(!Objects.equals(n.getOwnerId(), currentUser.getUserId())){
+                    if(!Objects.equals(n.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                         logger.severe("Попытка удаления функции другого пользователя");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
@@ -421,7 +421,7 @@ public class MathFunctionsServlet extends HttpServlet {
                 if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
                     int userId = Integer.parseInt(pathParts[2]);
 
-                    if(userId != currentUser.getUserId()){
+                    if(userId != currentUser.getUserId() && !currentUser.getRole().equals("Admin")){
                         logger.severe("Попытка удаления функций другого пользователя");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Ошибка доступа\"}");
@@ -442,7 +442,12 @@ public class MathFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Неверный формат запроса для удаления\"}");
             }
 
-        } catch (NumberFormatException e) {
+        } catch (DataDoesNotExistException e) {
+            logger.severe("Математическая ф-ция не найдена " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Математическая ф-ция не найдена\"}");
+        }
+        catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в DELETE запросе: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\": \"Неверный формат ID\"}");

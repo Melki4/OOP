@@ -14,15 +14,15 @@ public class connectionManager {
         try {
             // ЯВНАЯ загрузка драйвера
             Class.forName("org.postgresql.Driver");
-            LOGGER.info("✅ PostgreSQL Driver loaded successfully");
+            LOGGER.info("PostgreSQL Driver loaded successfully");
         } catch (ClassNotFoundException e) {
-            LOGGER.error("❌ PostgreSQL Driver not found!", e);
+            LOGGER.error("PostgreSQL Driver not found!", e);
             throw new RuntimeException(e);
         }
     }
 
     public static Connection open(){
-        String url = "jdbc:postgresql://localhost:5432/test_postgre";
+        String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
         String password = "4sfl8gpassword";
 
@@ -31,11 +31,11 @@ public class connectionManager {
             LOGGER.info("👤 Логин: {}", user);
 
             Connection connection = DriverManager.getConnection(url, user, password);
-            LOGGER.info("✅ Связь с БД установлена успешно");
+            LOGGER.info("Связь с БД установлена успешно");
             return connection;
 
         } catch (SQLException e) {
-            LOGGER.error("❌ Ошибка при подключении к бд: {}", e.getMessage());
+            LOGGER.error("Ошибка при подключении к бд: {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

@@ -59,15 +59,15 @@ public class createAComparebleTable {
         int user_id = JdbcUserRepository.selectIdByLogin("login");
 
         m.createMathFunction("x^2+2x+1_0", 10000, -100.0,
-                1, user_id, "SqrFunc");
+                1, user_id, "Квадратичная ф-ция");
         m.createMathFunction("x^2+2x+1_1", 20000, -100.0,
-                1, user_id, "SqrFunc");
+                1, user_id, "Квадратичная ф-ция");
         m.createMathFunction("x^2+2x+1_2", 40000, -100.0,
-                1, user_id, "SqrFunc");
+                1, user_id, "Квадратичная ф-ция");
         m.createMathFunction("x^2+2x+1_3", 80000, -100.0,
-                1, user_id, "SqrFunc");
+                1, user_id, "Квадратичная ф-ция");
         m.createMathFunction("x^2+2x+1_4", 100000, -100.0,
-                1, user_id, "SqrFunc");
+                1, user_id, "Квадратичная ф-ция");
 
         int function_id1 = m.findMathFunctionsByName("x^2+2x+1_0").getFirst().getFunctionId();
         int function_id2 = m.findMathFunctionsByName("x^2+2x+1_1").getFirst().getFunctionId();

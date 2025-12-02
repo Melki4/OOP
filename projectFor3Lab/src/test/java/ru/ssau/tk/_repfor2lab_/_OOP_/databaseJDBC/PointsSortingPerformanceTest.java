@@ -71,7 +71,7 @@ public class PointsSortingPerformanceTest {
 
         // Создаем функции в БД
         for (int i = 0; i < FUNCTION_COUNT; i++) {
-            mathRepo.createMathFunction(names[i], POINTS_COUNT, ranges[i][0], 1, userId, "PerfFunc");
+            mathRepo.createMathFunction(names[i], POINTS_COUNT, ranges[i][0], 1, userId, "Функция для тестирования");
         }
 
         // Получаем ID функций
