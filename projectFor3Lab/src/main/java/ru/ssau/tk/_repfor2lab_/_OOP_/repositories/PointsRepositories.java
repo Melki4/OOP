@@ -15,8 +15,8 @@ public interface PointsRepositories extends JpaRepository<Points, Long> {
     boolean existsByMathFunctionsMathFunctionsID(Long functionID);
     List<Points> findByxValue(Double xValue);
     boolean existsByxValue(Double xValue);
-    List<Points> findByyValue(Double xValue);
-    boolean existsByyValue(Double xValue);
+    List<Points> findByyValue(Double yValue);
+    boolean existsByyValue(Double yValue);
     List<Points> findByxValueBetween(Double minX, Double maxX);
     List<Points> findByyValueBetween(Double minY, Double maxY);
     @Transactional
@@ -26,4 +26,10 @@ public interface PointsRepositories extends JpaRepository<Points, Long> {
     List<Points> findByMathFunctionsMathFunctionsID(Long functionID, Sort sort);
     List<Points> findByxValueBetween(Double minX, Double maxX, Sort sort);
     List<Points> findByyValueBetween(Double minY, Double maxY, Sort sort);
+
+    Optional<Points> findByMathFunctionsMathFunctionsIDAndXValue(Long functionId, Double oldX);
+
+    Optional<Points> findByMathFunctionsMathFunctionsIDAndYValue(Long functionId, Double oldY);
+
 }
+

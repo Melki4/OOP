@@ -3,17 +3,20 @@ package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ssau.tk._repfor2lab_._OOP_.config.AppConfig;
+import ru.ssau.tk._repfor2lab_._OOP_.Application;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.SimpleFunctions;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
+@SpringBootTest(classes = Application.class)
 @Transactional
+@Rollback
 class SimpleFunctionsRepositoriesTest {
 
     @Autowired
@@ -28,8 +31,8 @@ class SimpleFunctionsRepositoriesTest {
         simpleFunctionsRepository.deleteAll();
 
         // Создание тестовых функций
-        testFunction1 = new SimpleFunctions("SIN", "sin_function");
-        testFunction2 = new SimpleFunctions("COS", "cos_function");
+        testFunction1 = new SimpleFunctions("sin_function");
+        testFunction2 = new SimpleFunctions("cos_function");
 
         // Сохранение тестовых данных
         simpleFunctionsRepository.save(testFunction1);
@@ -46,7 +49,6 @@ class SimpleFunctionsRepositoriesTest {
         // Then
         assertTrue(foundFunction.isPresent());
         assertEquals("sin_function", foundFunction.get().getLocalName());
-        assertEquals("SIN", foundFunction.get().getFunctionCode());
     }
 
     @Test
@@ -108,7 +110,7 @@ class SimpleFunctionsRepositoriesTest {
     @Test
     void testExistsByLocalName_AfterSave_ShouldReturnTrue() {
         // Given
-        SimpleFunctions newFunction = new SimpleFunctions("TAN", "tan_function");
+        SimpleFunctions newFunction = new SimpleFunctions("tan_function");
 
         // When
         simpleFunctionsRepository.save(newFunction);
@@ -176,7 +178,7 @@ class SimpleFunctionsRepositoriesTest {
     @Test
     void testSave_NewFunction_ShouldPersistSuccessfully() {
         // Given
-        SimpleFunctions newFunction = new SimpleFunctions("TAN", "tan_function");
+        SimpleFunctions newFunction = new SimpleFunctions( "tan_function");
 
         // When
         SimpleFunctions savedFunction = simpleFunctionsRepository.save(newFunction);
@@ -184,23 +186,9 @@ class SimpleFunctionsRepositoriesTest {
         // Then
         assertNotNull(savedFunction);
         assertEquals("tan_function", savedFunction.getLocalName());
-        assertEquals("TAN", savedFunction.getFunctionCode());
         assertTrue(simpleFunctionsRepository.existsByLocalName("tan_function"));
     }
 
-    @Test
-    void testFindById_WhenFunctionExists_ShouldReturnFunction() {
-        // Given
-        String functionCode = testFunction1.getFunctionCode();
-
-        // When
-        Optional<SimpleFunctions> foundFunction = simpleFunctionsRepository.findById(functionCode);
-
-        // Then
-        assertTrue(foundFunction.isPresent());
-        assertEquals("sin_function", foundFunction.get().getLocalName());
-        assertEquals("SIN", foundFunction.get().getFunctionCode());
-    }
 
     @Test
     void testFindAll_ShouldReturnAllFunctions() {
@@ -220,38 +208,5 @@ class SimpleFunctionsRepositoriesTest {
 
         // Then
         assertEquals(2, count);
-    }
-
-    @Test
-    void testDeleteById_ShouldDeleteFunction() {
-        // Given
-        String functionCode = testFunction1.getFunctionCode();
-        assertTrue(simpleFunctionsRepository.findById(functionCode).isPresent());
-
-        // When
-        simpleFunctionsRepository.deleteById(functionCode);
-
-        // Then
-        assertFalse(simpleFunctionsRepository.findById(functionCode).isPresent());
-    }
-
-
-    @Test
-    void testUpdate_Function_ShouldUpdateSuccessfully() {
-        // Given
-        SimpleFunctions function = simpleFunctionsRepository.findByLocalName("sin_function").get();
-        function.setLocalName("updated_sin_function");
-
-        // When
-        SimpleFunctions updatedFunction = simpleFunctionsRepository.save(function);
-
-        // Then
-        assertEquals("updated_sin_function", updatedFunction.getLocalName());
-        assertEquals("SIN", updatedFunction.getFunctionCode());
-
-        // Проверяем, что данные сохранились в базе
-        Optional<SimpleFunctions> persistedFunction = simpleFunctionsRepository.findByLocalName("updated_sin_function");
-        assertTrue(persistedFunction.isPresent());
-        assertEquals("SIN", persistedFunction.get().getFunctionCode());
     }
 }

@@ -3,9 +3,13 @@ package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ssau.tk._repfor2lab_._OOP_.config.AppConfig;
+import ru.ssau.tk._repfor2lab_._OOP_.Application;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.Users;
 
 import java.util.List;
@@ -13,8 +17,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
+@SpringBootTest(classes = Application.class)
 @Transactional
+@Rollback
 class UsersRepositoriesTest {
 
     @Autowired
@@ -217,4 +222,18 @@ class UsersRepositoriesTest {
         assertTrue(users.stream().anyMatch(user -> user.getUserID().equals(id1)));
         assertTrue(users.stream().anyMatch(user -> user.getUserID().equals(id2)));
     }
+
+    @Test
+    void testDeleteAllUsers() {
+        // Проверяем начальное количество
+        assertEquals(3, usersRepository.count());
+
+        // Удаляем всех пользователей
+        usersRepository.deleteAll();
+
+        // Проверяем, что все удалены
+        assertEquals(0, usersRepository.count());
+    }
+
+
 }

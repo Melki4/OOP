@@ -18,4 +18,5 @@ public interface SimpleFunctionsRepositories extends JpaRepository<SimpleFunctio
 
     //для поиска с сортировкой
     List<SimpleFunctions> findByLocalNameContainingIgnoreCase(String localName, Sort sort);
+    List<SimpleFunctions> findAllByOrderByLocalNameAsc();
 }

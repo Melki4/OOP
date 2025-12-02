@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface MathFunctionsRepositories extends JpaRepository<MathFunctions, Long> {
-    Optional<MathFunctions> findByMathFunctionsID(Long mathFunctionsID);
     Optional<MathFunctions> findByNameOfFunction(String nameOfFunction);
     boolean existsByNameOfFunction(String nameOfFunction);
     List<MathFunctions> findByUsersUserID(Long userID);
@@ -19,13 +18,19 @@ public interface MathFunctionsRepositories extends JpaRepository<MathFunctions, 
     List<MathFunctions> findByLeftBoarderBetween(Double minLeftBoarder, Double maxLeftBoarder);
     List<MathFunctions> findByRightBoarderBetween(Double minRightBoarder, Double maxRightBoarder);
     List<MathFunctions> findByAmountOfDotsBetween(Long minDots, Long maxDots);
-    List<MathFunctions> findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqual(Double minLeftBoarder, Double maxRightBoarder);
     @Transactional
     void deleteByNameOfFunction(String nameOfFunction);
-
+    void deleteByUsersUserID(Long userId);
     //для поиска с сортировкой
     List<MathFunctions> findByRightBoarderBetween(Double minRightBoarder, Double maxRightBoarder, Sort sort);
     List<MathFunctions> findByLeftBoarderBetween(Double minLeftBoarder, Double maxLeftBoarder, Sort sort);
     List<MathFunctions> findByUsersUserID(Long userID, Sort sort);
     List<MathFunctions> findByNameOfFunctionContainingIgnoreCase(String name, Sort sort);
+
+
+    List<MathFunctions> findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndNameOfFunction(double leftBoard, double rightBoard, long amountOfDots, String functionName);
+
+    List<Object> findByMathFunctionsID(Long mathFunctionsID);
 }
+
+

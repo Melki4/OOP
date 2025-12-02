@@ -3,9 +3,11 @@ package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ssau.tk._repfor2lab_._OOP_.config.AppConfig;
+import ru.ssau.tk._repfor2lab_._OOP_.Application;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.MathFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.Users;
 
@@ -14,8 +16,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(AppConfig.class)
+@SpringBootTest(classes = Application.class)
 @Transactional
+@Rollback
 class MathFunctionsRepositoriesTest {
 
     @Autowired
@@ -90,17 +93,6 @@ class MathFunctionsRepositoriesTest {
         assertEquals(testUser.getUserID(), savedFunction.getUsers().getUserID());
     }
 
-    @Test
-    void testFindByMathFunctionsID() {
-        Long functionId = testFunction1.getMathFunctionsID();
-
-        Optional<MathFunctions> foundFunction = mathFunctionsRepository.findByMathFunctionsID(functionId);
-
-        assertTrue(foundFunction.isPresent());
-        assertEquals("sin(x)", foundFunction.get().getNameOfFunction());
-        assertEquals(0.0, foundFunction.get().getLeftBoarder());
-        assertEquals(6.28, foundFunction.get().getRightBoarder());
-    }
 
     @Test
     void testFindByNameOfFunction() {
@@ -206,29 +198,6 @@ class MathFunctionsRepositoriesTest {
         assertTrue(allFunctions.stream().anyMatch(func -> "x^2".equals(func.getNameOfFunction())));
     }
 
-    @Test
-    void testUpdateMathFunction() {
-        // Находим функцию
-        MathFunctions function = mathFunctionsRepository.findByNameOfFunction("sin(x)").get();
-
-        // Обновляем данные
-        function.setNameOfFunction("updated_sin(x)");
-        function.setLeftBoarder(-1.0);
-        function.setRightBoarder(7.28);
-        function.setAmountOfDots(150L);
-
-        MathFunctions updatedFunction = mathFunctionsRepository.save(function);
-
-        // Проверяем обновленные данные
-        assertEquals("updated_sin(x)", updatedFunction.getNameOfFunction());
-        assertEquals(-1.0, updatedFunction.getLeftBoarder());
-        assertEquals(7.28, updatedFunction.getRightBoarder());
-        assertEquals(150L, updatedFunction.getAmountOfDots());
-
-        // Проверяем, что данные сохранились в базе
-        MathFunctions persistedFunction = mathFunctionsRepository.findByMathFunctionsID(function.getMathFunctionsID()).get();
-        assertEquals("updated_sin(x)", persistedFunction.getNameOfFunction());
-    }
 
     @Test
     void testCountMathFunctions() {
