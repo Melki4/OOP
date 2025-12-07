@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
+package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 
@@ -17,10 +17,10 @@ public interface UserRepository {
     void updateLoginById(String login, int id);
     void updateRoleById(String role, int id);
 
-    void deleteUserById(int id);
-    void deleteAllUsers();
+    boolean deleteUserById(int id);
+    boolean deleteAllUsers();
 
-    void createUser(String factoryType, String login, String password, String role);
+    Users createUser(String factoryType, String login, String password, String role);
 
     boolean existsUserById(int id);
     boolean existsUserByLogin(String login);

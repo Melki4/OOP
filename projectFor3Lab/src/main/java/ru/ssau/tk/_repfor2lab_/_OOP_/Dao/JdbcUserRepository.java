@@ -1,12 +1,13 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
+package ru.ssau.tk._repfor2lab_._OOP_.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserReturnDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.UserRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
+import ru.ssau.tk._repfor2lab_._OOP_.repositories.UserRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.utils.connectionManager;
+import ru.ssau.tk._repfor2lab_._OOP_.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
 import java.sql.ResultSet;
@@ -244,35 +245,60 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public void deleteUserById(int id){
+    public boolean deleteUserById(int id){
         LOGGER.info("Начинаем удаление пользователя с ID: {}", id);
         String sql = loaderSQL.loadSQL("scripts\\users\\delete_user_by_id.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
             statement.setInt(1, id);
-            statement.execute();
-            LOGGER.info("Пользователь с ID {} успешно удален", id);
+            return statement.executeUpdate() > 0;
+//            LOGGER.info("Пользователь с ID {} успешно удален", id);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении пользователя с ID: {}", id);
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteAllUsers(){
+    public boolean deleteAllUsers(){
         LOGGER.info("Начинаем удаление всех пользователей");
 
         String sql = loaderSQL.loadSQL("scripts\\users\\truncate_all_users.sql");
 
         try (var connection = connectionManager.open();
              var statement = connection.createStatement()) {
-            statement.execute(sql);
-            LOGGER.info("Все пользователи успешно удалены");
+            return statement.executeUpdate(sql) > 0;
+//            LOGGER.info("Все пользователи успешно удалены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении пользователей");
             throw new RuntimeException(e);
         }
     }
 
-    public void createUser(String factoryType, String login, String password, String role){
+    public Users createUser(Users user){
+        LOGGER.info("Начинаем добавление нового пользователя с логином: {}", user.getLogin());
+        String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
+        try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
+            statement.setString(1, user.getFactoryType());
+            statement.setString(2, user.getLogin());
+            statement.setString(3, user.getPassword());
+            statement.setString(4, user.getRole());
+
+            statement.executeUpdate();
+
+            var keys = statement.getGeneratedKeys();
+            if(keys.next()){
+                user.setUserId(keys.getInt("user_id"));
+            }
+
+            return user;
+
+//            LOGGER.info("Пользователь с логином {} успешно добавлен", user.getLogin());
+        } catch (SQLException e) {
+            LOGGER.warn("Произошла ошибка при добавлении пользователя с логином: {}", user.getLogin());
+            throw new DaoException(e);
+        }
+    }
+
+    public Users createUser(String factoryType, String login, String password, String role){
         LOGGER.info("Начинаем добавление нового пользователя с логином: {}", login);
         String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
@@ -281,11 +307,19 @@ public class JdbcUserRepository implements UserRepository {
             statement.setString(3, password);
             statement.setString(4, role);
 
-            statement.execute();
-            LOGGER.info("Пользователь с логином {} успешно добавлен", login);
+            statement.executeUpdate();
+            Users user = null;
+
+            var keys = statement.getGeneratedKeys();
+            if(keys.next()){
+                user = new Users(keys.getInt("user_id"), factoryType, login, password, role);
+            }
+
+            return user;
+//            LOGGER.info("Пользователь с логином {} успешно добавлен", login);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении пользователя с логином: {}", login);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -295,14 +329,17 @@ public class JdbcUserRepository implements UserRepository {
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             var resultSet = statement.executeQuery();
-            resultSet.next();
-            boolean value = resultSet.getBoolean(1);
-            if (value) LOGGER.info("Пользователь существует");
-            else LOGGER.info("Пользователя не существует");
-            return value;
+            if(resultSet.next()){
+                boolean value = resultSet.getBoolean(1);
+                if (value) LOGGER.info("Пользователь существует");
+                else LOGGER.info("Пользователя не существует");
+                return value;
+            } else{
+                throw new DaoException("Произошла ошибка с поиском пользователя");
+            }
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при проверке существования пользователя");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -321,7 +358,7 @@ public class JdbcUserRepository implements UserRepository {
             return false;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Authentication error", e);
+            throw new DaoException("Authentication error", e);
         }
     }
 
@@ -345,7 +382,7 @@ public class JdbcUserRepository implements UserRepository {
             return null;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding user by login", e);
+            throw new DaoException("Error finding user by login", e);
         }
     }
 
@@ -365,7 +402,7 @@ public class JdbcUserRepository implements UserRepository {
             return value;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при проверке существования пользователя с логином");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 }
