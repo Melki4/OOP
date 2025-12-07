@@ -3,7 +3,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcSimpleFunctionRepository;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,19 +11,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
+import service.SimpleFunctionService;
 
 @WebServlet("/simple-functions/*")
 public class SimpleFunctionsServlet extends HttpServlet {
-    private JdbcSimpleFunctionRepository simpleFunctionRepository;
+    private SimpleFunctionService simpleFunctionService;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(SimpleFunctionsServlet.class.getName());
 
     @Override
     public void init() {
-        this.simpleFunctionRepository = new JdbcSimpleFunctionRepository();
+        simpleFunctionService = new SimpleFunctionService();
         this.mapper = new ObjectMapper();
         logger.info("Сервлет SimpleFunctionsServlet успешно инициализирован");
     }
@@ -50,40 +52,48 @@ public class SimpleFunctionsServlet extends HttpServlet {
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
-                // GET /simple-functions - получение всех простых функций
                 logger.info("GET запрос: получение всех простых функций");
-                List<SimpleFunctionsDTO> functions = simpleFunctionRepository.findAllSimpleFunctionsAsDTO();
+
+                var functions = simpleFunctionService.findAllSimpleFunctions();
+
                 String json = mapper.writeValueAsString(functions);
                 response.getWriter().write(json);
                 logger.info("Успешно возвращено " + functions.size() + " простых функций");
+            }
 
-            } else if (pathInfo.equals("/sorted")) {
-                // GET /simple-functions/sorted - получение функций отсортированных по имени
+            else if (pathInfo.equals("/sorted")) {
                 logger.info("GET запрос: получение всех простых функций отсортированных по имени");
-                List<SimpleFunctionsDTO> functions = simpleFunctionRepository.findAllSimpleFunctionsSortedByLocalNameAsDTO();
+
+                List<SimpleFunctionsDTO> functions = simpleFunctionService.findAllSimpleFunctionsSorted();
+
                 String json = mapper.writeValueAsString(functions);
                 response.getWriter().write(json);
                 logger.info("Успешно возвращено " + functions.size() + " отсортированных простых функций");
+            }
 
-            } else if (pathInfo.startsWith("/check/")) {
-                // GET /simple-functions/check/{name} - проверка существования функции по имени
-                String[] pathParts = pathInfo.split("/");
-                if (pathParts.length >= 3) {
-                    String functionName = pathParts[2];
-                    logger.info("GET запрос: проверка существования простой функции: " + functionName);
-                    boolean exists = simpleFunctionRepository.existSimpleFunction(functionName);
+            else if (pathInfo.startsWith("/check")) {
+                Map<String, String[]> parameters = request.getParameterMap();
+
+                if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
+
+                if (parameters.containsKey("local-name")) {
+                    if (parameters.get("local-name").length > 1)
+                        throw new RuntimeException("Для параметра указано несколько значений");
+                    String local_name = parameters.get("local-name")[0];
+
+
+                    boolean exists = simpleFunctionService.existsByLocalName(local_name);
                     response.getWriter().write("{\"exists\": " + exists + "}");
-                    logger.info("Результат проверки существования простой функции '" + functionName + "': " + exists);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("{\"error\": \"Неверный формат запроса для проверки\"}");
+                    logger.info("Результат проверки существования простой ф-ции  " + local_name + ": " + exists);
                 }
-
+                else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    throw new RuntimeException("Некорректный параметр запроса");
+                }
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
-
         } catch (DataDoesNotExistException e) {
             logger.severe("Таблица с простыми функциями пуста: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -108,27 +118,27 @@ public class SimpleFunctionsServlet extends HttpServlet {
             return;
         }
 
+        // Проверка авторизации
+        if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
+            return;
+        }
+
         try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // POST /simple-functions - создание новой простой функции
-
-                // Проверка авторизации
-                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
-                    return;
-                }
-
+            if (pathInfo == null || pathInfo.equals("/create")) {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
-                String localName = mapper.readTree(requestBody).get("value").asText();
+
+                String localName = mapper.readTree(requestBody).get("local-name").asText();
 
                 logger.info("POST запрос: создание простой функции: " + localName);
-                simpleFunctionRepository.createSimpleFunction(localName);
+                SimpleFunctionsDTO simpleFunctionsDTO = simpleFunctionService.createSimpleFunction(localName);
 
                 response.setStatus(HttpServletResponse.SC_CREATED);
-                response.getWriter().write("{\"status\": \"Простая функция успешно создана\"}");
-                logger.info("Успешно создана простая функция: " + localName);
+                String json = mapper.writeValueAsString(simpleFunctionsDTO);
 
+                response.getWriter().write(json);
+                logger.info("Успешно создана простая функция: " + localName);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
@@ -154,29 +164,27 @@ public class SimpleFunctionsServlet extends HttpServlet {
             return;
         }
 
+        // Проверка авторизации
+        if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
+            return;
+        }
+
         try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // PUT /simple-functions - обновление имени функции
-
-                // Проверка авторизации
-                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
-                    return;
-                }
-
+            if (pathInfo.equals("/update")) {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
                 String oldName = jsonNode.get("oldName").asText();
                 String newName = jsonNode.get("newName").asText();
 
-                logger.info("PUT запрос: обновление имени простой функции с '" + oldName + "' на '" + newName + "'");
-                simpleFunctionRepository.updateSimpleFunctionName(oldName, newName);
+                logger.info("PUT запрос: обновление имени простой функции с " + oldName + " на " + newName);
+                simpleFunctionService.updateSimpleFunction(oldName, newName);
 
-                response.getWriter().write("{\"status\": \"Имя простой функции успешно обновлено\"}");
+                response.getWriter().write("{\"status\": \"Имя простой функции успешно обновлено с " + oldName +
+                        " на " + newName + "\"}");
                 logger.info("Успешно обновлено имя простой функции");
-
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
@@ -202,45 +210,34 @@ public class SimpleFunctionsServlet extends HttpServlet {
             return;
         }
 
-        try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // DELETE /simple-functions - удаление всех простых функций
+        // Проверка авторизации
+        if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
+            return;
+        }
 
-                // Проверка авторизации
-                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
-                    return;
-                }
+        try {
+            if (pathInfo.equals("/delete")) {
 
                 logger.warning("DELETE запрос: удаление всех простых функций");
-                simpleFunctionRepository.deleteAllFunctions();
+                simpleFunctionService.deleteAllFunctions();
+
                 response.getWriter().write("{\"status\": \"Все простые функции успешно удалены\"}");
                 logger.warning("Успешно удалены все простые функции");
 
-            } else if (pathInfo.startsWith("/name/")) {
-                // DELETE /simple-functions/name/{name} - удаление функции по имени
+            } else if (pathInfo.startsWith("/delete-by-name")) {
 
-                // Проверка авторизации
-                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
-                    return;
-                }
+                String requestBody = request.getReader().lines().reduce("", String::concat);
+                var jsonNode = mapper.readTree(requestBody);
 
-                String[] pathParts = pathInfo.split("/");
-                if (pathParts.length >= 3) {
-                    String functionName = pathParts[2];
-                    logger.info("DELETE запрос: удаление простой функции: " + functionName);
+                String name = jsonNode.get("name").asText();
 
-                    simpleFunctionRepository.deleteSimpleFunctionByName(functionName);
-                    response.getWriter().write("{\"status\": \"Простая функция успешно удалена\"}");
-                    logger.info("Успешно удалена простая функция: " + functionName);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("{\"error\": \"Неверный формат имени функции\"}");
-                }
+                logger.info("DELETE запрос: удаление простой функции: " + name);
+                simpleFunctionService.deleteSimpleFunction(name);
 
+                response.getWriter().write("{\"status\": \"Простая функция успешно удалена\"}");
+                logger.info("Успешно удалена простая функция: " + name);
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Неверный формат запроса для удаления\"}");

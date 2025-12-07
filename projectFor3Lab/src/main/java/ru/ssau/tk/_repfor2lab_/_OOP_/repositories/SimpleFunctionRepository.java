@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
+package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.SimpleFunctions;
 
@@ -12,10 +12,10 @@ public interface SimpleFunctionRepository {
 
     void updateSimpleFunctionName(String oldName, String newName);
 
-    void deleteSimpleFunctionByName(String localName);
-    void deleteAllFunctions();
+    boolean deleteSimpleFunctionByName(String localName);
+    boolean deleteAllFunctions();
 
-    void createSimpleFunction(String localName);
+    SimpleFunctions createSimpleFunction(String localName);
 
     boolean existSimpleFunction(String localName);
 }

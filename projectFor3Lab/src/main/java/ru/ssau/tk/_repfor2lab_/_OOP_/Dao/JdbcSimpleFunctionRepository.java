@@ -1,12 +1,13 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
+package ru.ssau.tk._repfor2lab_._OOP_.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.SimpleFunctions;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.SimpleFunctionRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.repositories.SimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.utils.connectionManager;
+import ru.ssau.tk._repfor2lab_._OOP_.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
 import java.sql.ResultSet;
@@ -157,39 +158,46 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
         }
     }
 
-    public void deleteSimpleFunctionByName(String localName){
+    public boolean deleteSimpleFunctionByName(String localName){
         LOGGER.info("Начинаем удаление простой функции с кодом: {}", localName);
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\delete_simple_function.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
             statement.setString(1, localName);
-            statement.execute();
-            LOGGER.info("Функция с кодом {} успешно удалена", localName);
+            return statement.executeUpdate()>0;
+//            LOGGER.info("Функция с кодом {} успешно удалена", localName);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении функции с кодом: {}", localName);
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteAllFunctions(){
+    public boolean deleteAllFunctions(){
         LOGGER.info("Начинаем удаление всех простых функций");
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\truncate_table_simple_functions.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
-            statement.execute();
-            LOGGER.info("Все простые функции успешно удалены");
+            return statement.executeUpdate()>0;
+//            LOGGER.info("Все простые функции успешно удалены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении всех простых функций");
             throw new RuntimeException(e);
         }
-        createTable();
     }
 
-    public void createSimpleFunction(String localName){
+    public SimpleFunctions createSimpleFunction(String localName){
         LOGGER.info("Начинаем добавление простой функции с именем: {}", localName);
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\insert_simple_function.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
             statement.setString(1, localName);
-            statement.execute();
-            LOGGER.info("Простая функция с именем {} успешно добавлена", localName);
+
+            statement.executeUpdate();
+            SimpleFunctions simpleFunctions = new SimpleFunctions(localName);
+
+            var keys = statement.getGeneratedKeys();
+            if(keys.next()){
+                simpleFunctions.setLocalName(keys.getString("local_name"));
+            }
+
+            return simpleFunctions;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении простой функции с именем: {}", localName);
             throw new RuntimeException(e);
