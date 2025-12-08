@@ -8,7 +8,7 @@
 
     <filter>
         <filter-name>AuthFilter</filter-name>
-        <filter-class>ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthFilter</filter-class>
+        <filter-class>ru.ssau.tk._repfor2lab_._OOP_.model.basicAUTH.AuthFilter</filter-class>
     </filter>
 
     <filter-mapping>

@@ -1,0 +1,28 @@
+package ru.ssau.tk._repfor2lab_._OOP_.model.repositories;
+
+import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.MathFunctions;
+import java.util.List;
+
+public interface MathFunctionRepository {
+    void createTable();
+
+    List<MathFunctions> findMathFunctionsByUserId(int id);
+    List<MathFunctions> findMathFunctionsByName(String name);
+
+    MathFunctions findMathFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
+                                          String functionName);
+    Integer findMathFunctionIdComplex(double leftBoard, double rightBoard, int amountOfDots,
+                                      String functionName);
+
+    void updateFunctionNameByFunctionId(String name, int id);
+
+    boolean deleteMathFunctionByFunctionId(int id);
+    boolean deleteAllFunctions();
+    boolean deleteMathFunctionsByUserId(int id);
+
+    MathFunctions createMathFunction(String function_name, int amount_of_dots, double left_boarder,
+                                double right_boarder, int owner_id, String function_type);
+
+    boolean existsFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
+                                  String functionName);
+}

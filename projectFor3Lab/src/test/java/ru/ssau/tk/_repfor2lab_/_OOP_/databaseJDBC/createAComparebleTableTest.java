@@ -2,10 +2,11 @@ package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcSimpleFunctionRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcUserRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcMathFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcPointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcSimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcUserRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.databaseJDBC.createAComparebleTable;
 
 class createAComparebleTableTest {
     @AfterEach

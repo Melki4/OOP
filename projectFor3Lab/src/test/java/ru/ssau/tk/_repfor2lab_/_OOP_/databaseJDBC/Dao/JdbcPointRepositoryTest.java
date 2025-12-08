@@ -1,7 +1,11 @@
 package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
 
 import org.junit.jupiter.api.*;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcMathFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcPointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcSimpleFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcUserRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.MathFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
