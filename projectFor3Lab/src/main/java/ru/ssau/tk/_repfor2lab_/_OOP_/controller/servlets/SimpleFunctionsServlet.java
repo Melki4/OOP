@@ -34,18 +34,10 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
-            return;
-        }
-
-        // Проверка авторизации
-        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
             return;
         }
 
@@ -109,7 +101,6 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -117,7 +108,6 @@ public class SimpleFunctionsServlet extends HttpServlet {
             return;
         }
 
-        // Проверка авторизации
         if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
@@ -125,7 +115,7 @@ public class SimpleFunctionsServlet extends HttpServlet {
         }
 
         try {
-            if (pathInfo == null || pathInfo.equals("/create")) {
+            if (pathInfo.equals("/create")) {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 String localName = mapper.readTree(requestBody).get("local-name").asText();
@@ -155,7 +145,6 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -163,7 +152,6 @@ public class SimpleFunctionsServlet extends HttpServlet {
             return;
         }
 
-        // Проверка авторизации
         if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
@@ -201,7 +189,6 @@ public class SimpleFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -209,7 +196,6 @@ public class SimpleFunctionsServlet extends HttpServlet {
             return;
         }
 
-        // Проверка авторизации
         if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("{\"error\": \"Недостаточно прав\"}");

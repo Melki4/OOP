@@ -41,18 +41,10 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
-            return;
-        }
-
-        // Проверка авторизации
-        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
             return;
         }
 
@@ -134,7 +126,6 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -215,7 +206,6 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -293,7 +283,6 @@ public class PointsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

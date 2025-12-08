@@ -19,14 +19,12 @@ import ru.ssau.tk._repfor2lab_._OOP_.model.service.MathFunctionService;
 
 @WebServlet("/math-functions/*")
 public class MathFunctionsServlet extends HttpServlet {
-//    private JdbcMathFunctionRepository mathFunctionRepository;
     private MathFunctionService mathFunctionService;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(MathFunctionsServlet.class.getName());
 
     @Override
     public void init() {
-//        this.mathFunctionRepository = new JdbcMathFunctionRepository();
         mathFunctionService = new MathFunctionService();
         this.mapper = new ObjectMapper();
         logger.info("Сервлет MathFunctionsServlet успешно инициализирован");
@@ -37,18 +35,10 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
-            return;
-        }
-
-        // Проверка авторизации
-        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
             return;
         }
 
@@ -177,7 +167,6 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -242,7 +231,6 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -291,7 +279,6 @@ public class MathFunctionsServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

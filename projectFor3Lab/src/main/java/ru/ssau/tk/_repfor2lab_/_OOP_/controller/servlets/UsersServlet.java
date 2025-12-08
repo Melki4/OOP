@@ -34,18 +34,10 @@ public class UsersServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Требуется аутентификация\"}");
-            return;
-        }
-
-        // Проверка авторизации
-        if (!AuthorizationService.hasAccess(currentUser, "GET", request.getRequestURI())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
             return;
         }
 
@@ -68,9 +60,7 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/sorted")) {
-                // GET /users/sorted - получение пользователей отсортированных по логину (только для ADMIN)
-
-                // Проверка авторизации
+                // Проверка, что пользователь - админ
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
@@ -114,10 +104,8 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/get-id-by-login")) {
-                // GET /users/id/login - получение ID пользователя по логину из тела запроса
                 logger.info("GET запрос: получение ID пользователя по логину пользователем " + currentUser.getLogin());
 
-                //!!
                 Map<String, String[]> parameters = request.getParameterMap();
                 Integer id;
                 if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
@@ -131,8 +119,6 @@ public class UsersServlet extends HttpServlet {
                     }
                     id = userService.findIdByLogin(login);
                 } else throw new RuntimeException("Некорректный параметр запроса");
-
-                //!!
 
                 // Возврат ID
                 String json = mapper.writeValueAsString(id);
@@ -197,7 +183,6 @@ public class UsersServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -209,11 +194,9 @@ public class UsersServlet extends HttpServlet {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Укажите ID пользователя\"}");
-                return;
             }
 
             else if (pathInfo.equals("/update/factory-type")){
-                // Чтение значения для обновления из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
@@ -231,7 +214,6 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/update/password")) {
-                // Чтение значения для обновления из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
@@ -256,8 +238,6 @@ public class UsersServlet extends HttpServlet {
                     response.getWriter().write("{\"error\": \"Только Admin может изменять роли\"}");
                     return;
                 }
-
-                // Чтение значения для обновления из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
@@ -269,7 +249,6 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/update-by-login")){
-                // Чтение значения для обновления из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
@@ -307,7 +286,6 @@ public class UsersServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String pathInfo = request.getPathInfo();
 
-        // Проверка аутентификации
         Users currentUser = (Users) request.getAttribute("currentUser");
         if (currentUser == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -315,7 +293,6 @@ public class UsersServlet extends HttpServlet {
             return;
         }
 
-        // Проверка авторизации
         if (!AuthorizationService.hasAdminAccess(currentUser, "DELETE", request.getRequestURI())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
@@ -324,7 +301,6 @@ public class UsersServlet extends HttpServlet {
 
         try {
             if (pathInfo.equals("/delete")) {
-                // DELETE /users - удаление всех пользователей (только для ADMIN)
                 logger.info("DELETE запрос: удаление всех пользователей админом " + currentUser.getLogin());
                 userService.deleteAllUsers();
                 response.getWriter().write("{\"status\": \"Все пользователи успешно удалены\"}");
