@@ -2,9 +2,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 
 import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserReturnDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
-import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcUserRepository;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,7 +18,6 @@ import service.UserService;
 
 @WebServlet("/users/*")
 public class UsersServlet extends HttpServlet {
-//    private JdbcUserRepository userRepository;
     private UserService userService;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(UsersServlet.class.getName());
@@ -68,6 +65,23 @@ public class UsersServlet extends HttpServlet {
                 String json = mapper.writeValueAsString(users);
                 response.getWriter().write(json);
                 logger.info("Успешно возвращено " + users.size() + " пользователей");
+            }
+
+            else if (pathInfo.equals("/sorted")) {
+                // GET /users/sorted - получение пользователей отсортированных по логину (только для ADMIN)
+
+                // Проверка авторизации
+                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
+                    return;
+                }
+                logger.info("GET запрос: получение всех пользователей отсортированных по логину пользователем " + currentUser.getLogin());
+
+                List<UserDTO> users = userService.findAllUsersSorted();
+                String json = mapper.writeValueAsString(users);
+                response.getWriter().write(json);
+                logger.info("Успешно возвращено " + users.size() + " отсортированных пользователей");
             }
 
             else if (pathInfo.equals("/get")) {
@@ -125,23 +139,6 @@ public class UsersServlet extends HttpServlet {
                 String json = mapper.writeValueAsString(id);
                 response.getWriter().write(json);
                 logger.info("Успешно возвращен ID пользователя: " + id);
-            }
-
-            else if (pathInfo.equals("/sorted")) {
-                // GET /users/sorted - получение пользователей отсортированных по логину (только для ADMIN)
-
-                // Проверка авторизации
-                if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
-                    return;
-                }
-                logger.info("GET запрос: получение всех пользователей отсортированных по логину пользователем " + currentUser.getLogin());
-
-                List<UserReturnDTO> users = userService.findAllUsersSorted();
-                String json = mapper.writeValueAsString(users);
-                response.getWriter().write(json);
-                logger.info("Успешно возвращено " + users.size() + " отсортированных пользователей");
             }
 
             else if (pathInfo.startsWith("/check")) {
@@ -216,7 +213,7 @@ public class UsersServlet extends HttpServlet {
                 return;
             }
 
-            else if (pathInfo.equals("/update/factoryType")){
+            else if (pathInfo.equals("/update/factory-type")){
                 // Чтение значения для обновления из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
@@ -228,7 +225,7 @@ public class UsersServlet extends HttpServlet {
                     return;
                 }
 
-                String factoryType = mapper.readTree(requestBody).get("value").asText();
+                String factoryType = mapper.readTree(requestBody).get("factory-type").asText();
                 userService.updateFactory(factoryType, id);
                 response.getWriter().write("{\"Успешно\": \"Успешно обновлено\"}");
                 logger.info("PUT запрос: обновление factoryType для пользователя ID: " + id + " пользователем " + currentUser.getLogin());
@@ -246,7 +243,7 @@ public class UsersServlet extends HttpServlet {
                     return;
                 }
 
-                String password = mapper.readTree(requestBody).get("value").asText();
+                String password = mapper.readTree(requestBody).get("password").asText();
                 userService.updatePassword(password, id);
                 response.getWriter().write("{\"Успешно\": \"Успешно обновлено\"}");
                 logger.info("PUT запрос: обновление factoryType для пользователя ID: " + id + " пользователем " + currentUser.getLogin());
@@ -266,13 +263,13 @@ public class UsersServlet extends HttpServlet {
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
 
-                String role = mapper.readTree(requestBody).get("value").asText();
+                String role = mapper.readTree(requestBody).get("role").asText();
                 userService.updateRole(role, id);
                 response.getWriter().write("{\"Успешно\": \"Успешно обновлено\"}");
                 logger.info("PUT запрос: обновление роли для пользователя ID: " + id + " пользователем " + currentUser.getLogin());
             }
 
-            else if (pathInfo.equals("/update/login")){
+            else if (pathInfo.equals("/update-by-login")){
                 // Чтение значения для обновления из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
@@ -284,7 +281,7 @@ public class UsersServlet extends HttpServlet {
                     return;
                 }
 
-                String login = mapper.readTree(requestBody).get("value").asText();
+                String login = mapper.readTree(requestBody).get("login").asText();
                 userService.updateLogin(login, id);
                 response.getWriter().write("{\"Успешно\": \"Успешно обновлено\"}");
                 logger.info("PUT запрос: обновление логина для пользователя ID: " + id + " пользователем " + currentUser.getLogin());

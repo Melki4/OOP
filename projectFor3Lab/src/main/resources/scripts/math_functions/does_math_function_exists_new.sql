@@ -1,0 +1,6 @@
+SELECT EXISTS (
+    SELECT 1
+    FROM math_functions
+    where left_boarder = ? and right_boarder = ? and amount_of_dots = ?
+     and function_name = ? and owner_id = ? and function_type != 'Табулированная'
+);

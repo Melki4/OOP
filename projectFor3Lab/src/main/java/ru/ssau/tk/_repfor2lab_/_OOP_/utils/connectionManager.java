@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils;
+package ru.ssau.tk._repfor2lab_._OOP_.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +27,8 @@ public class connectionManager {
         String password = "4sfl8gpassword";
 
         try {
-            LOGGER.info("🔗 Подключаемся к: {}", url);
-            LOGGER.info("👤 Логин: {}", user);
+            LOGGER.info("Подключаемся к: {}", url);
+            LOGGER.info("Логин: {}", user);
 
             Connection connection = DriverManager.getConnection(url, user, password);
             LOGGER.info("Связь с БД установлена успешно");

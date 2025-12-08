@@ -2,7 +2,6 @@ package service;
 
 import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcUserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserReturnDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 
 import java.util.List;
@@ -14,11 +13,11 @@ public class UserService {
         userRepository = new JdbcUserRepository();
     }
 
-    public List<UserReturnDTO> findAllUsers(){
+    public List<UserDTO> findAllUsers(){
         return userRepository.findAllUsersAsDTO();
     }
 
-    public List<UserReturnDTO> findAllUsersSorted(){
+    public List<UserDTO> findAllUsersSorted(){
         return userRepository.findAllUsersSortedByLoginAsDTO();
     }
 
@@ -55,11 +54,11 @@ public class UserService {
         userRepository.updateRoleById(role, id);
     }
 
-    public void deleteAllUsers(){
-        userRepository.deleteAllUsers();
+    public boolean deleteAllUsers(){
+        return userRepository.deleteAllUsers();
     }
 
-    public void deleteUser(Integer id){
-        userRepository.deleteUserById(id);
+    public boolean deleteUser(Integer id){
+        return userRepository.deleteUserById(id);
     }
 }

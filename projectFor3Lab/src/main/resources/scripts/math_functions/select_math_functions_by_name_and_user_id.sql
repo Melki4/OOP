@@ -1,0 +1,1 @@
+SELECT * FROM math_functions where function_name = ? and owner_id = ?

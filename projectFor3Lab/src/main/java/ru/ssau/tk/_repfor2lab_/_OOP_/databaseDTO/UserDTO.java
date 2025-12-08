@@ -4,17 +4,15 @@ public class UserDTO {
     private Integer userId;
     private String factoryType;
     private String login;
-    private String password;
     private String role;
 
     // Конструкторы
     public UserDTO() {}
 
-    public UserDTO(Integer userId, String factoryType, String login, String password, String role) {
+    public UserDTO(Integer userId, String factoryType, String login, String role) {
         this.userId = userId;
         this.factoryType = factoryType;
         this.login = login;
-        this.password = password;
         this.role = role;
     }
 
@@ -27,9 +25,6 @@ public class UserDTO {
 
     public String getLogin() { return login; }
     public void setLogin(String login) { this.login = login; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }

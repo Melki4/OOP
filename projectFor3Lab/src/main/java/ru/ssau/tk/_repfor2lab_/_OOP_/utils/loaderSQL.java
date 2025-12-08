@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils;
+package ru.ssau.tk._repfor2lab_._OOP_.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
