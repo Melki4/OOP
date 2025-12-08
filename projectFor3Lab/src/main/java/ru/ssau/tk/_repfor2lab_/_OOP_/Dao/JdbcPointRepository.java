@@ -1,13 +1,13 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao;
+package ru.ssau.tk._repfor2lab_._OOP_.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Points;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories.PointRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.connectionManager;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils.loaderSQL;
+import ru.ssau.tk._repfor2lab_._OOP_.repositories.PointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.utils.connectionManager;
+import ru.ssau.tk._repfor2lab_._OOP_.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
@@ -208,25 +208,25 @@ public class JdbcPointRepository implements PointRepository {
         }
     }
 
-    public void deletePointsByFunctionId(int functionId){
+    public boolean deletePointsByFunctionId(int functionId){
         LOGGER.info("Начинаем удаление точки с айди функции {}", functionId);
         String sql = loaderSQL.loadSQL("scripts\\points\\delete_point_by_id.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
             statement.setInt(1, functionId);
-            statement.execute();
-            LOGGER.info("Удаление прошло успешно");
+            return statement.executeUpdate()>0;
+//            LOGGER.info("Удаление прошло успешно");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении точки");
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteAllPoints(){
+    public boolean deleteAllPoints(){
         LOGGER.info("Начинаем удаление всех точек");
         String sql = loaderSQL.loadSQL("scripts\\points\\truncate_table_points.sql");
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
-            statement.execute();
-            LOGGER.info("все точки были удалены дропом таблицы и таблица была создана заново, но в транзакции");
+            return statement.executeUpdate()>0;
+//            LOGGER.info("все точки были удалены дропом таблицы и таблица была создана заново, но в транзакции");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении всех точек, т.к. есть транзакция - значения не были удалены");
             throw new RuntimeException(e);

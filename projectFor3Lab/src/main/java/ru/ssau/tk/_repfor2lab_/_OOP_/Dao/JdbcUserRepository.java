@@ -2,7 +2,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.Dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserReturnDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 import ru.ssau.tk._repfor2lab_._OOP_.repositories.UserRepository;
@@ -62,18 +62,18 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public List<UserReturnDTO> findAllUsersAsDTO() {
+    public List<UserDTO> findAllUsersAsDTO() {
         LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
-        List<UserReturnDTO> result = new ArrayList<>();
+        List<UserDTO> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
 
-            UserReturnDTO boof;
+            UserDTO boof;
             while(resultSet.next()){
-                boof = new UserReturnDTO(resultSet.getInt(1),
+                boof = new UserDTO(resultSet.getInt(1),
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getString(5));
@@ -123,18 +123,18 @@ public class JdbcUserRepository implements UserRepository {
         }
     }
 
-    public List<UserReturnDTO> findAllUsersSortedByLoginAsDTO() {
+    public List<UserDTO> findAllUsersSortedByLoginAsDTO() {
         LOGGER.info("Начинаем возврат списка dto всех пользователей отсортированных по логинам");
 
-        List<UserReturnDTO> result = new ArrayList<>();
+        List<UserDTO> result = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users_sorted_by_login.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.createStatement()){
             ResultSet resultSet = statement.executeQuery(sql);
-            UserReturnDTO boof;
+            UserDTO boof;
 
             while(resultSet.next()){
-                boof = new UserReturnDTO(resultSet.getInt(1),
+                boof = new UserDTO(resultSet.getInt(1),
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getString(5));

@@ -1,1 +1,1 @@
-ALTER TABLE math_functions ADD CONSTRAINT function_type_fk FOREIGN KEY (function_type) REFERENCES simple_functions(local_name)
+ALTER TABLE math_functions ADD CONSTRAINT function_type_fk FOREIGN KEY (function_type) REFERENCES simple_functions(local_name);

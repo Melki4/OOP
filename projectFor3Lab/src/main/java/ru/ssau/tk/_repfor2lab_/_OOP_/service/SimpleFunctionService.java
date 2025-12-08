@@ -1,4 +1,4 @@
-package service;
+package ru.ssau.tk._repfor2lab_._OOP_.service;
 
 import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcSimpleFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionsDTO;

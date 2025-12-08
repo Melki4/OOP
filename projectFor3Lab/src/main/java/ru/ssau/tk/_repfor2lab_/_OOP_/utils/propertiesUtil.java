@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.utils;
+package ru.ssau.tk._repfor2lab_._OOP_.utils;
 
 import java.io.IOException;
 import java.util.Properties;

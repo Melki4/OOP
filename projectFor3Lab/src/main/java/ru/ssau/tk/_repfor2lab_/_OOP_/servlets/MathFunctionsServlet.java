@@ -2,7 +2,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 
 import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 
@@ -11,13 +10,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import service.MathFunctionService;
+import ru.ssau.tk._repfor2lab_._OOP_.service.MathFunctionService;
 
 @WebServlet("/math-functions/*")
 public class MathFunctionsServlet extends HttpServlet {
@@ -66,7 +64,7 @@ public class MathFunctionsServlet extends HttpServlet {
                 if (parameters.containsKey("user-id")){
                     id = Integer.parseInt(parameters.get("user-id")[0]);
 
-                    if (!AuthorizationService.canAccessMathFunctionById(currentUser, id)) {
+                    if (!AuthorizationService.canAccessById(currentUser, id)) {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                         return;
@@ -114,7 +112,7 @@ public class MathFunctionsServlet extends HttpServlet {
                         ", dots=" + amountOfDots);
 
                 MathFunctionsDTO function = mathFunctionService.findMathFunctionComplex(
-                        leftBoard, rightBoard, amountOfDots, functionName, currentUser.getUserId());
+                        leftBoard, rightBoard, amountOfDots, functionName);
 
                 String json = mapper.writeValueAsString(function);
                 response.getWriter().write(json);
@@ -129,7 +127,7 @@ public class MathFunctionsServlet extends HttpServlet {
                 logger.info("POST запрос: расширенная проверка существования функции: " + functionName);
 
                 boolean exists = mathFunctionService.existsMathFunctionComplex(
-                        leftBoard, rightBoard, amountOfDots, functionName, currentUser.getUserId());
+                        leftBoard, rightBoard, amountOfDots, functionName);
 
                 response.getWriter().write("{\"exists\": " + exists + "}");
                 logger.info("Результат расширенной проверки существования функции '" + functionName + "': " + exists);
@@ -187,7 +185,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 logger.info("POST запрос: создание математической функции: " + functionName + " для пользователя ID: " + ownerId);
 
-                if (mathFunctionService.existsMathFunctionComplex(leftBorder, rightBorder, amountOfDots, functionName, currentUser.getUserId())){
+                if (mathFunctionService.existsMathFunctionComplex(leftBorder, rightBorder, amountOfDots, functionName)){
                     logger.info("Функция уже существует: ");
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     response.getWriter().write("{\"error\": \"Функция уже существует\"}");

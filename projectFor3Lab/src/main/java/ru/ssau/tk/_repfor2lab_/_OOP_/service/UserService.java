@@ -1,4 +1,4 @@
-package service;
+package ru.ssau.tk._repfor2lab_._OOP_.service;
 
 import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcUserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.UserDTO;

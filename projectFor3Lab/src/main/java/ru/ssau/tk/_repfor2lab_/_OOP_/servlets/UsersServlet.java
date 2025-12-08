@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
-import service.UserService;
+import ru.ssau.tk._repfor2lab_._OOP_.service.UserService;
 
 @WebServlet("/users/*")
 public class UsersServlet extends HttpServlet {
@@ -85,7 +85,6 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/get")) {
-                // GET /users/get - получение пользователя по логину из тела запроса
                 logger.info("GET запрос: получение пользователя по логину пользователем " + currentUser.getLogin());
                 UserDTO userDTO = null;
                 Map<String, String[]> parameters = request.getParameterMap();

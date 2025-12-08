@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
+package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.MathFunctions;
 import java.util.List;
@@ -16,11 +16,11 @@ public interface MathFunctionRepository {
 
     void updateFunctionNameByFunctionId(String name, int id);
 
-    void deleteMathFunctionByFunctionId(int id);
-    void deleteAllFunctions();
-    void deleteMathFunctionsByUserId(int id);
+    boolean deleteMathFunctionByFunctionId(int id);
+    boolean deleteAllFunctions();
+    boolean deleteMathFunctionsByUserId(int id);
 
-    void createMathFunction(String function_name, int amount_of_dots, double left_boarder,
+    MathFunctions createMathFunction(String function_name, int amount_of_dots, double left_boarder,
                                 double right_boarder, int owner_id, String function_type);
 
     boolean existsFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,

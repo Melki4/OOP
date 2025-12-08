@@ -3,7 +3,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.servlets;
 import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.SimpleFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
-import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcSimpleFunctionRepository;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
-import service.SimpleFunctionService;
+import ru.ssau.tk._repfor2lab_._OOP_.service.SimpleFunctionService;
 
 @WebServlet("/simple-functions/*")
 public class SimpleFunctionsServlet extends HttpServlet {

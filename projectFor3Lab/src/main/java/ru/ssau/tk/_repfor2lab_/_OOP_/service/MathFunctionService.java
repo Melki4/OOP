@@ -1,4 +1,4 @@
-package service;
+package ru.ssau.tk._repfor2lab_._OOP_.service;
 
 import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcMathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
@@ -26,15 +26,15 @@ public class MathFunctionService {
     }
 
     public MathFunctionsDTO findMathFunctionComplex(Double leftBoard, Double rightBoard, Integer amountOfDots,
-                                                    String functionName, Integer owner_id){
-        MathFunctions mathFunctions = mathFunctionRepository.findMathFunctionComplex(leftBoard, rightBoard, amountOfDots, functionName, owner_id);
+                                                    String functionName){
+        MathFunctions mathFunctions = mathFunctionRepository.findMathFunctionComplex(leftBoard, rightBoard, amountOfDots, functionName);
         return new MathFunctionsDTO(mathFunctions.getFunctionId(), mathFunctions.getFunctionName(), mathFunctions.getAmountOfDots(),
                 mathFunctions.getLeftBorder(), mathFunctions.getRightBorder(), mathFunctions.getOwnerId(), mathFunctions.getFunctionType());
     }
 
     public boolean existsMathFunctionComplex(Double leftBoard, Double rightBoard, Integer amountOfDots,
-                                             String functionName, Integer owner_id){
-        return mathFunctionRepository.existsFunctionComplex(leftBoard, rightBoard, amountOfDots, functionName, owner_id);
+                                             String functionName){
+        return mathFunctionRepository.existsFunctionComplex(leftBoard, rightBoard, amountOfDots, functionName);
     }
 
     public MathFunctionsDTO createMathFunction(String function_name, int amount_of_dots, double left_boarder,

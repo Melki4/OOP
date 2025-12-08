@@ -4,8 +4,8 @@ import ru.ssau.tk._repfor2lab_._OOP_.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseDTO.PointsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Users;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcMathFunctionRepository;
-import ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.Dao.JdbcPointRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcMathFunctionRepository;
+import ru.ssau.tk._repfor2lab_._OOP_.Dao.JdbcPointRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
 
@@ -15,22 +15,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import ru.ssau.tk._repfor2lab_._OOP_.service.MathFunctionService;
+import ru.ssau.tk._repfor2lab_._OOP_.service.PointService;
 
 @WebServlet("/points/*")
 public class PointsServlet extends HttpServlet {
-    private JdbcPointRepository pointRepository;
-    private JdbcMathFunctionRepository mathFunctionRepository;
+    private PointService pointService;
+    private MathFunctionService mathFunctionService;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(PointsServlet.class.getName());
 
     @Override
     public void init() {
-        this.pointRepository = new JdbcPointRepository();
-        this.mathFunctionRepository = new JdbcMathFunctionRepository();
+        pointService = new PointService();
+        mathFunctionService = new MathFunctionService();
         this.mapper = new ObjectMapper();
         logger.info("Сервлет PointsServlet успешно инициализирован");
     }
@@ -60,48 +63,51 @@ public class PointsServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Укажите ID функции\"}");
 
-            } else if (pathInfo.startsWith("/function/")) {
-                String[] pathParts = pathInfo.split("/");
+            } else if (pathInfo.startsWith("/get-points-by-function-id")) {
 
-                if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
-                    int functionId = Integer.parseInt(pathParts[2]);
+                Map<String, String[]> parameters = request.getParameterMap();
 
-                    if (pathParts.length >= 4 && "sorted".equals(pathParts[3])) {
-                        // GET /points/function/{functionId}/sorted - получение точек по ID функции (отсортированные)
-                        logger.info("GET запрос: получение отсортированных точек для функции ID: " + functionId);
+                if (parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
 
-                        MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+                if (parameters.containsKey("function-id")) {
+                    int function_id = Integer.parseInt(parameters.get("function-id")[0]);
 
-                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
-                            logger.severe("Доступ к точкам функции запрещен");
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            response.getWriter().write("{\"error\": \"Точки для функции не найдены\"}");
-                            return;
-                        }
+                    MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(function_id);
 
-                        List<PointsDTO> points = pointRepository.findPointsByFunctionIdSortedAsDTO(functionId);
-                        String json = mapper.writeValueAsString(points);
-                        response.getWriter().write(json);
-                        logger.info("Успешно возвращено " + points.size() + " отсортированных точек для функции ID: " + functionId);
-
-                    } else {
-                        // GET /points/function/{functionId} - получение точек по ID функции
-                        logger.info("GET запрос: получение точек для функции ID: " + functionId);
-
-                        MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-
-                        if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
-                            logger.severe("Доступ к точкам функции запрещен");
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            response.getWriter().write("{\"error\": \"Точки для функции не найдены\"}");
-                            return;
-                        }
-
-                        List<PointsDTO> points = pointRepository.findPointsByFunctionIdAsDTO(functionId);
-                        String json = mapper.writeValueAsString(points);
-                        response.getWriter().write(json);
-                        logger.info("Успешно возвращено " + points.size() + " точек для функции ID: " + functionId);
+                    if (!AuthorizationService.canAccessById(currentUser, function.getOwnerId())) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
+                        return;
                     }
+
+                    List<PointsDTO> points = pointService.findPointsByFunctionId(function_id);
+                    String json = mapper.writeValueAsString(points);
+                    response.getWriter().write(json);
+                    logger.info("Успешно возвращено " + points.size() + " точек для функции ID: " + function_id);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\": \"Неверный формат ID пользователя\"}");
+                }
+            } else if (pathInfo.startsWith("/get-points-by-function-id-sorted")) {
+
+                Map<String, String[]> parameters = request.getParameterMap();
+
+                if (parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
+
+                if (parameters.containsKey("function-id")) {
+                    int function_id = Integer.parseInt(parameters.get("function-id")[0]);
+
+                    MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(function_id);
+
+                    if (!AuthorizationService.canAccessById(currentUser, function.getOwnerId())) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
+                        return;
+                    }
+                    List<PointsDTO> points = pointService.findPointsByFunctionIdSorted(function_id);
+                    String json = mapper.writeValueAsString(points);
+                    response.getWriter().write(json);
+                    logger.info("Успешно возвращено " + points.size() + " отсортированных точек для функции ID: " + function_id);
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write("{\"error\": \"Неверный формат ID функции\"}");
@@ -110,7 +116,6 @@ public class PointsServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
-
         } catch (DataDoesNotExistException e) {
             logger.severe("Точек для функции не найдено: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -142,19 +147,19 @@ public class PointsServlet extends HttpServlet {
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\": \"Укажите конечную точку (single или bulk)\"}");
+                response.getWriter().write("{\"error\": \"Неверный формат запроса\"}");
 
-            } else if (pathInfo.equals("/single")) {
-                // POST /points/single - создание одной точки
+            } else if (pathInfo.equals("/create-point")) {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
                 double xValue = jsonNode.get("x_value").asDouble();
                 double yValue = jsonNode.get("y_value").asDouble();
-                int functionId = jsonNode.get("function_id").asInt();
+                int functionId = jsonNode.get("function-id").asInt();
 
-                MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
+                MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(functionId);
+
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId())){
                     logger.severe("Попытка создания точки для чужой функции");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к созданию точек для этой функции запрещен\"}");
@@ -163,19 +168,18 @@ public class PointsServlet extends HttpServlet {
 
                 logger.info("POST запрос: создание точки для функции ID: " + functionId + " с координатами (" + xValue + ", " + yValue + ")");
 
-                pointRepository.createPoint(xValue, yValue, functionId);
+                pointService.createPoint(xValue, yValue, functionId);
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 response.getWriter().write("{\"status\": \"Точка успешно создана\"}");
                 logger.info("Успешно создана точка для функции ID: " + functionId);
 
-            } else if (pathInfo.equals("/bulk")) {
-                // POST /points/bulk - создание нескольких точек
+            } else if (pathInfo.equals("/create-points")) {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
-                int functionId = jsonNode.get("function_id").asInt();
+                int functionId = jsonNode.get("function-id").asInt();
 
-                MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
+                MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(functionId);
 
                 if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
                     logger.severe("Попытка создания точек для чужой функции");
@@ -191,7 +195,7 @@ public class PointsServlet extends HttpServlet {
 
                 logger.info("POST запрос: создание " + points.size() + " точек для функции ID: " + functionId);
 
-                pointRepository.addManyPoints(points, functionId);
+                pointService.createManyPoints(points, functionId);
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 response.getWriter().write("{\"status\": \"Точки успешно созданы\"}");
                 logger.info("Успешно создано " + points.size() + " точек для функции ID: " + functionId);
@@ -225,46 +229,51 @@ public class PointsServlet extends HttpServlet {
             if (pathInfo == null || pathInfo.equals("/")) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Укажите переменную для обновления (x или y)\"}");
-                return;
-            }
-
-            String[] pathParts = pathInfo.split("/");
-            if (pathParts.length == 2) {
-                String variable = pathParts[1];
-
+            } else if (pathInfo.equals("/update-x")) {
                 // Чтение значений из тела запроса
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
-                int functionId = jsonNode.get("id").asInt();
-                double oldValue = jsonNode.get("oldValue").asDouble();
-                double newValue = jsonNode.get("newValue").asDouble();
+                int functionId = jsonNode.get("function-id").asInt();
+                double oldValue = jsonNode.get("old-value").asDouble();
+                double newValue = jsonNode.get("new-value").asDouble();
 
-                MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
+                MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(functionId);
+
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId())){
                     logger.severe("Попытка обновления точек чужой функции");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к обновлению точек этой функции запрещен\"}");
                     return;
                 }
 
-                switch (variable) {
-                    case "x":
-                        logger.info("PUT запрос: обновление x для функции ID: " + functionId);
-                        pointRepository.updateXValueByFunctionIdAndOldX(oldValue, functionId, newValue);
-                        break;
-                    case "y":
-                        logger.info("PUT запрос: обновление y для функции ID: " + functionId);
-                        pointRepository.updateYValueByFunctionIdAndOldY(oldValue, functionId, newValue);
-                        break;
-                    default:
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        response.getWriter().write("{\"error\": \"Неизвестная переменная: " + variable + "\"}");
-                        return;
+                logger.info("PUT запрос: обновление x для функции ID: " + functionId);
+                pointService.updateXValue(functionId, oldValue, newValue);
+                response.getWriter().write("{\"status\": \"Значение успешно обновлено\"}");
+                logger.info("Успешно обновлено значение x у функции с ID: " + functionId);
+
+            } else if (pathInfo.equals("/update-y")) {
+                // Чтение значений из тела запроса
+                String requestBody = request.getReader().lines().reduce("", String::concat);
+                var jsonNode = mapper.readTree(requestBody);
+
+                int functionId = jsonNode.get("function-id").asInt();
+                double oldValue = jsonNode.get("old-value").asDouble();
+                double newValue = jsonNode.get("new-value").asDouble();
+
+                MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(functionId);
+
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId())){
+                    logger.severe("Попытка обновления точек чужой функции");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Доступ к обновлению точек этой функции запрещен\"}");
+                    return;
                 }
 
+                logger.info("PUT запрос: обновление x для функции ID: " + functionId);
+                pointService.updateYValue(functionId, oldValue, newValue);
                 response.getWriter().write("{\"status\": \"Значение успешно обновлено\"}");
-                logger.info("Успешно обновлено значение " + variable + " у функции с ID: " + functionId);
+                logger.info("Успешно обновлено значение x у функции с ID: " + functionId);
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Неверный формат URL для обновления\"}");
@@ -295,10 +304,7 @@ public class PointsServlet extends HttpServlet {
         }
 
         try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // DELETE /points - удаление всех точек
-
-                // Проверка авторизации
+            if (pathInfo == null || pathInfo.equals("/delete")) {
                 if (!AuthorizationService.hasAdminAccess(currentUser, "GET", request.getRequestURI())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Недостаточно прав\"}");
@@ -306,32 +312,30 @@ public class PointsServlet extends HttpServlet {
                 }
 
                 logger.warning("DELETE запрос: удаление всех точек");
-                pointRepository.deleteAllPoints();
+                pointService.deleteAllPoints();
                 response.getWriter().write("{\"status\": \"Все точки успешно удалены\"}");
                 logger.warning("Успешно удалены все точки");
 
-            } else if (pathInfo.startsWith("/function/")) {
-                // DELETE /points/function/{functionId} - удаление точек по ID функции
-                String[] pathParts = pathInfo.split("/");
-                if (pathParts.length >= 3 && pathParts[2].matches("\\d+")) {
-                    int functionId = Integer.parseInt(pathParts[2]);
-                    logger.info("DELETE запрос: удаление точек для функции ID: " + functionId);
+            } else if (pathInfo.startsWith("/delete-points-for-function")) {
+                // Чтение значений из тела запроса
+                String requestBody = request.getReader().lines().reduce("", String::concat);
+                var jsonNode = mapper.readTree(requestBody);
 
-                    MathFunctionsDTO function = mathFunctionRepository.findMathFunctionByFunctionId(functionId);
-                    if (!Objects.equals(function.getOwnerId(), currentUser.getUserId()) && !currentUser.getRole().equals("Admin")){
-                        logger.severe("Попытка удаления точек чужой функции");
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write("{\"error\": \"Доступ к удалению точек этой функции запрещен\"}");
-                        return;
-                    }
+                int functionId = jsonNode.get("function-id").asInt();
 
-                    pointRepository.deletePointsByFunctionId(functionId);
-                    response.getWriter().write("{\"status\": \"Точки для функции успешно удалены\"}");
-                    logger.info("Успешно удалены точки для функции ID: " + functionId);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("{\"error\": \"Неверный формат ID функции\"}");
+                MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(functionId);
+
+                if (!Objects.equals(function.getOwnerId(), currentUser.getUserId())) {
+                    logger.severe("Попытка удаления точек чужой функции");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Доступ к удалению точек этой функции запрещен\"}");
+                    return;
                 }
+
+                pointService.deletePointsByFunctionId(functionId);
+                response.getWriter().write("{\"status\": \"Точки для функции успешно удалены\"}");
+                logger.info("Успешно удалены точки для функции ID: " + functionId);
+
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Неверный формат запроса для удаления\"}");

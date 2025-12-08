@@ -1,4 +1,4 @@
-package ru.ssau.tk._repfor2lab_._OOP_.databaseJDBC.repositories;
+package ru.ssau.tk._repfor2lab_._OOP_.repositories;
 
 import ru.ssau.tk._repfor2lab_._OOP_.databaseEnteties.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
@@ -14,8 +14,8 @@ public interface PointRepository {
     void updateXValueByFunctionIdAndOldX(Double x_value_old, int id, Double x_value_new);
     void updateYValueByFunctionIdAndOldY(Double y_value_old, int id, Double y_value_new);
 
-    void deleteAllPoints();
-    void deletePointsByFunctionId(int functionId);
+    boolean deleteAllPoints();
+    boolean deletePointsByFunctionId(int functionId);
 
     void createPoint(Double x_value, Double y_value, int id);
 
