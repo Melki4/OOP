@@ -1,5 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.controller.servlets;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.UserDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.Users;
@@ -127,6 +128,7 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.startsWith("/check")) {
+                logger.info("GET запрос: проверка, существования такого пользователя по логину " + currentUser.getLogin());
                 Map<String, String[]> parameters = request.getParameterMap();
 
                 if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
@@ -140,10 +142,15 @@ public class UsersServlet extends HttpServlet {
                         response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                         return;
                     }
+
                     boolean exists = userService.existsByLogin(login);
                     response.getWriter().write("{\"exists\": " + exists + "}");
                     logger.info("Результат проверки существования пользователя с логином " + login + ": " + exists);
-                } else if (parameters.containsKey("id")){
+                }
+
+                else if (parameters.containsKey("id")){
+                    logger.info("GET запрос: проверка, существования такого пользователя по логину " + currentUser.getLogin());
+
                     Integer id = Integer.parseInt(parameters.get("id")[0]);
 
                     if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
@@ -151,22 +158,26 @@ public class UsersServlet extends HttpServlet {
                         response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                         return;
                     }
+
                     boolean exists = userService.existsById(id);
                     response.getWriter().write("{\"exists\": " + exists + "}");
                     logger.info("Результат проверки существования пользователя с айди " + id + ": " + exists);
-                } else {
+                }
+                else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    throw new RuntimeException("Некорректный параметр запроса");
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
 
         } catch (DataDoesNotExistException e) {
-            logger.severe("Таблица пользователей пуста: " + e.getMessage());
+            logger.severe("Таких данных в таблице нет: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write("{\"error\": \"Пользователи не найдены\"}");
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
         } catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в GET запросе пользователей: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -197,11 +208,12 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/update/factory-type")){
+                logger.info("Начинаем обновление типа фабрики для " + currentUser.getLogin());
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
 
-                if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
+                if (!AuthorizationService.canAccessById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                     return;
@@ -214,11 +226,12 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/update/password")) {
+                logger.info("Начинаем обновление пароля для " + currentUser.getLogin());
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
 
-                if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
+                if (!AuthorizationService.canAccessById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                     return;
@@ -232,6 +245,7 @@ public class UsersServlet extends HttpServlet {
 
             else if (pathInfo.equals("/update/role")) {
                 // Только admin может менять роли
+                logger.info("Начинаем обновление роли для " + currentUser.getLogin());
 
                 if (!"Admin".equals(currentUser.getRole())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -249,11 +263,13 @@ public class UsersServlet extends HttpServlet {
             }
 
             else if (pathInfo.equals("/update-by-login")){
+                logger.info("Начинаем обновление логина для " + currentUser.getLogin());
+
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 Integer id = mapper.readTree(requestBody).get("id").asInt();
 
-                if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
+                if (!AuthorizationService.canAccessById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
                     return;
@@ -270,7 +286,16 @@ public class UsersServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Неверный формат URL для обновления\"}");
         }
 
-        } catch (NumberFormatException e) {
+        } catch (DataDoesNotExistException e) {
+            logger.severe("Таких данных в таблице нет: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Пользователи не найдены\"}");
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+        }
+        catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в PUT запросе пользователей: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\": \"Неверный формат ID пользователя\"}");
@@ -331,7 +356,16 @@ public class UsersServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Неверный формат ID пользователя\"}");
             }
 
-        } catch (NumberFormatException e) {
+        }
+        catch (DataDoesNotExistException e) {
+            logger.severe("Таких данных в таблице нет: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Пользователи не найдены\"}");
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+        }catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в DELETE запросе пользователей: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\": \"Неверный формат ID пользователя\"}");

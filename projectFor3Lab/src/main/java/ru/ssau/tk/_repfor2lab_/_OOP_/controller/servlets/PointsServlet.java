@@ -1,5 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.controller.servlets;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
@@ -106,6 +107,10 @@ public class PointsServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
         } catch (DataDoesNotExistException e) {
             logger.severe("Точек для функции не найдено: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -194,6 +199,18 @@ public class PointsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
 
+        } catch (DataDoesNotExistException e) {
+            logger.severe("Таких данных в таблице нет: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Точки не найдены\"}");
+        } catch (NumberFormatException e) {
+            logger.severe("Ошибка формата числа запросе: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"error\": \"Неверный формат\"}");
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
         } catch (Exception e) {
             logger.severe("Ошибка создания точек: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -267,6 +284,14 @@ public class PointsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Неверный формат URL для обновления\"}");
             }
 
+        } catch (DataDoesNotExistException e) {
+            logger.severe("Таких данных в таблице нет: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Точки не найдены\"}");
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
         } catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в PUT запросе точек: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -328,6 +353,14 @@ public class PointsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Неверный формат запроса для удаления\"}");
             }
 
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+        } catch (DataDoesNotExistException e) {
+            logger.severe("Таких данных в таблице нет: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Точки не найдены\"}");
         } catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в DELETE запросе точек: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

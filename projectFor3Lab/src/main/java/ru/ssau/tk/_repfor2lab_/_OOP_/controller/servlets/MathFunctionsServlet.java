@@ -1,5 +1,6 @@
 package ru.ssau.tk._repfor2lab_._OOP_.controller.servlets;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.basicAUTH.AuthorizationService;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.Users;
@@ -147,7 +148,11 @@ public class MathFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
 
-        } catch (DataDoesNotExistException e) {
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+        }catch (DataDoesNotExistException e) {
             logger.severe("Математические функции не найдены: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write("{\"error\": \"Функции не найдены\"}");
@@ -215,7 +220,12 @@ public class MathFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
 
-        } catch (DataDoesNotExistException e) {
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+        }
+        catch (DataDoesNotExistException e) {
             logger.severe("Функция не найдена при расширенном поиске: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write("{\"error\": \"Функция не найдена\"}");
@@ -263,6 +273,14 @@ public class MathFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
             }
 
+        } catch (DataDoesNotExistException e) {
+            logger.severe("Функция не найдена при расширенном поиске: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Функция не найдена\"}");
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
         } catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в PUT запросе: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -341,6 +359,10 @@ public class MathFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Неверный формат запроса для удаления\"}");
             }
 
+        } catch (DaoException e) {
+            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
         } catch (DataDoesNotExistException e) {
             logger.severe("Математическая ф-ция не найдена " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
