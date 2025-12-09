@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.model.basicAUTH;
 
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
+import ru.ssau.tk._repfor2lab_._OOP_.model.Dao.JdbcUserRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.Users;
 
 import java.util.logging.Logger;
@@ -8,6 +10,13 @@ public class AuthorizationService {
     private static final Logger logger = Logger.getLogger(AuthorizationService.class.getName());
 
     public static boolean hasAccess(Users user, String method, String path) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserById(user.getUserId())){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + user.getUserId());
+        }
+
         String userRole = user.getRole();
 
         // ADMIN - полный доступ
@@ -26,6 +35,13 @@ public class AuthorizationService {
     }
 
     public static boolean hasAdminAccess(Users user, String method, String path) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserById(user.getUserId())){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + user.getUserId());
+        }
+
         String userRole = user.getRole();
 
         // ADMIN - полный доступ
@@ -39,6 +55,13 @@ public class AuthorizationService {
     }
 
     private static boolean checkUserAccess(Users user, String method, String path) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserById(user.getUserId())){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + user.getUserId());
+        }
+
         // GET запросы - чтение данных
         if ("GET".equals(method)) {
             if (path.matches("/(users|math-functions|points|simple-functions).*") ||
@@ -71,6 +94,13 @@ public class AuthorizationService {
     }
 
     public static boolean canAccessUserData(Users currentUser, Integer targetUserId, String targetLogin) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserById(targetUserId) || !userRepository.existsUserByLogin(targetLogin) ){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + currentUser.getUserId());
+        }
+
         // ADMIN имеет доступ ко всем данным
         if ("Admin".equals(currentUser.getRole())) {
             return true;
@@ -90,6 +120,13 @@ public class AuthorizationService {
     }
 
     public static boolean canAccessUserDataByLogin(Users currentUser, String targetLogin) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserByLogin(targetLogin)){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + currentUser.getUserId());
+        }
+
         // ADMIN имеет доступ ко всем данным
         if ("Admin".equals(currentUser.getRole())) {
             return true;
@@ -104,6 +141,13 @@ public class AuthorizationService {
     }
 
     public static boolean canAccessUserDataById(Users currentUser, Integer targetUserId) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserById(targetUserId)){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + currentUser.getUserId());
+        }
+
         // ADMIN имеет доступ ко всем данным
         if ("Admin".equals(currentUser.getRole())) {
             return true;
@@ -119,6 +163,13 @@ public class AuthorizationService {
     }
 
     public static boolean canAccessById(Users currentUser, Integer targetUserId) {
+
+        JdbcUserRepository userRepository = new JdbcUserRepository();
+        if (!userRepository.existsUserById(targetUserId)){
+            throw new DataDoesNotExistException("Пользователя для которого вы пытаетесь провести операцию не существует," +
+                    " его айди:" + currentUser.getUserId());
+        }
+
         // имеет доступ только к своим данным
         if (targetUserId != null && targetUserId.equals(currentUser.getUserId())) {
             return true;

@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.service.UserService;
@@ -22,6 +25,22 @@ public class UsersServlet extends HttpServlet {
     private UserService userService;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(UsersServlet.class.getName());
+
+    // Паттерн для извлечения логина (после определенных префиксов)
+    private static final Pattern LOGIN_ACTION_PATTERN =
+            Pattern.compile("^/(get|get-id-by-login|check-by-login)/([a-zA-Z0-9._-]+)$");
+    // ^/ - начало pathInfo
+    // (get|get-id-by-login|check) - одна из трех операций
+    // / - разделитель
+    // ([a-zA-Z0-9._-]+) - логин (группа 2)
+
+    // Паттерн для извлечения ID (после определенных префиксов)
+    private static final Pattern ID_ACTION_PATTERN =
+            Pattern.compile("^/(check-by-id|update/factory-type|update/password|update/login|update/role|delete/user)/(\\d+)$");
+    // ^/ - начало pathInfo
+    // (check|update/factory-type|... - одна из операций
+    // / - разделитель
+    // (\\d+) - ID (группа 2)
 
     @Override
     public void init() {
@@ -75,23 +94,30 @@ public class UsersServlet extends HttpServlet {
                 logger.info("Успешно возвращено " + users.size() + " отсортированных пользователей");
             }
 
-            else if (pathInfo.equals("/get")) {
+            else if (pathInfo.startsWith("/get/")) {
                 logger.info("GET запрос: получение пользователя по логину пользователем " + currentUser.getLogin());
-                UserDTO userDTO = null;
-                Map<String, String[]> parameters = request.getParameterMap();
+                UserDTO userDTO;
 
-                if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
+                String path = request.getPathInfo();
 
-                if (parameters.containsKey("login")){
-                    String login = parameters.get("login")[0];
+                Matcher matcher = LOGIN_ACTION_PATTERN.matcher(path);
 
-                    if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
-                        return;
-                    }
-                   userDTO = userService.findByLogin(login);
-                } else throw new RuntimeException("Некорректный параметр запроса");
+                String login;
+                if (matcher.matches()) {
+                    login = matcher.group(2); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
+                    return;
+                }
+
+                userDTO = userService.findByLogin(login);
 
                 if (userDTO == null) {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -104,22 +130,28 @@ public class UsersServlet extends HttpServlet {
                 logger.info("Успешно возвращен пользователь по логину: " + userDTO.getLogin());
             }
 
-            else if (pathInfo.equals("/get-id-by-login")) {
+            else if (pathInfo.startsWith("/get-id-by-login/")) {
                 logger.info("GET запрос: получение ID пользователя по логину пользователем " + currentUser.getLogin());
 
-                Map<String, String[]> parameters = request.getParameterMap();
-                Integer id;
-                if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
+                String path = request.getPathInfo();
 
-                if (parameters.containsKey("login")){
-                    String login = parameters.get("login")[0];
-                    if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
-                        return;
-                    }
-                    id = userService.findIdByLogin(login);
-                } else throw new RuntimeException("Некорректный параметр запроса");
+                Matcher matcher = LOGIN_ACTION_PATTERN.matcher(path);
+
+                String login;
+                if (matcher.matches()) {
+                    login = matcher.group(2); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
+                    return;
+                }
+                Integer id = userService.findIdByLogin(login);
 
                 // Возврат ID
                 String json = mapper.writeValueAsString(id);
@@ -127,49 +159,59 @@ public class UsersServlet extends HttpServlet {
                 logger.info("Успешно возвращен ID пользователя: " + id);
             }
 
-            else if (pathInfo.startsWith("/check")) {
-                logger.info("GET запрос: проверка, существования такого пользователя по логину " + currentUser.getLogin());
-                Map<String, String[]> parameters = request.getParameterMap();
+            else if (pathInfo.startsWith("/check-by-login/")) {
 
-                if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
+                String path = request.getPathInfo();
 
-                if (parameters.containsKey("login")){
-                    if(parameters.get("login").length > 1) throw new RuntimeException("Для параметра указано несколько значений");
-                    String login = parameters.get("login")[0];
+                Matcher matcher = LOGIN_ACTION_PATTERN.matcher(path);
 
-                    if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
-                        return;
-                    }
-
-                    boolean exists = userService.existsByLogin(login);
-                    response.getWriter().write("{\"exists\": " + exists + "}");
-                    logger.info("Результат проверки существования пользователя с логином " + login + ": " + exists);
-                }
-
-                else if (parameters.containsKey("id")){
-                    logger.info("GET запрос: проверка, существования такого пользователя по логину " + currentUser.getLogin());
-
-                    Integer id = Integer.parseInt(parameters.get("id")[0]);
-
-                    if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
-                        return;
-                    }
-
-                    boolean exists = userService.existsById(id);
-                    response.getWriter().write("{\"exists\": " + exists + "}");
-                    logger.info("Результат проверки существования пользователя с айди " + id + ": " + exists);
-                }
-                else {
+                String login;
+                if (matcher.matches()) {
+                    login = matcher.group(2); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
                 }
+
+                if (!AuthorizationService.canAccessUserDataByLogin(currentUser, login)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
+                    return;
+                }
+
+                boolean exists = userService.existsByLogin(login);
+                response.getWriter().write("{\"exists\": " + exists + "}");
+                logger.info("Результат проверки существования пользователя с логином " + login + ": " + exists);
+            }
+
+            else if (pathInfo.startsWith("/check-by-id/")) {
+
+                String path = request.getPathInfo();
+
+                Matcher matcher = ID_ACTION_PATTERN.matcher(path);
+
+                Integer id;
+                if (matcher.matches()) {
+                    id = Integer.parseInt(matcher.group(2)); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\": \"Доступ к данным пользователя запрещен\"}");
+                    return;
+                }
+
+                boolean exists = userService.existsById(id);
+                response.getWriter().write("{\"exists\": " + exists + "}");
+                logger.info("Результат проверки существования пользователя с айди " + id + ": " + exists);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
-
         } catch (DataDoesNotExistException e) {
             logger.severe("Таких данных в таблице нет: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -207,11 +249,23 @@ public class UsersServlet extends HttpServlet {
                 response.getWriter().write("{\"error\": \"Укажите ID пользователя\"}");
             }
 
-            else if (pathInfo.equals("/update/factory-type")){
+            else if (pathInfo.startsWith("/update/factory-type/")){
                 logger.info("Начинаем обновление типа фабрики для " + currentUser.getLogin());
-                String requestBody = request.getReader().lines().reduce("", String::concat);
 
-                Integer id = mapper.readTree(requestBody).get("id").asInt();
+                String path = request.getPathInfo();
+
+                Matcher matcher = ID_ACTION_PATTERN.matcher(path);
+
+                Integer id;
+                if (matcher.matches()) {
+                    id = Integer.parseInt(matcher.group(2)); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 if (!AuthorizationService.canAccessById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -225,11 +279,24 @@ public class UsersServlet extends HttpServlet {
                 logger.info("PUT запрос: обновление factoryType для пользователя ID: " + id + " пользователем " + currentUser.getLogin());
             }
 
-            else if (pathInfo.equals("/update/password")) {
+            else if (pathInfo.startsWith("/update/password/")) {
                 logger.info("Начинаем обновление пароля для " + currentUser.getLogin());
-                String requestBody = request.getReader().lines().reduce("", String::concat);
 
-                Integer id = mapper.readTree(requestBody).get("id").asInt();
+                String path = request.getPathInfo();
+
+                Matcher matcher = ID_ACTION_PATTERN.matcher(path);
+
+                Integer id;
+                if (matcher.matches()) {
+                    id = Integer.parseInt(matcher.group(2)); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+
+                String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 if (!AuthorizationService.canAccessById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -243,9 +310,22 @@ public class UsersServlet extends HttpServlet {
                 logger.info("PUT запрос: обновление factoryType для пользователя ID: " + id + " пользователем " + currentUser.getLogin());
             }
 
-            else if (pathInfo.equals("/update/role")) {
+            else if (pathInfo.startsWith("/update/role/")) {
                 // Только admin может менять роли
                 logger.info("Начинаем обновление роли для " + currentUser.getLogin());
+
+                String path = request.getPathInfo();
+
+                Matcher matcher = ID_ACTION_PATTERN.matcher(path);
+
+                Integer id;
+                if (matcher.matches()) {
+                    id = Integer.parseInt(matcher.group(2)); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
 
                 if (!"Admin".equals(currentUser.getRole())) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -254,20 +334,30 @@ public class UsersServlet extends HttpServlet {
                 }
                 String requestBody = request.getReader().lines().reduce("", String::concat);
 
-                Integer id = mapper.readTree(requestBody).get("id").asInt();
-
                 String role = mapper.readTree(requestBody).get("role").asText();
+
                 userService.updateRole(role, id);
                 response.getWriter().write("{\"Успешно\": \"Успешно обновлено\"}");
                 logger.info("PUT запрос: обновление роли для пользователя ID: " + id + " пользователем " + currentUser.getLogin());
             }
 
-            else if (pathInfo.equals("/update-by-login")){
+            else if (pathInfo.startsWith("/update/login/")){
                 logger.info("Начинаем обновление логина для " + currentUser.getLogin());
 
-                String requestBody = request.getReader().lines().reduce("", String::concat);
+                String path = request.getPathInfo();
 
-                Integer id = mapper.readTree(requestBody).get("id").asInt();
+                Matcher matcher = ID_ACTION_PATTERN.matcher(path);
+
+                Integer id;
+                if (matcher.matches()) {
+                    id = Integer.parseInt(matcher.group(2)); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                String requestBody = request.getReader().lines().reduce("", String::concat);
 
                 if (!AuthorizationService.canAccessById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -333,11 +423,19 @@ public class UsersServlet extends HttpServlet {
 
             }
 
-            else if (pathInfo.equals("/delete/user")) {
+            else if (pathInfo.startsWith("/delete/user/")) {
+                String path = request.getPathInfo();
 
-                String requestBody = request.getReader().lines().reduce("", String::concat);
+                Matcher matcher = ID_ACTION_PATTERN.matcher(path);
 
-                Integer id = mapper.readTree(requestBody).get("id").asInt();
+                Integer id;
+                if (matcher.matches()) {
+                    id = Integer.parseInt(matcher.group(2)); // john123
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
 
                 if (!AuthorizationService.canAccessUserDataById(currentUser, id)) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -350,12 +448,10 @@ public class UsersServlet extends HttpServlet {
                 response.getWriter().write("{\"status\": \"Пользователь успешно удален\"}");
                 logger.info("Успешно удален пользователь ID: " + id);
             }
-
             else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Неверный формат ID пользователя\"}");
             }
-
         }
         catch (DataDoesNotExistException e) {
             logger.severe("Таких данных в таблице нет: " + e.getMessage());

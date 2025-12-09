@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.service.SimpleFunctionService;
@@ -22,6 +25,14 @@ public class SimpleFunctionsServlet extends HttpServlet {
     private SimpleFunctionService simpleFunctionService;
     private ObjectMapper mapper;
     private static final Logger logger = Logger.getLogger(SimpleFunctionsServlet.class.getName());
+
+    // Паттерн для операций с названием функции (с пробелами и русскими буквами)
+    private static final Pattern FUNCTION_NAME_ACTION_PATTERN =
+            Pattern.compile("^/(check|delete-by-name)/(.+)$");
+    // ^/ - начало pathInfo
+    // (check|delete-by-name) - операция
+    // / - разделитель
+    // (.+) - название функции (группа 2), любой текст до конца строки
 
     @Override
     public void init() {
@@ -63,25 +74,24 @@ public class SimpleFunctionsServlet extends HttpServlet {
                 logger.info("Успешно возвращено " + functions.size() + " отсортированных простых функций");
             }
 
-            else if (pathInfo.startsWith("/check")) {
-                Map<String, String[]> parameters = request.getParameterMap();
+            else if (pathInfo.startsWith("/check/")) {
 
-                if(parameters.size() > 1) throw new RuntimeException("Слишком много параметров в запросе");
+                String path = request.getPathInfo();
 
-                if (parameters.containsKey("local-name")) {
-                    if (parameters.get("local-name").length > 1)
-                        throw new RuntimeException("Для параметра указано несколько значений");
-                    String local_name = parameters.get("local-name")[0];
+                Matcher matcher = FUNCTION_NAME_ACTION_PATTERN.matcher(path);
 
-
-                    boolean exists = simpleFunctionService.existsByLocalName(local_name);
-                    response.getWriter().write("{\"exists\": " + exists + "}");
-                    logger.info("Результат проверки существования простой ф-ции  " + local_name + ": " + exists);
-                }
-                else {
+                String local_name;
+                if (matcher.matches()) {
+                    local_name = matcher.group(2); // Квадратичная функция
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    throw new RuntimeException("Некорректный параметр запроса");
+                    return;
                 }
+
+                boolean exists = simpleFunctionService.existsByLocalName(local_name);
+                response.getWriter().write("{\"exists\": " + exists + "}");
+                logger.info("Результат проверки существования простой ф-ции  " + local_name + ": " + exists);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("{\"error\": \"Ресурс не найден\"}");
@@ -232,18 +242,26 @@ public class SimpleFunctionsServlet extends HttpServlet {
                 response.getWriter().write("{\"status\": \"Все простые функции успешно удалены\"}");
                 logger.warning("Успешно удалены все простые функции");
 
-            } else if (pathInfo.startsWith("/delete-by-name")) {
+            } else if (pathInfo.startsWith("/delete-by-name/")) {
 
-                String requestBody = request.getReader().lines().reduce("", String::concat);
-                var jsonNode = mapper.readTree(requestBody);
+                String path = request.getPathInfo();
 
-                String name = jsonNode.get("name").asText();
+                Matcher matcher = FUNCTION_NAME_ACTION_PATTERN.matcher(path);
 
-                logger.info("DELETE запрос: удаление простой функции: " + name);
-                simpleFunctionService.deleteSimpleFunction(name);
+                String local_name;
+                if (matcher.matches()) {
+                    local_name = matcher.group(2); // Квадратичная функция
+                } else{
+                    response.getWriter().write("{\"error\": \"Некорректный запрос\"}");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                logger.info("DELETE запрос: удаление простой функции: " + local_name);
+                simpleFunctionService.deleteSimpleFunction(local_name);
 
                 response.getWriter().write("{\"status\": \"Простая функция успешно удалена\"}");
-                logger.info("Успешно удалена простая функция: " + name);
+                logger.info("Успешно удалена простая функция: " + local_name);
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Неверный формат запроса для удаления\"}");

@@ -37,6 +37,11 @@ public class MathFunctionService {
         return mathFunctionRepository.existsFunctionComplex(leftBoard, rightBoard, amountOfDots, functionName);
     }
 
+    public boolean existsMathFunctionComplex(Double leftBoard, Double rightBoard, Integer amountOfDots,
+                                             String functionName, int user_id){
+        return mathFunctionRepository.existsFunctionComplex(leftBoard, rightBoard, amountOfDots, functionName, user_id);
+    }
+
     public MathFunctionsDTO createMathFunction(String function_name, int amount_of_dots, double left_boarder,
                                                double right_boarder, int owner_id, String function_type){
         MathFunctions mathFunctions = mathFunctionRepository.createMathFunction(function_name,
