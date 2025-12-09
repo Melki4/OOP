@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.model.repositories.PointRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.model.utils.connectionManager;
@@ -26,7 +27,7 @@ public class JdbcPointRepository implements PointRepository {
             LOGGER.info("Таблица создана");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка на этапе создания таблицы точек");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -62,7 +63,7 @@ public class JdbcPointRepository implements PointRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе точек по айди ф-ции {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -97,7 +98,7 @@ public class JdbcPointRepository implements PointRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе точек по айди функции {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -133,7 +134,7 @@ public class JdbcPointRepository implements PointRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе сортированных точек по айди ф-ции {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -168,7 +169,7 @@ public class JdbcPointRepository implements PointRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе сортированных точек по айди функции {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -186,7 +187,7 @@ public class JdbcPointRepository implements PointRepository {
             LOGGER.info("Обновление для X прошло успешно");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении значения X");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -204,7 +205,7 @@ public class JdbcPointRepository implements PointRepository {
             LOGGER.info("Обновление прошло успешно");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении Y");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -217,7 +218,7 @@ public class JdbcPointRepository implements PointRepository {
 //            LOGGER.info("Удаление прошло успешно");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении точки");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -229,7 +230,7 @@ public class JdbcPointRepository implements PointRepository {
 //            LOGGER.info("все точки были удалены дропом таблицы и таблица была создана заново, но в транзакции");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении всех точек, т.к. есть транзакция - значения не были удалены");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -245,7 +246,7 @@ public class JdbcPointRepository implements PointRepository {
             LOGGER.info("Успешно добавили");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении точки");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -271,7 +272,7 @@ public class JdbcPointRepository implements PointRepository {
             LOGGER.info("Все точки были успешно добавлены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении точек");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 }

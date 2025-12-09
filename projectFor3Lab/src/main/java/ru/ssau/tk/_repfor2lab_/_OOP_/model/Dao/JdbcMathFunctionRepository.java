@@ -8,6 +8,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.model.repositories.MathFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.model.utils.connectionManager;
 import ru.ssau.tk._repfor2lab_._OOP_.model.utils.loaderSQL;
 import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DataDoesNotExistException;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
     }
 
     public List<MathFunctions> findMathFunctionsByUserId(int id) {
-        LOGGER.info("Начинаем выбор ф-ций по айди владельца и вернём их как лист, айди{}", id);
+        LOGGER.info("Начинаем выбор ф-ций по айди владельца и вернём их как лист entities, айди{}", id);
         List<MathFunctions> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_user_id.sql");
@@ -70,7 +71,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске функций пользователя с айди {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -108,12 +109,12 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске ф-ций пользователя с айди {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     public List<MathFunctions> findMathFunctionsByName(String name) {
-        LOGGER.info("Начинаем поиск ф-ции по имени и вернём её как  DTO, имя{}", name);
+        LOGGER.info("Начинаем поиск ф-ции по имени и вернём её как entities, имя{}", name);
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_name.sql");
         List<MathFunctions> result = new ArrayList<>();
 
@@ -137,20 +138,20 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             }
 
             if (result.isEmpty()){
-                LOGGER.warn("У пользователя нет ф-ций");
+                LOGGER.warn("У пользователя в таблице нет ф-ций");
                 throw new DataDoesNotExistException();
             }
 
-            LOGGER.info("Возвращаем ф-цию");
+            LOGGER.info("Возвращаем ф-цию из таблицы");
             return result;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске ф-ций с именем {}", name);
-            throw new RuntimeException(e);
+            LOGGER.warn("Произошла ошибка при поиске ф-ций в таблице с именем {}", name);
+            throw new DaoException(e);
         }
     }
 
     public List<MathFunctionsDTO> findMathFunctionsByNameAsDTO(String name) {
-        LOGGER.info("Начинаем поиск ф-ции по имени и вернём её как  DTO, имя{}", name);
+        LOGGER.info("Начинаем поиск ф-ции по имени и вернём её как DTO, имя{}", name);
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_name.sql");
         List<MathFunctionsDTO> result = new ArrayList<>();
 
@@ -174,20 +175,20 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             }
 
             if (result.isEmpty()){
-                LOGGER.warn("У пользователя нет ф-ций");
+                LOGGER.warn("В таблице у нет функций с таким именем");
                 throw new DataDoesNotExistException();
             }
 
-            LOGGER.info("Возвращаем ф-цию");
+            LOGGER.info("Возвращаем функцию");
             return result;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске ф-ций с именем {}", name);
-            throw new RuntimeException(e);
+            LOGGER.warn("Произошла ошибка при поиске функций с именем {}", name);
+            throw new DaoException(e);
         }
     }
 
     public List<MathFunctionsDTO> findMathFunctionsByNameAsDTO(String name, Integer user_id) {
-        LOGGER.info("Начинаем поиск ф-ции по имени и вернём её как  DTO, имя{}", name);
+        LOGGER.info("Начинаем поиск ф-ции по имени у пользователя и вернём её как  DTO, имя{}", name);
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\select_math_functions_by_name_and_user_id.sql");
         List<MathFunctionsDTO> result = new ArrayList<>();
 
@@ -212,7 +213,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             }
 
             if (result.isEmpty()){
-                LOGGER.warn("У пользователя нет ф-ций");
+                LOGGER.warn("У пользователя нет ф-ций с таким именем");
                 throw new DataDoesNotExistException();
             }
 
@@ -220,7 +221,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске ф-ций с именем {}", name);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -249,13 +250,13 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
 
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске ф-ций с айди {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     public MathFunctions findMathFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
                                                  String functionName){
-        LOGGER.info("Начинаем сложный поиск по ф-ции");
+        LOGGER.info("Начинаем сложный поиск по функции");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\complex_function_find.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -268,7 +269,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             var resultSet = statement.executeQuery();
 
             if (!resultSet.next()){
-                LOGGER.warn("Такой ф-ции в бд нет");
+                LOGGER.warn("Такой функции в бд нет");
                 throw new DataDoesNotExistException();
             };
 
@@ -280,17 +281,17 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
                     resultSet.getInt(6),
                     resultSet.getString(7));
 
-            LOGGER.info("Возвращаем ф-цию при сложном поиске");
+            LOGGER.info("Возвращаем функцию при сложном поиске");
             return boof;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при поиске сложной ф-ции");
-            throw new RuntimeException(e);
+            LOGGER.warn("Произошла ошибка при поиске сложной функции");
+            throw new DaoException(e);
         }
     }
 
     public MathFunctions findMathFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
                                                  String functionName, int owner_id){
-        LOGGER.info("Начинаем сложный поиск по ф-ции");
+        LOGGER.info("Начинаем сложный поиск по ф-ции по владельцу");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\complex_function_new_find.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)){
@@ -320,7 +321,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return boof;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске сложной ф-ции");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -347,7 +348,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return resultSet.getInt(1);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при поиске айди сложной ф-ции");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -364,7 +365,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             LOGGER.info("Успешно обновили");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении имени ф-ции по айди{}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -378,7 +379,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
 //            LOGGER.info("Успешно удалили");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении мат. ф-ции по айди{}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -392,7 +393,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
 //            LOGGER.info("Все ф-ции успешно удалены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обработке запроса по удалению какой-то мат ф.ции");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -407,7 +408,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
 //            LOGGER.info("Удаление прошло успешно");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении ф-ции");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -436,13 +437,13 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return mathFunctions;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка с добавлением ф-ции в бд");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     public boolean existsFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
                                          String functionName) {
-        LOGGER.info("Начинаем проверку на существование ф-ции сложной");
+        LOGGER.info("Начинаем проверку на существование ф-ции сложным поиском");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\does_math_function_exists.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
@@ -458,18 +459,18 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
 
             boolean value = resultSet.getBoolean(1);
 
-            if (value) LOGGER.info("Ф-ция существует");
-            else LOGGER.info("Ф-ция не существует");
+            if (value) LOGGER.info("Функция существует");
+            else LOGGER.info("Функция не существует");
             return value;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при проверке существования ф-ции");
-            throw new RuntimeException(e);
+            LOGGER.warn("Произошла ошибка при проверке существования функции");
+            throw new DaoException(e);
         }
     }
 
     public boolean existsFunctionComplex(double leftBoard, double rightBoard, int amountOfDots,
                                          String functionName, int owner_id) {
-        LOGGER.info("Начинаем проверку на существование ф-ции сложной");
+        LOGGER.info("Начинаем проверку на существование ф-ции сложной по владельцу");
         String sql = loaderSQL.loadSQL("scripts\\math_functions\\does_math_function_exists_new.sql");
 
         try (var connection = connectionManager.open(); var statement = connection.prepareStatement(sql)) {
@@ -491,7 +492,7 @@ public class JdbcMathFunctionRepository implements MathFunctionRepository {
             return value;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при проверке существования ф-ции");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 }

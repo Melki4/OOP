@@ -3,6 +3,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.model.Dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.SimpleFunctionsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.exceptions.DaoException;
 import ru.ssau.tk._repfor2lab_._OOP_.model.databaseEnteties.SimpleFunctions;
 import ru.ssau.tk._repfor2lab_._OOP_.model.repositories.SimpleFunctionRepository;
 import ru.ssau.tk._repfor2lab_._OOP_.model.utils.connectionManager;
@@ -26,13 +27,13 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             LOGGER.info("Таблица создана");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при создании таблицы");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     public List<SimpleFunctions> findAllSimpleFunctions() {
 
-        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист");
+        LOGGER.info("Начинаем выбор всех ф-ций и вернём их как лист entities");
         List<SimpleFunctions> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\simple_functions\\select_all_simple_functions.sql");
@@ -55,7 +56,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех простых функций");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -84,7 +85,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех простых функций ");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -110,7 +111,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -136,7 +137,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных простых функций ");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -153,7 +154,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             LOGGER.info("Локальное имя для функции со старым именем {} успешно обновлено", oldName);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении локального имени для функции с именем: {}", oldName);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -166,7 +167,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
 //            LOGGER.info("Функция с кодом {} успешно удалена", localName);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении функции с кодом: {}", localName);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -178,7 +179,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
 //            LOGGER.info("Все простые функции успешно удалены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении всех простых функций");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -199,7 +200,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return simpleFunctions;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при добавлении простой функции с именем: {}", localName);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -216,7 +217,7 @@ public class JdbcSimpleFunctionRepository implements SimpleFunctionRepository {
             return value;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при проверке существования простой функций");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 }
