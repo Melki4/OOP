@@ -27,12 +27,12 @@ public class JdbcUserRepository implements UserRepository {
             LOGGER.info("Таблица пользователей успешно создана");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при создании таблицы пользователей");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     public List<Users> findAllUsers() {
-        LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист DTO");
+        LOGGER.info("Начинаем возврат списка всех пользователей и вернём их как лист enteties");
         List<Users> result = new ArrayList<>();
 
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users.sql");
@@ -51,14 +51,14 @@ public class JdbcUserRepository implements UserRepository {
                 result.add(boof);
             }
             if (result.isEmpty()){
-                LOGGER.warn("Таблица пуста");
+                LOGGER.warn("Таблица пользователей пуста");
                 throw new DataDoesNotExistException();
             }
-            LOGGER.info("Все пользователи успешно получены");
+            LOGGER.info("Все пользователи из таблицы успешно получены");
             return result;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при выборе всех пользователей");
-            throw new RuntimeException(e);
+            LOGGER.warn("Произошла ошибка при выборе всех пользователей из таблицы");
+            throw new DaoException("Произошла ошибка при выборе всех пользователей из таблицы", e);
         }
     }
 
@@ -88,12 +88,12 @@ public class JdbcUserRepository implements UserRepository {
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех пользователей");
-            throw new RuntimeException(e);
+            throw new DaoException("Произошла ошибка при выборе всех пользователей", e);
         }
     }
 
     public List<Users> findAllUsersSortedByLogin() {
-        LOGGER.info("Начинаем возврат списка всех пользователей отсортированных по логинам");
+        LOGGER.info("Начинаем возврат списка всех пользователей как листа entities отсортированных по логинам");
 
         List<Users> result = new ArrayList<>();
         String sql = loaderSQL.loadSQL("scripts\\users\\select_all_users_sorted_by_login.sql");
@@ -115,11 +115,11 @@ public class JdbcUserRepository implements UserRepository {
                 LOGGER.warn("Таблица с пользователями пуста");
                 throw new DataDoesNotExistException();
             }
-            LOGGER.info("Все сортированные пользователи успешно получены");
+            LOGGER.info("Все отсортированные пользователи успешно получены");
             return result;
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей");
-            throw new RuntimeException(e);
+            throw new DaoException("Произошла ошибка при выборе всех отсортированных пользователей", e);
         }
     }
 
@@ -142,14 +142,14 @@ public class JdbcUserRepository implements UserRepository {
                 result.add(boof);
             }
             if (result.isEmpty()){
-                LOGGER.warn("Таблица с пользователями пуста ");
+                LOGGER.warn("Таблица с пользователями пуста (dto)");
                 throw new DataDoesNotExistException();
             }
-            LOGGER.info("Все сортированные пользователи успешно получены ");
+            LOGGER.info("Все сортированные пользователи успешно получены (dto)");
             return result;
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей ");
-            throw new RuntimeException(e);
+            LOGGER.warn("Произошла ошибка при выборе всех отсортированных пользователей (dto)");
+            throw new DaoException("Произошла ошибка при выборе всех отсортированных пользователей", e);
         }
     }
 
@@ -173,7 +173,7 @@ public class JdbcUserRepository implements UserRepository {
             return resultSet.getInt(1);
         } catch (SQLException e) {
             LOGGER.warn("Пользователь с логином не найден или произошла непредвиденная ошибка");
-            return -1;
+            throw new DaoException("Пользователь с логином не найден или произошла непредвиденная ошибка", e);
         }
     }
 
@@ -190,7 +190,7 @@ public class JdbcUserRepository implements UserRepository {
             LOGGER.info("Тип фабрики для пользователя с ID {} успешно обновлен", id);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении типа фабрики для пользователя с ID: {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -207,7 +207,7 @@ public class JdbcUserRepository implements UserRepository {
             LOGGER.info("Пароль для пользователя с ID {} успешно обновлен", id);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении пароля для пользователя с ID: {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -224,7 +224,7 @@ public class JdbcUserRepository implements UserRepository {
             LOGGER.info("Логин для пользователя с ID {} успешно обновлен", id);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении логина для пользователя с ID: {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -241,7 +241,7 @@ public class JdbcUserRepository implements UserRepository {
             LOGGER.info("Роль для пользователя с ID {} успешно обновлена", id);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при обновлении роли для пользователя с ID: {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -254,7 +254,7 @@ public class JdbcUserRepository implements UserRepository {
 //            LOGGER.info("Пользователь с ID {} успешно удален", id);
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении пользователя с ID: {}", id);
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
@@ -269,12 +269,13 @@ public class JdbcUserRepository implements UserRepository {
 //            LOGGER.info("Все пользователи успешно удалены");
         } catch (SQLException e) {
             LOGGER.warn("Произошла ошибка при удалении пользователей");
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     public Users createUser(Users user){
-        LOGGER.info("Начинаем добавление нового пользователя с логином: {}", user.getLogin());
+        LOGGER.info("Начинаем добавление нового пользователя через метод," +
+                " в который передали пользователя с логином: {}", user.getLogin());
         String sql = loaderSQL.loadSQL("scripts\\users\\insert_user.sql");
         try (var connection = connectionManager.open();var statement = connection.prepareStatement(sql)){
             statement.setString(1, user.getFactoryType());
@@ -288,12 +289,11 @@ public class JdbcUserRepository implements UserRepository {
             if(keys.next()){
                 user.setUserId(keys.getInt("user_id"));
             }
-
             return user;
-
 //            LOGGER.info("Пользователь с логином {} успешно добавлен", user.getLogin());
         } catch (SQLException e) {
-            LOGGER.warn("Произошла ошибка при добавлении пользователя с логином: {}", user.getLogin());
+            LOGGER.warn("Произошла ошибка при добавлении пользователя через метод," +
+                    " в который передали пользователя с логином: {}", user.getLogin());
             throw new DaoException(e);
         }
     }
@@ -308,13 +308,12 @@ public class JdbcUserRepository implements UserRepository {
             statement.setString(4, role);
 
             statement.executeUpdate();
-            Users user = null;
+            Users user = new Users();
 
             var keys = statement.getGeneratedKeys();
             if(keys.next()){
                 user = new Users(keys.getInt("user_id"), factoryType, login, password, role);
             }
-
             return user;
 //            LOGGER.info("Пользователь с логином {} успешно добавлен", login);
         } catch (SQLException e) {
@@ -352,13 +351,13 @@ public class JdbcUserRepository implements UserRepository {
 
             if (resultSet.next()) {
                 String storedPassword = resultSet.getString("password");
-                // Сравниваем пароли (в реальном приложении - хэши!)
+                // Сравниваем пароли
                 return password.equals(storedPassword);
             }
             return false;
 
         } catch (SQLException e) {
-            throw new DaoException("Authentication error", e);
+            throw new DaoException("Ошибка аунтефикации", e);
         }
     }
 
@@ -382,7 +381,7 @@ public class JdbcUserRepository implements UserRepository {
             return null;
 
         } catch (SQLException e) {
-            throw new DaoException("Error finding user by login", e);
+            throw new DaoException("Не смогли найти пользователя", e);
         }
     }
 
