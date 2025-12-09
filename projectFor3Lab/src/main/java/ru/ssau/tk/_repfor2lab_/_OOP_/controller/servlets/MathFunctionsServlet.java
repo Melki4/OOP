@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -118,7 +117,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 Matcher matcher = ID_PATH_PATTERN.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id= Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -290,7 +289,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 Matcher matcher = ID_PATH_PATTERN.matcher(path);
 
-                Integer functionId;
+                int functionId;
                 if (matcher.matches()) {
                     functionId = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -372,7 +371,7 @@ public class MathFunctionsServlet extends HttpServlet {
 
                 Matcher matcher = ID_PATH_PATTERN.matcher(path);
 
-                Integer functionId;
+                int functionId;
                 if (matcher.matches()) {
                     functionId = Integer.parseInt(matcher.group(2)); // 123
                 } else{

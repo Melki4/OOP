@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -71,7 +70,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -98,7 +97,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -165,7 +164,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -202,7 +201,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -281,7 +280,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -317,7 +316,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -400,7 +399,7 @@ public class PointsServlet extends HttpServlet {
 
                 Matcher matcher = ALL_ID_PATTERNS.matcher(path);
 
-                Integer function_id;
+                int function_id;
                 if (matcher.matches()) {
                     function_id = Integer.parseInt(matcher.group(2)); // 123
                 } else{
@@ -408,10 +407,6 @@ public class PointsServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-
-                // Чтение значений из тела запроса
-                String requestBody = request.getReader().lines().reduce("", String::concat);
-                var jsonNode = mapper.readTree(requestBody);
 
                 MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(function_id);
 

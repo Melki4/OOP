@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -318,7 +317,7 @@ public class UsersServlet extends HttpServlet {
 
                 Matcher matcher = ID_ACTION_PATTERN.matcher(path);
 
-                Integer id;
+                int id;
                 if (matcher.matches()) {
                     id = Integer.parseInt(matcher.group(2)); // john123
                 } else{
