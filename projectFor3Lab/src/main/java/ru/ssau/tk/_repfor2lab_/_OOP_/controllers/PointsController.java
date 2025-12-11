@@ -38,7 +38,7 @@ public class PointsController {
     @Autowired
     private MathFunctionsRepositories mathFunctionsRepository;
 
-    @GetMapping("/function/{functionId}")
+    @GetMapping("/get-points-by-function-id/{functionId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PointsDTO>> getPointsByFunctionId(@PathVariable Long functionId) {
         checkFunctionAccess(functionId);
@@ -49,7 +49,7 @@ public class PointsController {
         return ResponseEntity.ok(points);
     }
 
-    @GetMapping("/function/{functionId}/sorted")
+    @GetMapping("/get-points-by-function-id-sorted/{functionId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PointsDTO>> getPointsByFunctionIdSorted(@PathVariable Long functionId) {
         checkFunctionAccess(functionId);
@@ -62,47 +62,50 @@ public class PointsController {
         return ResponseEntity.ok(points);
     }
 
-    @PostMapping("/single")
+    @PostMapping("/create-point/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> createSinglePoint(@RequestBody JsonNode body) {
+    public ResponseEntity<String> createSinglePoint(
+            @PathVariable Long id,
+            @RequestBody JsonNode body) {
+
         double xValue = body.get("x_value").asDouble();
         double yValue = body.get("y_value").asDouble();
-        long functionId = body.get("function_id").asLong();
-        logger.info("Запрос на создание одной точки");
+        logger.info("Запрос на создание одной точки для функции с ID: {}", id);
 
-        checkFunctionAccess(functionId);
+        checkFunctionAccess(id);
 
         Points point = new Points();
         point.setxValue(xValue);
         point.setyValue(yValue);
         point.setMathFunctions(new MathFunctions());
-        point.getMathFunctions().setMathFunctionsID(functionId);
+        point.getMathFunctions().setMathFunctionsID(id);
 
         pointsRepository.save(point);
 
         return ResponseEntity.status(201).body("{\"status\": \"Точка успешно создана\"}");
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/create-points/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> createBulkPoints(@RequestBody JsonNode body) {
-        long functionId = body.get("function_id").asLong();
-        checkFunctionAccess(functionId);
-        logger.info("Запрос на создание нескольких точек");
+    public ResponseEntity<String> createBulkPoints(
+            @PathVariable Long id,
+            @RequestBody JsonNode body) {
+
+        checkFunctionAccess(id);
+        logger.info("Запрос на создание нескольких точек для функции с ID: {}", id);
 
         try {
-            List<ru.ssau.tk._repfor2lab_._OOP_.DTO.PointsDTO> points =
-                    mapper.readValue(
-                            body.get("points").traverse(),
-                            new TypeReference<List<PointsDTO>>() {}
-                    );
+            List<PointsDTO> points = mapper.readValue(
+                    body.get("points").traverse(),
+                    new TypeReference<List<PointsDTO>>() {}
+            );
 
             List<Points> entities = points.stream().map(p -> {
                 Points point = new Points();
                 point.setxValue(p.getxValue());
                 point.setyValue(p.getyValue());
                 point.setMathFunctions(new MathFunctions());
-                point.getMathFunctions().setMathFunctionsID(functionId);
+                point.getMathFunctions().setMathFunctionsID(id); // ← id из пути
                 return point;
             }).collect(Collectors.toList());
 
@@ -115,17 +118,18 @@ public class PointsController {
         }
     }
 
-    @PutMapping("/x")
+    @PutMapping("/update-x/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> updateXValue(@RequestBody JsonNode body) {
-        long functionId = body.get("id").asLong();
+    public ResponseEntity<String> updateXValue(
+            @RequestBody JsonNode body,
+            @PathVariable Long id) {
         double oldValue = body.get("oldValue").asDouble();
         double newValue = body.get("newValue").asDouble();
         logger.info("Запрос на обновление x_value");
 
-        checkFunctionAccess(functionId);
+        checkFunctionAccess(id);
 
-        pointsRepository.findByMathFunctionsMathFunctionsIDAndXValue(functionId, oldValue)
+        pointsRepository.findByMathFunctionsMathFunctionsIDAndXValue(id, oldValue)
                 .ifPresent(point -> {
                     point.setxValue(newValue);
                     pointsRepository.save(point);
@@ -134,17 +138,18 @@ public class PointsController {
         return ResponseEntity.ok("{\"status\": \"Значение успешно обновлено\"}");
     }
 
-    @PutMapping("/y")
+    @PutMapping("/update-y/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> updateYValue(@RequestBody JsonNode body) {
-        long functionId = body.get("id").asLong();
+    public ResponseEntity<String> updateYValue(
+            @RequestBody JsonNode body,
+            @PathVariable Long id) {
         double oldValue = body.get("oldValue").asDouble();
         double newValue = body.get("newValue").asDouble();
         logger.info("Запрос на обновление y_value");
 
-        checkFunctionAccess(functionId);
+        checkFunctionAccess(id);
 
-        pointsRepository.findByMathFunctionsMathFunctionsIDAndYValue(functionId, oldValue)
+        pointsRepository.findByMathFunctionsMathFunctionsIDAndYValue(id, oldValue)
                 .ifPresent(point -> {
                     point.setyValue(newValue);
                     pointsRepository.save(point);
@@ -153,7 +158,7 @@ public class PointsController {
         return ResponseEntity.ok("{\"status\": \"Значение успешно обновлено\"}");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteAllPoints() {
         logger.info("Запрос на удаление всех точек");
@@ -161,7 +166,7 @@ public class PointsController {
         return ResponseEntity.ok("{\"status\": \"Все точки успешно удалены\"}");
     }
 
-    @DeleteMapping("/function/{functionId}")
+    @DeleteMapping("/delete-points-for-function/{functionId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> deletePointsByFunctionId(@PathVariable Long functionId) {
         logger.info("Запрос на удаление точек по айди функции");

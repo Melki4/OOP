@@ -36,8 +36,8 @@ public class MathFunctionsController {
     @Autowired
     private UsersRepositories usersRepository;
 
-    @GetMapping("/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
+    @GetMapping("/get-by-user-id/{userId}")
+    @PreAuthorize("#userId == authentication.principal.userId")
     public ResponseEntity<List<MathFunctionsDTO>> findMathFunctionsByUserId(@PathVariable Long userId) {
         logger.info("Получение функций пользователя с ID: {}", userId);
         List<MathFunctionsDTO> functions = mathFunctionsRepository.findByUsersUserID(userId).stream()
@@ -46,8 +46,8 @@ public class MathFunctionsController {
         return ResponseEntity.ok(functions);
     }
 
-    @GetMapping("/name/{functionName}")
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/get-by-function-name/{functionName}")
+    @PreAuthorize("isAuthenticated()") //for users functions
     public ResponseEntity<List<MathFunctionsDTO>> findMathFunctionsByName(@PathVariable String functionName) {
         logger.info("Поиск функций по имени: {}", functionName);
         Optional<MathFunctions> functions = mathFunctionsRepository.findByNameOfFunction(functionName);
@@ -66,7 +66,7 @@ public class MathFunctionsController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/complex/find")
+    @GetMapping("/get-complex")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MathFunctionsDTO> findFunctionComplex(
             @RequestParam Double leftBoard,
@@ -86,33 +86,14 @@ public class MathFunctionsController {
         return ResponseEntity.ok(toDto(function));
     }
 
-    @GetMapping("/complex/id")
+
+    @GetMapping("/check-complex")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> findFunctionIdComplex(
+    public ResponseEntity<String> existsFunctionComplex(
             @RequestParam Double leftBoard,
             @RequestParam Double rightBoard,
             @RequestParam Long amountOfDots,
             @RequestParam String functionName) {
-        logger.info("Запрос на получение ID функции по параметрам");
-
-        MathFunctions function = mathFunctionsRepository
-                .findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndNameOfFunction(
-                        leftBoard, rightBoard, amountOfDots, functionName)
-                .stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("Function not found"));
-
-        checkAccess(function);
-
-        return ResponseEntity.ok("{\"functionId\": " + function.getMathFunctionsID() + "}");
-    }
-
-    @GetMapping("/check-complex")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> existsFunctionComplex(@RequestBody JsonNode body) {
-        double leftBoard = body.get("leftBoard").asDouble();
-        double rightBoard = body.get("rightBoard").asDouble();
-        long amountOfDots = body.get("amountOfDots").asLong();
-        String functionName = body.get("functionName").asText();
         logger.info("Запрос на проверку существования функции по параметрам");
 
         List<MathFunctions> functions = mathFunctionsRepository
@@ -129,44 +110,25 @@ public class MathFunctionsController {
                 exists = false;
             }
         }
-
         return ResponseEntity.ok("{\"exists\": " + exists + "}");
     }
 
-    @GetMapping("/complex-search")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<MathFunctionsDTO> findFunctionComplexPost(@RequestBody JsonNode body) {
-        double leftBoard = body.get("leftBoard").asDouble();
-        double rightBoard = body.get("rightBoard").asDouble();
-        long amountOfDots = body.get("amountOfDots").asLong();
-        String functionName = body.get("functionName").asText();
-        logger.info("Запрос на получение функции по параметрам");
 
-        MathFunctions function = mathFunctionsRepository
-                .findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndNameOfFunction(
-                        leftBoard, rightBoard, amountOfDots, functionName)
-                .stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("Function not found"));
-
-        checkAccess(function);
-
-        return ResponseEntity.ok(toDto(function));
-    }
-
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> createMathFunction(@RequestBody JsonNode body) {
+    @PostMapping("/create/id")
+    @PreAuthorize("isAuthenticated()") //айди хозяина через путь
+    public ResponseEntity<String> createMathFunction(
+            @RequestBody JsonNode body,
+            @PathVariable Long id) {
         String functionName = body.get("function_name").asText();
         long amountOfDots = body.get("amount_of_dots").asLong();
         double leftBorder = body.get("left_border").asDouble();
         double rightBorder = body.get("right_border").asDouble();
-        long ownerId = body.get("owner_id").asLong();
         String functionType = body.get("function_type").asText();
         logger.info("Запрос на создание функции");
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId = userDetails.getUserId();
-        if (ownerId != currentUserId) {
+        if (id != currentUserId) {
             return ResponseEntity.status(406).body("{\"error\": \"Ошибка доступа\"}");
         }
 
@@ -176,7 +138,7 @@ public class MathFunctionsController {
         function.setLeftBoarder(leftBorder);
         function.setRightBoarder(rightBorder);
         function.setUsers(new Users());
-        function.getUsers().setUserID(ownerId);
+        function.getUsers().setUserID(id);
 
         function.setSimpleFunctions(new ru.ssau.tk._repfor2lab_._OOP_.entities.SimpleFunctions());
         function.getSimpleFunctions().setLocalName(functionType);
@@ -186,7 +148,7 @@ public class MathFunctionsController {
         return ResponseEntity.status(201).body("{\"status\": \"Математическая функция успешно создана\"}");
     }
 
-    @PutMapping("/function/{functionId}")
+    @PutMapping("/update/{functionId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updateFunctionName(
             @PathVariable Long functionId,
@@ -205,7 +167,7 @@ public class MathFunctionsController {
         return ResponseEntity.ok("{\"status\": \"Имя функции успешно обновлено\"}");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteAllFunctions() {
         logger.info("Запрос на удаление всех функций");
@@ -213,8 +175,8 @@ public class MathFunctionsController {
         return ResponseEntity.ok("{\"status\": \"Все математические функции успешно удалены\"}");
     }
 
-    @DeleteMapping("/function/{functionId}")
-    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/delete-by-function-id/{functionId}")
+    @PreAuthorize("isAuthenticated()") //user owner
     public ResponseEntity<String> deleteFunctionById(@PathVariable Long functionId) {
         logger.info("Запрос на удаление функций по functionId");
         MathFunctions function = mathFunctionsRepository.findById(functionId)
@@ -224,8 +186,8 @@ public class MathFunctionsController {
         return ResponseEntity.ok("{\"status\": \"Математическая функция успешно удалена\"}");
     }
 
-    @DeleteMapping("/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
+    @DeleteMapping("/delete-by-user-id/{userId}")
+    @PreAuthorize("#userId == authentication.principal.userId")
     public ResponseEntity<String> deleteFunctionsByUserId(@PathVariable Long userId) {
         logger.info("Запрос на удаление функций по userId");
         mathFunctionsRepository.deleteByUsersUserID(userId);

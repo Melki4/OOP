@@ -50,10 +50,9 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/id/login")
+    @GetMapping("/get-id-by-login/{login}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Integer> selectIdByLogin(@RequestBody Map<String, String> body) {
-        String login = body.get("value");
+    public ResponseEntity<Integer> selectIdByLogin(@PathVariable String login) {
         if (login == null || login.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
@@ -67,14 +66,15 @@ public class UserController {
         if (!isAdmin && !currentLogin.equals(login)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        logger.info("Получение айди по логину");
+
+        logger.info("Получение ID по логину: {}", login);
         Users user = usersRepository.findByLogin(login)
                 .orElseThrow(() -> new RuntimeException("User not found: " + login));
 
         return ResponseEntity.ok(user.getUserID().intValue());
     }
 
-    @GetMapping("/by-login/{login}")
+    @GetMapping("/get/{login}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDTO> getUserByLoginPath(@PathVariable String login) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -116,7 +116,7 @@ public class UserController {
         return ResponseEntity.ok(toDto(saved));
     }
 
-    @GetMapping("/check/id/{id}")
+    @GetMapping("/check/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> existsById(@PathVariable Long id) {
         logger.info("Проверка существования пользователя по айди");
@@ -136,7 +136,7 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
-    @GetMapping("/check/login/{login}")
+    @GetMapping("/check/{login}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> existsByLogin(@PathVariable String login) {
         logger.info("Проверка существования пользователя по логину");
@@ -160,8 +160,8 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
-    @PutMapping("/{id}/factoryType")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
+    @PutMapping("/update/factory-type/{id}")
+    @PreAuthorize("#id == authentication.principal.userId")
     public ResponseEntity<String> updateFactoryType(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String newValue = body.get("value");
         logger.info("Запрос на обновление factoryType");
@@ -178,8 +178,8 @@ public class UserController {
         return ResponseEntity.ok("{\"status\": \"Пользователь успешно обновлен\"}");
     }
 
-    @PutMapping("/{id}/password")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
+    @PutMapping("/update/password/{password}")
+    @PreAuthorize("#id == authentication.principal.userId")
     public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String newValue = body.get("value");
         logger.info("Запрос на обновление пароля");
@@ -195,8 +195,8 @@ public class UserController {
         return ResponseEntity.ok("{\"status\": \"Пользователь успешно обновлен\"}");
     }
 
-    @PutMapping("/{id}/login")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
+    @PutMapping("/update/login/{id}")
+    @PreAuthorize("#id == authentication.principal.userId")
     public ResponseEntity<String> updateLogin(@PathVariable Long id, @RequestBody Map<String, String> body) {
         logger.info("Запрос на обновление логина");
         String newValue = body.get("value");
@@ -212,7 +212,7 @@ public class UserController {
         return ResponseEntity.ok("{\"status\": \"Пользователь успешно обновлен\"}");
     }
 
-    @PutMapping("/{id}/role")
+    @PutMapping("/update/role/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
         logger.info("Запрос на обновление роли");
@@ -229,7 +229,7 @@ public class UserController {
         return ResponseEntity.ok("{\"status\": \"Пользователь успешно обновлен\"}");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteAll() {
         logger.info("Запрос на удаление всех пользователей");
@@ -237,7 +237,7 @@ public class UserController {
         return ResponseEntity.ok("{\"status\": \"Все пользователи успешно удалены\"}");
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/users/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
     public ResponseEntity<String> deleteById(@PathVariable Long id) {
         logger.info("Запрос на удаление пользователя");

@@ -54,7 +54,7 @@ public class SimpleFunctionController {
         return ResponseEntity.ok("{\"exists\": " + exists + "}");
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> createFunction(@RequestBody JsonNode body) {
         String localName = body.get("value").asText();
@@ -67,7 +67,7 @@ public class SimpleFunctionController {
         return ResponseEntity.status(201).body("{\"status\": \"Простая функция успешно создана\"}");
     }
 
-    @PutMapping
+    @PutMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateSimpleFunctionName(
             @RequestBody JsonNode body) {
@@ -87,7 +87,7 @@ public class SimpleFunctionController {
         return ResponseEntity.ok("{\"status\": \"Имя простой функции успешно обновлено\"}");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteAll() {
         logger.warn("Удаление всех простых функций");
@@ -95,7 +95,7 @@ public class SimpleFunctionController {
         return ResponseEntity.ok("{\"status\": \"Все простые функции успешно удалены\"}");
     }
 
-    @DeleteMapping("/name/{name}")
+    @DeleteMapping("/delete-by-name/{name}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteByName(@PathVariable String name) {
         logger.info("Удаление функции: {}", name);
