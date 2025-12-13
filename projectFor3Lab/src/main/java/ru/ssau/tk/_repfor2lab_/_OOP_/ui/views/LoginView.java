@@ -1,9 +1,12 @@
 package ru.ssau.tk._repfor2lab_._OOP_.ui.views;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -29,24 +32,68 @@ public class LoginView extends VerticalLayout {
     private final Button loginButton = new Button("Войти");
 
     public LoginView() {
-        addClassName("login-view");
+        // Настройки основного контейнера
+        setWidth("100%");
+        setHeight("100vh"); // Занимаем всю высоту viewport
         setJustifyContentMode(JustifyContentMode.CENTER);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        setSizeFull();
+        setPadding(false);
+        setSpacing(false);
+        getStyle().set("background-color", "var(--lumo-contrast-5pct)");
 
+        // Контейнер для формы с отступами
+        Div formContainer = new Div();
+        formContainer.getStyle()
+                .set("background", "var(--lumo-base-color)")
+                .set("border-radius", "var(--lumo-border-radius-l)")
+                .set("box-shadow", "var(--lumo-box-shadow-s)")
+                .set("padding", "var(--lumo-space-l)")
+                .set("width", "100%")
+                .set("max-width", "400px");
+
+        // Заголовок
         H2 title = new H2("Вход в систему");
-        title.getStyle().set("margin-bottom", "1.5rem");
+        title.getStyle()
+                .set("margin", "0 0 var(--lumo-space-m) 0")
+                .set("text-align", "center")
+                .set("color", "var(--lumo-header-text-color)");
 
         loginField.setRequiredIndicatorVisible(true);
         passwordField.setRequiredIndicatorVisible(true);
+        loginField.setWidth("100%");
+        passwordField.setWidth("100%");
 
         loginButton.addClickListener(e -> handleLogin());
+        loginButton.setWidth("100%");
+        loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         FormLayout form = new FormLayout();
         form.add(loginField, passwordField);
+        form.setWidth("100%");
         form.setMaxWidth("400px");
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
 
-        add(title, form, loginButton);
+        // Вертикальный контейнер для всех элементов формы
+        VerticalLayout formContent = new VerticalLayout(title, form, loginButton);
+        formContent.setSpacing(true);
+        formContent.setPadding(false);
+        formContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+        formContent.getStyle().set("width", "100%");
+
+        // Добавляем контент в контейнер формы
+        formContainer.add(formContent);
+
+        // Центрируем контейнер с формой по вертикали и горизонтали
+        VerticalLayout centerWrapper = new VerticalLayout(formContainer);
+        centerWrapper.setJustifyContentMode(JustifyContentMode.CENTER);
+        centerWrapper.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        centerWrapper.setWidth("100%");
+        centerWrapper.setPadding(true);
+        centerWrapper.getStyle().set("flex-grow", "1");
+
+        add(centerWrapper);
     }
 
     private void handleLogin() {

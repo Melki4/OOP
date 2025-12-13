@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.logging.Logger;
 
-@WebServlet("/user/auth/register")
+@WebServlet("/users/auth/register")
 public class RegistrationServlet extends HttpServlet {
     private JdbcUserRepository userRepository = new JdbcUserRepository();
     private static final Logger logger = Logger.getLogger(RegistrationServlet.class.getName());

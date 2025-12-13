@@ -29,7 +29,7 @@ public class SettingsView extends VerticalLayout {
         addClassName("settings-view");
         setPadding(true);
 
-        factorySelect.setItems("array", "linked-list");
+        factorySelect.setItems("array", "list");
         factorySelect.setPlaceholder("Выберите");
 
         add(new H2("Настройки"), factorySelect, saveBtn);

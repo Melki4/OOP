@@ -8,16 +8,13 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.router.RouteConfiguration;
-import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-
 import java.util.HashMap;
 import java.util.Map;
 
 @AnonymousAllowed
 public class MainLayout extends AppLayout {
-
     private final Tabs menu;
     private final Map<Tab, String> tabToRoute = new HashMap<>();
 
@@ -49,11 +46,12 @@ public class MainLayout extends AppLayout {
     private Tabs createMenuTabs() {
         Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
-        tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
+        tabs.addThemeVariants(TabsVariant.LUMO_CENTERED);
 
         addTab(tabs, "Главная", "main");
         addTab(tabs, "Создать функцию", "create-function");
         addTab(tabs, "Мои функции", "my-functions");
+        addTab(tabs, "Операции с функциями", "function-operations"); // Новая вкладка
         addTab(tabs, "Настройки", "settings");
         addTab(tabs, "Выйти", "logout");
 

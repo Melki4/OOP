@@ -14,7 +14,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-final class FunctionsIO {
+public final class FunctionsIO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FunctionsIO.class);
 
@@ -111,7 +111,7 @@ final class FunctionsIO {
         LOGGER.trace("всё прошло успешно в xml");
     }
 
-    static ArrayTabulatedFunction deserializeXml(BufferedReader reader) throws IOException {
+    public static ArrayTabulatedFunction deserializeXml(BufferedReader reader) throws IOException {
         LOGGER.trace("Попытка десериализовать xml");
         XStream stream = new XStream();
         stream.allowTypesByWildcard(new String[]{"ru.ssau.tk.**"});
@@ -127,7 +127,7 @@ final class FunctionsIO {
         LOGGER.trace("всё прошло успешно в json");
     }
 
-    static ArrayTabulatedFunction deserializeJson(BufferedReader reader) throws IOException {
+    public static ArrayTabulatedFunction deserializeJson(BufferedReader reader) throws IOException {
         LOGGER.trace("Попытка десериализовать json");
         ObjectMapper objectMapper = new ObjectMapper();
         LOGGER.trace("всё прошло успешно в json возвращаем и приводим к массиву");

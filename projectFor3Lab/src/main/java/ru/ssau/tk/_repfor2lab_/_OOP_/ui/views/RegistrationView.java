@@ -78,7 +78,7 @@ public class RegistrationView extends VerticalLayout {
 
         try {
             // ⚠️ Замените URL на ваш сервер (если фронт и бэк на одном порту — оставьте как есть)
-            URI uri = new URI("http://localhost:8080/projectFor3Lab/user/auth/register");
+            URI uri = new URI("http://localhost:8080/projectFor3Lab/users/auth/register");
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)

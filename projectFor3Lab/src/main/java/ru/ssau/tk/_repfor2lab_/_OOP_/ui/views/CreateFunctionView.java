@@ -10,40 +10,42 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.VaadinSession;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.UserDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.SimpleFunctionRegistry;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.MainLayout;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.utils.BasicAuthClient;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.SimpleFunctionsDTO;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
+        import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Route(value = "create-function", layout = MainLayout.class)
 @PageTitle("Создать функцию | MathFunction App")
 public class CreateFunctionView extends VerticalLayout {
 
+    private static final int AUTO_FILL_THRESHOLD = 20;
+
     private final ComboBox<String> creationMode = new ComboBox<>("Способ создания");
     private final VerticalLayout formContainer = new VerticalLayout();
-    private final Button createButton = new Button("Создать функцию", this::handleCreate);
-    private final Button backButton = new Button("Назад", e -> getUI().ifPresent(ui -> ui.navigate("main")));
 
-    // Способ 1: ручной ввод
+    private TextField functionNameField;
     private List<NumberField> xFields = new ArrayList<>();
     private List<NumberField> yFields = new ArrayList<>();
     private IntegerField pointCountField;
+    private Button autoFillButton;
 
-    // Способ 2: простая функция
     private ComboBox<String> simpleFunctionSelect;
     private NumberField leftBorderField;
     private NumberField rightBorderField;
@@ -54,24 +56,26 @@ public class CreateFunctionView extends VerticalLayout {
 
     public CreateFunctionView() {
         addClassName("create-function-view");
-        setPadding(true);
         setSpacing(true);
+        setPadding(true);
         setSizeFull();
+        // === ВСЁ ПО ЦЕНТРУ ===
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         creationMode.setItems("Ввести точки вручную", "Создать из простой функции");
-        creationMode.setValue("Ввести точки вручную");
+        creationMode.setWidth("300px");
         creationMode.addValueChangeListener(e -> {
             selectedMode = e.getValue().contains("точки") ? "points" : "simple";
             updateForm();
         });
 
-        formContainer.setSizeFull();
-        formContainer.setPadding(false);
+        Button createButton = new Button("Создать функцию", this::handleCreate);
+        Button backButton = new Button("Назад", e -> getUI().ifPresent(ui -> ui.navigate("main")));
 
-        HorizontalLayout buttonBar = new HorizontalLayout(backButton, createButton);
-        buttonBar.setWidth("100%");
-
-        add(new H2("Создание табулированной функции"), creationMode, formContainer, buttonBar);
+        add(new H2("Создание табулированной функции"));
+        add(creationMode);
+        add(formContainer);
+        add(createButton, backButton);
         updateForm();
     }
 
@@ -80,20 +84,28 @@ public class CreateFunctionView extends VerticalLayout {
         xFields.clear();
         yFields.clear();
 
+        // === Имя функции — обязательно для обоих способов ===
+        functionNameField = new TextField("Имя функции");
+        functionNameField.setRequiredIndicatorVisible(true);
+        functionNameField.setPlaceholder("Введите имя...");
+        formContainer.add(functionNameField);
+
         if ("points".equals(selectedMode)) {
+            // === Способ 1: ручной ввод ===
             pointCountField = new IntegerField("Количество точек");
             pointCountField.setMin(2);
+            pointCountField.setMax(1000);
             pointCountField.setValue(2);
             pointCountField.addValueChangeListener(e -> {
-                if (e.getValue() != null && e.getValue() >= 2) {
-                    createPointInputs(e.getValue());
+                Integer val = e.getValue();
+                if (val != null && val >= 2) {
+                    createPointInputs(val);
                 }
             });
-
             formContainer.add(new FormLayout(pointCountField));
-            createPointInputs(2);
 
         } else {
+            // === Способ 2: простая функция ===
             simpleFunctionSelect = new ComboBox<>("Простая функция");
             loadSimpleFunctions();
 
@@ -101,6 +113,7 @@ public class CreateFunctionView extends VerticalLayout {
             rightBorderField = new NumberField("Правая граница");
             amountOfDotsField = new IntegerField("Количество точек");
             amountOfDotsField.setMin(2);
+            amountOfDotsField.setMax(1000);
             amountOfDotsField.setValue(10);
 
             FormLayout form = new FormLayout();
@@ -111,29 +124,66 @@ public class CreateFunctionView extends VerticalLayout {
     }
 
     private void createPointInputs(int count) {
-        VerticalLayout pointsLayout = new VerticalLayout();
-        pointsLayout.setSpacing(true);
+        formContainer.getChildren()
+                .filter(comp -> comp instanceof VerticalLayout && comp != formContainer)
+                .forEach(formContainer::remove);
 
         xFields.clear();
         yFields.clear();
+
+        VerticalLayout pointsLayout = new VerticalLayout();
+        pointsLayout.setSpacing(true);
+        pointsLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         for (int i = 0; i < count; i++) {
             NumberField xField = new NumberField("x" + (i + 1));
             NumberField yField = new NumberField("y" + (i + 1));
             xFields.add(xField);
             yFields.add(yField);
-
-            HorizontalLayout row = new HorizontalLayout(xField, yField);
-            row.setSpacing(true);
-            pointsLayout.add(row);
+            pointsLayout.add(new HorizontalLayout(xField, yField));
         }
 
         formContainer.add(pointsLayout);
+
+        if (count > AUTO_FILL_THRESHOLD && autoFillButton == null) {
+            autoFillButton = new Button("Заполнить автоматически (линейно)", e -> autoFillPoints());
+            formContainer.add(autoFillButton);
+        } else if (count <= AUTO_FILL_THRESHOLD && autoFillButton != null) {
+            formContainer.remove(autoFillButton);
+            autoFillButton = null;
+        }
+    }
+
+    private void autoFillPoints() {
+        // (реализация как в предыдущей версии)
+        Double x0 = xFields.get(0).getValue();
+        Double y0 = yFields.get(0).getValue();
+        Double xN = xFields.get(xFields.size() - 1).getValue();
+        Double yN = yFields.get(yFields.size() - 1).getValue();
+
+        if (x0 == null || y0 == null || xN == null || yN == null) {
+            Notification.show("Заполните первую и последнюю точку", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+        if (x0.equals(xN)) {
+            Notification.show("x0 и xN должны быть разными", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
+        int n = xFields.size();
+        double step = (xN - x0) / (n - 1);
+        for (int i = 0; i < n; i++) {
+            double x = x0 + i * step;
+            double y = y0 + (yN - y0) * i / (n - 1);
+            xFields.get(i).setValue(x);
+            yFields.get(i).setValue(y);
+        }
+        Notification.show("Автоматическое заполнение завершено", 2000, Notification.Position.MIDDLE);
     }
 
     private void loadSimpleFunctions() {
         try {
-            var response = BasicAuthClient.sendGet("/simple-functions");
+            var response = BasicAuthClient.sendGet("/simple-functions/sorted");
             if (response.statusCode() == 200) {
                 List<SimpleFunctionsDTO> functions = mapper.readValue(
                         response.body(),
@@ -141,60 +191,61 @@ public class CreateFunctionView extends VerticalLayout {
                 );
                 List<String> names = functions.stream()
                         .map(SimpleFunctionsDTO::getLocalName)
-                        .sorted()
                         .collect(Collectors.toList());
                 simpleFunctionSelect.setItems(names);
-            } else {
-                Notification.show("Не удалось загрузить простые функции", 4000, Notification.Position.MIDDLE);
             }
         } catch (Exception e) {
-            Notification.show("Ошибка загрузки: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
+            Notification.show("Ошибка загрузки функций", 4000, Notification.Position.MIDDLE);
         }
     }
 
     private void handleCreate(ClickEvent<Button> event) {
+        String userProvidedName = functionNameField.getValue();
+        if (userProvidedName == null || userProvidedName.trim().isEmpty()) {
+            Notification.show("Укажите имя функции", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
         if ("points".equals(selectedMode)) {
-            createFromPoints();
+            createFromPoints(userProvidedName.trim());
         } else {
-            createFromSimpleFunction();
+            createFromSimpleFunction(userProvidedName.trim());
         }
     }
 
-    private void createFromPoints() {
+    private void createFromPoints(String functionName) {
         try {
-            List<Double> xList = xFields.stream().map(f -> f.getValue() != null ? f.getValue() : 0.0).collect(Collectors.toList());
-            List<Double> yList = yFields.stream().map(f -> f.getValue() != null ? f.getValue() : 0.0).collect(Collectors.toList());
+            List<Double> xList = xFields.stream()
+                    .map(f -> f.getValue() != null ? f.getValue() : 0.0)
+                    .collect(Collectors.toList());
+            List<Double> yList = yFields.stream()
+                    .map(f -> f.getValue() != null ? f.getValue() : 0.0)
+                    .collect(Collectors.toList());
 
             if (xList.size() < 2) {
                 Notification.show("Нужно минимум 2 точки", 3000, Notification.Position.MIDDLE);
                 return;
             }
 
-            // Проверка уникальности и сортировки
-            List<Double> sortedX = new ArrayList<>(xList);
-            sortedX.sort(Double::compareTo);
-            if (!sortedX.equals(xList)) {
-                Notification.show("x должны быть строго возрастающими", 4000, Notification.Position.MIDDLE);
-                return;
-            }
-            if (new HashSet<>(xList).size() != xList.size()) {
-                Notification.show("x должны быть уникальными", 4000, Notification.Position.MIDDLE);
-                return;
+            // Проверка: x строго возрастает
+            for (int i = 0; i < xList.size() - 1; i++) {
+                if (xList.get(i) >= xList.get(i + 1)) {
+                    Notification.show("x должны быть строго возрастающими", 4000, Notification.Position.MIDDLE);
+                    return;
+                }
             }
 
             String login = (String) VaadinSession.getCurrent().getAttribute("login");
             int userId = getUserIdByLogin(login);
 
-            // Генерация имени (можно сделать редактируемым, но по ТЗ — не обязательно)
-            String functionName = "Функция от " + new java.util.Date();
-
-            // Создание функции
+            // === Создание функции через API ===
             MathFunctionsDTO funcDto = new MathFunctionsDTO();
             funcDto.setFunctionName(functionName);
             funcDto.setAmountOfDots(xList.size());
             funcDto.setLeftBorder(Collections.min(xList));
             funcDto.setRightBorder(Collections.max(xList));
             funcDto.setFunctionType("manual");
+            funcDto.setOwnerId(userId);
 
             String jsonFunc = mapper.writeValueAsString(funcDto);
             var funcResp = BasicAuthClient.sendPost("/math-functions/create/" + userId, jsonFunc);
@@ -205,7 +256,7 @@ public class CreateFunctionView extends VerticalLayout {
                 return;
             }
 
-            // Получить ID функции: запрос по имени
+            // Получаем ID функции
             var searchResp = BasicAuthClient.sendGet("/math-functions/get-by-function-name/" + functionName);
             if (searchResp.statusCode() != 200) {
                 Notification.show("Не удалось найти функцию", 4000, Notification.Position.MIDDLE);
@@ -218,7 +269,7 @@ public class CreateFunctionView extends VerticalLayout {
             }
             int functionId = found.get(0).getFunctionId();
 
-            // Создание точек
+            // === Отправка точек ===
             List<PointsDTO> points = IntStream.range(0, xList.size())
                     .mapToObj(i -> {
                         PointsDTO p = new PointsDTO();
@@ -249,14 +300,14 @@ public class CreateFunctionView extends VerticalLayout {
         }
     }
 
-    private void createFromSimpleFunction() {
+    private void createFromSimpleFunction(String userProvidedName) {
         try {
-            String funcName = simpleFunctionSelect.getValue();
+            String localizedFuncName = simpleFunctionSelect.getValue(); // ← "Квадратичная функция"
             Double left = leftBorderField.getValue();
             Double right = rightBorderField.getValue();
             Integer dots = amountOfDotsField.getValue();
 
-            if (funcName == null || funcName.isEmpty()) {
+            if (localizedFuncName == null || localizedFuncName.isEmpty()) {
                 Notification.show("Выберите функцию", 3000, Notification.Position.MIDDLE);
                 return;
             }
@@ -264,18 +315,24 @@ public class CreateFunctionView extends VerticalLayout {
                 Notification.show("Заполните все поля", 3000, Notification.Position.MIDDLE);
                 return;
             }
+            if (left >= right) {
+                Notification.show("Левая граница должна быть < правой", 3000, Notification.Position.MIDDLE);
+                return;
+            }
 
             String login = (String) VaadinSession.getCurrent().getAttribute("login");
             int userId = getUserIdByLogin(login);
 
-            MathFunctionsDTO funcDto = new MathFunctionsDTO();
-            funcDto.setFunctionName(funcName);
-            funcDto.setAmountOfDots(dots);
-            funcDto.setLeftBorder(left);
-            funcDto.setRightBorder(right);
-            funcDto.setFunctionType("simple");
+            MathFunctionsDTO dto = new MathFunctionsDTO();
+            dto.setFunctionName(userProvidedName);
+            dto.setAmountOfDots(dots);
+            dto.setLeftBorder(left);
+            dto.setRightBorder(right);
+            dto.setFunctionType("tabulated");
+            dto.setOwnerId(userId);
+//            dto.setLocalizedName(localizedFuncName); // ← КЛЮЧЕВОЕ ПОЛЕ!
 
-            String json = mapper.writeValueAsString(funcDto);
+            String json = new ObjectMapper().writeValueAsString(dto);
             var response = BasicAuthClient.sendPost("/math-functions/create/" + userId, json);
 
             if (response.statusCode() == 201) {
@@ -286,18 +343,57 @@ public class CreateFunctionView extends VerticalLayout {
                 Notification.show("Ошибка: " + error, 5000, Notification.Position.MIDDLE);
             }
 
+            //!!!
+
+            // Получаем ID функции
+            var searchResp = BasicAuthClient.sendGet("/math-functions/get-by-function-name/" + userProvidedName);
+            if (searchResp.statusCode() != 200) {
+                Notification.show("Не удалось найти функцию", 4000, Notification.Position.MIDDLE);
+                return;
+            }
+            List<MathFunctionsDTO> found = mapper.readValue(searchResp.body(), new TypeReference<>() {});
+            if (found.isEmpty()) {
+                Notification.show("Функция не найдена", 4000, Notification.Position.MIDDLE);
+                return;
+            }
+            int functionId = found.get(0).getFunctionId();
+
+            //Нужно создать ф-цию по типу выбранной
+            
+            String f_type = "";
+            
+            var response1 = BasicAuthClient.sendGet("/users/get/" + login);
+            if (response1.statusCode() == 200) {
+                UserDTO user = mapper.readValue(response1.body(), new TypeReference<>() {});
+                f_type = user.getFactoryType();
+            }
+
+            List<PointsDTO> points = SimpleFunctionRegistry.CreatePoints(localizedFuncName, left, right, dots,
+                    f_type, functionId);
+
+            Map<String, List<PointsDTO>> payload = new HashMap<>();
+            payload.put("points", points);
+            String pointsJson = mapper.writeValueAsString(payload);
+
+            var pointsResp = BasicAuthClient.sendPost("/points/create-points/" + functionId, pointsJson);
+
+            if (pointsResp.statusCode() == 201) {
+                Notification.show("Функция успешно создана!", 4000, Notification.Position.MIDDLE);
+                getUI().ifPresent(ui -> ui.navigate("my-functions"));
+            } else {
+                String error = BasicAuthClient.extractErrorMessage(pointsResp.body());
+                Notification.show("Ошибка точек: " + error, 5000, Notification.Position.MIDDLE);
+            }
+
         } catch (Exception e) {
             Notification.show("Ошибка: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
-            e.printStackTrace();
         }
     }
 
     private int getUserIdByLogin(String login) throws IOException, InterruptedException, URISyntaxException {
         var response = BasicAuthClient.sendGet("/users/get-id-by-login/" + login);
-        if (response.statusCode() == 200) {
-            return mapper.readValue(response.body(), Integer.class);
-        } else {
-            throw new RuntimeException("Не удалось получить ID пользователя");
-        }
+        return new ObjectMapper().readValue(response.body(), Integer.class);
     }
+
+    // createFromPoints() — оставьте как есть (с отправкой x/y)
 }

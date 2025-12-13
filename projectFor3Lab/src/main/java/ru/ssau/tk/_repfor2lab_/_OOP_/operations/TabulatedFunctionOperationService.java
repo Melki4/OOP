@@ -13,7 +13,7 @@ public class TabulatedFunctionOperationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TabulatedFunctionOperationService.class);
 
-    TabulatedFunctionOperationService(TabulatedFunctionFactory factory){
+    public TabulatedFunctionOperationService(TabulatedFunctionFactory factory){
         this.factory = factory;
     }
 
