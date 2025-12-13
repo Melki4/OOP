@@ -144,8 +144,16 @@ public class MyFunctionView extends VerticalLayout {
             content.add(new HorizontalLayout(xField, yField, addBtn));
         }
 
+        Button closeButton = new Button("Закрыть", e -> dialog.close());
+        content.add(new HorizontalLayout(closeButton));
+
         dialog.add(content);
         dialog.addDialogCloseActionListener(e -> loadFunctions());
+        dialog.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                loadFunctions();
+            }
+        });
         dialog.open();
 
         changePage(pointsGrid, cachedPoints, pageInfo, 0);
