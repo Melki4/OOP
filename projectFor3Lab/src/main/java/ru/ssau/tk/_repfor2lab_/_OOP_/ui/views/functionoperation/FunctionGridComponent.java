@@ -6,6 +6,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -68,7 +70,6 @@ public class FunctionGridComponent extends VerticalLayout {
                 return field;
             }).setHeader("Y").setResizable(true).setWidth("50%");
         } else {
-            addResultControlButtons(); // Добавляем кнопки для результата
             grid.addColumn(new NumberRenderer<>(Point::getY, "%.4f"))
                     .setHeader("Y")
                     .setResizable(true)
@@ -83,6 +84,8 @@ public class FunctionGridComponent extends VerticalLayout {
 
         if (isEditable) {
             addControlButtons();
+        } else {
+            addResultControlButtons();
         }
     }
 
@@ -92,6 +95,7 @@ public class FunctionGridComponent extends VerticalLayout {
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setSpacing(true);
         buttonLayout.setHeight("52px"); // Фиксированная высота
+        buttonLayout.setWrapMode(HorizontalLayout.WrapMode.WRAP);
 
         saveToDatabaseButton = new Button("Сохранить в базу");
         saveToDatabaseButton.addClickListener(e -> {
@@ -129,8 +133,9 @@ public class FunctionGridComponent extends VerticalLayout {
     private void addControlButtons() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidth("100%");
-        buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setSpacing(true);
+        buttonLayout.setWrapMode(HorizontalLayout.WrapMode.WRAP);
+        buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
         Button createFunctionButton = new Button("Создать функцию");
         createFunctionButton.addClickListener(e -> actionHandler.accept(panelNumber, "create"));
@@ -160,4 +165,6 @@ public class FunctionGridComponent extends VerticalLayout {
         dataProvider.getItems().addAll(points);
         dataProvider.refreshAll();
     }
+
+
 }
