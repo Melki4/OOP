@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.StreamResource;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
@@ -28,9 +28,10 @@ import com.vaadin.flow.component.textfield.TextField;
 
 import com.vaadin.flow.component.dialog.Dialog;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
@@ -349,8 +350,13 @@ public class FunctionOperationsView extends VerticalLayout {
         formatSelect.setValue("JSON");
         formatSelect.setWidth("150px");
 
+        VerticalLayout dialogLayout = new VerticalLayout();
+        dialogLayout.setSpacing(true);
+        dialogLayout.setPadding(true);
+        dialogLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+
         Button saveButton = new Button("Сохранить", e -> {
-            String fileName = fileNameField.getValue(); // getValue() работает корректно
+            String fileName = fileNameField.getValue();
             String format = formatSelect.getValue().toLowerCase();
 
             if (fileName == null || fileName.trim().isEmpty()) {
@@ -365,39 +371,38 @@ public class FunctionOperationsView extends VerticalLayout {
 
             try {
                 // Определяем директорию для сохранения
-                File directory = new File("src/main/resources/files");
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-
-                File file = new File(directory, fileName);
-
-                if ("json".equals(format)) {
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                    if ("json".equals(format)) {
                         FunctionsIO.serializeJson(writer, arrayFunction);
-                    }
-                } else if ("xml".equals(format)) {
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    } else {
                         FunctionsIO.serializeXml(writer, arrayFunction);
                     }
+                    writer.flush();
                 }
+                byte[] data = outputStream.toByteArray();
+                StreamResource resource = new StreamResource(fileName, () -> new ByteArrayInputStream(data));
+                resource.setContentType("json".equals(format) ? "application/json" : "application/xml");
+                resource.setCacheTime(0);
+
+                Anchor download = new Anchor(resource, "Скачать");
+                download.getElement().setAttribute("download", true);
+                download.getStyle().set("display", "none");
+                dialogLayout.add(download);
+                download.getElement().callJsFunction("click");
 
                 dialog.close();
-                Notification.show("Функция успешно сохранена в файл " + fileName,
+                Notification.show("Выберите место для сохранения файла " + fileName,
                         3000, Notification.Position.MIDDLE);
             } catch (Exception ex) {
                 Notification.show("Ошибка сохранения: " + ex.getMessage(), 5000, Notification.Position.MIDDLE);
-                ex.printStackTrace();
             }
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         Button cancelButton = new Button("Отмена", e -> dialog.close());
 
-        VerticalLayout dialogLayout = new VerticalLayout(fileNameField, formatSelect, saveButton, cancelButton);
-        dialogLayout.setSpacing(true);
-        dialogLayout.setPadding(true);
-        dialogLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        dialogLayout.add(fileNameField, formatSelect, saveButton, cancelButton);
 
         dialog.add(dialogLayout);
         dialog.setWidth("400px");

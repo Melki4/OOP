@@ -8,7 +8,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.UploadHandler;
 import com.vaadin.flow.server.VaadinSession;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
@@ -16,7 +17,10 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.io.FunctionsIO;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.utils.FunctionUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 public class FunctionFileUploadDialog {
@@ -35,37 +39,21 @@ public class FunctionFileUploadDialog {
 
         dialog.setHeaderTitle("Загрузить функцию из " + format.toUpperCase());
 
-        // Поле для ввода имени файла
-        TextField fileNameField = new TextField("Имя файла");
-        fileNameField.setPlaceholder("Введите имя файла");
-        fileNameField.setRequired(true);
-
-        // Кнопка загрузки
-        Button loadButton = new Button("Загрузить", e -> {
-            String fileName = fileNameField.getValue().trim();
-            if (fileName.isEmpty()) {
-                Notification.show("Введите имя файла", 3000, Notification.Position.MIDDLE);
-                return;
-            }
-            // Добавляем расширение, если его нет
-            if (!fileName.toLowerCase().endsWith("." + format.toLowerCase())) {
-                fileName += "." + format.toLowerCase();
-            }
-            loadFunctionFromFile(fileName);
-        });
-        loadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Upload upload = createUploadComponent();
 
         // Кнопка отмены
         Button cancelButton = new Button("Отмена", e -> dialog.close());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         // Кнопки управления
-        HorizontalLayout buttonLayout = new HorizontalLayout(loadButton, cancelButton);
+
+        HorizontalLayout buttonLayout = new HorizontalLayout(upload, cancelButton);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        buttonLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 
         // Собираем интерфейс диалога
         VerticalLayout dialogLayout = new VerticalLayout(
-                new Span("Введите имя файла для загрузки:"),
-                fileNameField,
+                new Span("Выберите файл для загрузки:"),
                 buttonLayout
         );
         dialogLayout.setSpacing(true);
@@ -76,22 +64,38 @@ public class FunctionFileUploadDialog {
         dialog.open();
     }
 
-    private void loadFunctionFromFile(String fileName) {
+    private Upload createUploadComponent() {
+        UploadHandler uploadHandler = UploadHandler.inMemory((metadata, data) -> {
+            String fileName = metadata.fileName();
+            String expectedExtension = "." + currentFormat.toLowerCase();
+            if (!fileName.toLowerCase().endsWith(expectedExtension)) {
+                Notification.show("Выберите файл в формате " + currentFormat.toUpperCase(), 4000, Notification.Position.MIDDLE);
+                return;
+            }
+
+            try {
+                handleUploadedFile(data, fileName);
+            } catch (Exception ex) {
+                Notification.show("Ошибка загрузки: " + ex.getMessage(), 5000, Notification.Position.MIDDLE);
+            }
+        });
+
+        Upload upload = new Upload(uploadHandler);
+        upload.setMaxFiles(1);
+        upload.setAcceptedFileTypes("json".equalsIgnoreCase(currentFormat) ? ".json" : ".xml");
+        return upload;
+    }
+
+    private void handleUploadedFile(InputStream inputStream, String fileName) {
+
         try {
             // Получаем фабрику пользователя
             String login = (String) VaadinSession.getCurrent().getAttribute("login");
             TabulatedFunctionFactory factory = FunctionUtils.getUserFunctionFactory(login);
 
-            // Читаем файл
-            InputStream inputStream = getClass().getResourceAsStream("/files/" + fileName);
-            if (inputStream == null) {
-                Notification.show("Файл " + fileName + " не найден", 5000, Notification.Position.MIDDLE);
-                return;
-            }
-
             TabulatedFunction loadedFunction = null;
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+           try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 if ("json".equals(currentFormat)) {
                     // Загрузка из JSON
                     ArrayTabulatedFunction arrayFunc = FunctionsIO.deserializeJson(reader);
