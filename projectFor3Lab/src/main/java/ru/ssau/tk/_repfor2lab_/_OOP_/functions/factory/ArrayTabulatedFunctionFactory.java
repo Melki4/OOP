@@ -12,4 +12,21 @@ public class ArrayTabulatedFunctionFactory implements TabulatedFunctionFactory{
         LOGGER.info("Создание массива из табулированных функций");
         return new ArrayTabulatedFunction(xValues, yValues);
     }
+
+    public ArrayTabulatedFunction create(Double[] xValues, Double[] yValues) {
+        LOGGER.info("Создание массива табулированных функций");
+
+        double[] primitiveDoublesX = new double[xValues.length];
+        double[] primitiveDoublesY = new double[yValues.length];
+
+        for (int i = 0; i < xValues.length; i++) {
+            primitiveDoublesX[i] = xValues[i]; // Автоматическое разворачивание
+        }
+
+        for (int i = 0; i < yValues.length; i++) {
+            primitiveDoublesY[i] = yValues[i]; // Автоматическое разворачивание
+        }
+
+        return new ArrayTabulatedFunction(primitiveDoublesX, primitiveDoublesY);
+    }
 }

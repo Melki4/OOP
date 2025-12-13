@@ -85,7 +85,6 @@ public class JdbcPointRepository implements PointRepository {
                 boof = new PointsDTO(resultSet.getDouble(2),
                         resultSet.getDouble(3),
                         resultSet.getInt(4));
-
                 result.add(boof);
             }
 
@@ -155,7 +154,7 @@ public class JdbcPointRepository implements PointRepository {
             while(resultSet.next()){
                 boof = new PointsDTO(resultSet.getDouble(2),
                         resultSet.getDouble(3),
-                        resultSet.getInt(4));
+                        resultSet.getInt(3));
 
                 result.add(boof);
             }
