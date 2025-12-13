@@ -1,12 +1,13 @@
 package ru.ssau.tk._repfor2lab_._OOP_.ui.views;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -22,12 +23,11 @@ import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Route(value = "my-functions", layout = MainLayout.class)
 @PageTitle("Мои функции | MathFunction App")
@@ -119,7 +119,7 @@ public class MyFunctionView extends VerticalLayout {
 
         List<PointsDTO> cachedPoints = new ArrayList<>(points.get());
 
-        Label pageInfo = new Label();
+        Span pageInfo = new Span();
         Grid<PointsDTO> pointsGrid = new Grid<>();
         pointsGrid.addColumn(PointsDTO::getXValue).setHeader("X");
         pointsGrid.addColumn(PointsDTO::getYValue).setHeader("Y");
@@ -151,7 +151,7 @@ public class MyFunctionView extends VerticalLayout {
         changePage(pointsGrid, cachedPoints, pageInfo, 0);
     }
 
-    private void changePage(Grid<PointsDTO> grid, List<PointsDTO> points, Label info, int delta) {
+    private void changePage(Grid<PointsDTO> grid, List<PointsDTO> points, Span info, int delta) {
         int currentPage = info.getText().isEmpty() ? 0 : Integer.parseInt(info.getText().split("/")[0]) - 1;
         int totalPages = Math.max(1, (int) Math.ceil(points.size() / (double) PAGE_SIZE));
         int newPage = Math.min(Math.max(0, currentPage + delta), totalPages - 1);
@@ -177,7 +177,7 @@ public class MyFunctionView extends VerticalLayout {
     }
 
     private void addPoint(MathFunctionsDTO func, Double xValue, Double yValue, List<PointsDTO> points,
-                          Grid<PointsDTO> grid, Label info) {
+                          Grid<PointsDTO> grid, Span info) {
         if (xValue == null || yValue == null) {
             Notification.show("Введите X и Y", 3000, Notification.Position.MIDDLE);
             return;
@@ -203,7 +203,7 @@ public class MyFunctionView extends VerticalLayout {
     }
 
     private void deletePoint(MathFunctionsDTO func, PointsDTO point, List<PointsDTO> points,
-                             Grid<PointsDTO> grid, Label info) {
+                             Grid<PointsDTO> grid, Span info) {
         try {
             List<PointsDTO> updated = new ArrayList<>(points);
             updated.removeIf(p -> p.getXValue().equals(point.getXValue()) && p.getYValue().equals(point.getYValue()));
