@@ -42,13 +42,22 @@ public class MyFunctionView extends VerticalLayout {
         addClassName("my-functions-view");
         setSizeFull();
 
+        grid.setWidthFull();
         grid.removeAllColumns();
-        grid.addColumn(MathFunctionsDTO::getFunctionName).setHeader("Имя");
-        grid.addColumn(MathFunctionsDTO::getAmountOfDots).setHeader("Точек");
-        grid.addColumn(MathFunctionsDTO::getLeftBorder).setHeader("Левая граница");
-        grid.addColumn(MathFunctionsDTO::getRightBorder).setHeader("Правая граница");
-        grid.addColumn(MathFunctionsDTO::getFunctionType).setHeader("Тип");
-        grid.addComponentColumn(this::createActions).setHeader("Действия");
+
+        var nameCol = grid.addColumn(MathFunctionsDTO::getFunctionName).setHeader("Имя");
+        var pointsCol = grid.addColumn(MathFunctionsDTO::getAmountOfDots).setHeader("Точек");
+        var leftCol = grid.addColumn(MathFunctionsDTO::getLeftBorder).setHeader("Левая граница");
+        var rightCol = grid.addColumn(MathFunctionsDTO::getRightBorder).setHeader("Правая граница");
+        var typeCol = grid.addColumn(MathFunctionsDTO::getFunctionType).setHeader("Тип");
+        var actionsCol = grid.addComponentColumn(this::createActions).setHeader("Действия");
+
+        nameCol.setFlexGrow(1).setAutoWidth(true);
+        pointsCol.setFlexGrow(0).setAutoWidth(true).setWidth("110px");
+        leftCol.setFlexGrow(0).setAutoWidth(true).setWidth("130px");
+        rightCol.setFlexGrow(0).setAutoWidth(true).setWidth("130px");
+        typeCol.setFlexGrow(0).setAutoWidth(true).setWidth("140px");
+        actionsCol.setFlexGrow(0).setAutoWidth(true).setWidth("370px");
 
         add(new H2("Мои функции"), refreshBtn, grid);
         loadFunctions();
@@ -59,7 +68,11 @@ public class MyFunctionView extends VerticalLayout {
         Button editBtn = new Button("Изменить", e -> editFunction(func));
         Button delBtn = new Button("Удалить", e -> deleteFunction(func));
 
-        return new HorizontalLayout(viewBtn, editBtn, delBtn);
+        HorizontalLayout actions = new HorizontalLayout(viewBtn, editBtn, delBtn);
+        actions.setSpacing(true);
+        actions.setPadding(false);
+        actions.setMargin(false);
+        return actions;
     }
 
     private void loadFunctions() {

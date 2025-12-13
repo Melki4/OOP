@@ -81,7 +81,7 @@ public class FunctionSelectionDialog {
 
     private void loadSelectedFunction(MathFunctionsDTO selectedFunction) {
         try {
-            var response = BasicAuthClient.sendGet("/points/get-points-by-function-id/" + selectedFunction.getFunctionId());
+            var response = BasicAuthClient.sendGet("/points/get-points-by-function-id-sorted/" + selectedFunction.getFunctionId());
             if (response.statusCode() == 200) {
                 List<PointsDTO> pointsDTOs = mapper.readValue(
                         response.body(),
