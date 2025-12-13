@@ -95,7 +95,7 @@ public class FunctionGridComponent extends VerticalLayout {
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setSpacing(true);
         buttonLayout.setHeight("52px"); // Фиксированная высота
-        buttonLayout.setWrapMode(HorizontalLayout.WrapMode.WRAP);
+        buttonLayout.getStyle().set("flex-wrap", "wrap");
 
         saveToDatabaseButton = new Button("Сохранить в базу");
         saveToDatabaseButton.addClickListener(e -> {
@@ -134,7 +134,7 @@ public class FunctionGridComponent extends VerticalLayout {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidth("100%");
         buttonLayout.setSpacing(true);
-        buttonLayout.setWrapMode(HorizontalLayout.WrapMode.WRAP);
+        buttonLayout.getStyle().set("flex-wrap", "wrap");
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
         Button createFunctionButton = new Button("Создать функцию");
@@ -165,6 +165,4 @@ public class FunctionGridComponent extends VerticalLayout {
         dataProvider.getItems().addAll(points);
         dataProvider.refreshAll();
     }
-
-
 }

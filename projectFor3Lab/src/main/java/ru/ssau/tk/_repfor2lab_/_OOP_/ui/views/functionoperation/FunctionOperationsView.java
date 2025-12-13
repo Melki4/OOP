@@ -250,9 +250,9 @@ public class FunctionOperationsView extends VerticalLayout {
                 }
                 // Сохраняем функцию
 
-                if (funcResp.statusCode() == 200) {
+                if (funcResp.statusCode() == 200 || funcResp.statusCode() == 201) {
                     // Получаем ID функции
-                    var searchResp = BasicAuthClient.sendGet("/math-functions/get-by-function-name/" + name.trim());
+                    var searchResp = BasicAuthClient.sendGet("/math-functions/get-by-function-name/" + name);
                     if (searchResp.statusCode() != 200) {
                         Notification.show("Не удалось найти функцию", 4000, Notification.Position.MIDDLE);
                         return;
