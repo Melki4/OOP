@@ -102,7 +102,7 @@ public final class FunctionsIO {
         return (TabulatedFunction) stream1.readObject();
     }
 
-    static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+    public static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
         LOGGER.trace("Попытка сериализовать в xml");
         XStream stream = new XStream();
         stream.allowTypesByWildcard(new String[]{"ru.ssau.tk.**"});
@@ -119,7 +119,7 @@ public final class FunctionsIO {
         return (ArrayTabulatedFunction) stream.fromXML(reader);
     }
 
-    static void serializeJson(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+    public static void serializeJson(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
         LOGGER.trace("Попытка сериализовать в json");
         ObjectMapper objectMapper = new ObjectMapper();
         writer.write(objectMapper.writeValueAsString(function));
