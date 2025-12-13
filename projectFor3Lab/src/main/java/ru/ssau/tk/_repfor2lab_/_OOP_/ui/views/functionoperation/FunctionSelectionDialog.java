@@ -47,6 +47,13 @@ public class FunctionSelectionDialog {
 
         dialog.add(grid);
         dialog.getFooter().add(footerLayout);
+
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (event.getValue() != null && selectionHandler != null) {
+                loadSelectedFunction(event.getValue());
+                dialog.close();
+            }
+        });
     }
 
     public void loadAvailableFunctions(String login) {
@@ -68,14 +75,7 @@ public class FunctionSelectionDialog {
 
     public void open(Consumer<TabulatedFunction> handler) {
         this.selectionHandler = handler;
-
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                loadSelectedFunction(event.getValue());
-                dialog.close();
-            }
-        });
-
+        grid.deselectAll();
         dialog.open();
     }
 
