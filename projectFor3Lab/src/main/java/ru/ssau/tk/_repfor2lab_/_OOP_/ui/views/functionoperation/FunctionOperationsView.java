@@ -8,6 +8,8 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
@@ -26,7 +28,6 @@ import com.vaadin.flow.component.textfield.TextField;
 
 import com.vaadin.flow.component.dialog.Dialog;
 
-import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -103,28 +104,28 @@ public class FunctionOperationsView extends VerticalLayout {
         // Три области для функций
         HorizontalLayout functionsLayout = new HorizontalLayout();
         functionsLayout.setWidth("100%");
-        functionsLayout.setHeight("600px");
+        functionsLayout.setHeight("520px");
         functionsLayout.setSpacing(true);
         functionsLayout.setPadding(true);
+        functionsLayout.setDefaultVerticalComponentAlignment(Alignment.START);
+        functionsLayout.setJustifyContentMode(JustifyContentMode.AROUND);
 
         // Создаем панели с оптимизированными размерами
         firstFunctionGrid = new FunctionGridComponent("Первая функция", true, 1, this::handlePanelAction);
         secondFunctionGrid = new FunctionGridComponent("Вторая функция", true, 2, this::handlePanelAction);
         resultGrid = new FunctionGridComponent("Результат", false, 3, this::handlePanelAction);
 
-        // Уменьшаем размер таблиц
-        firstFunctionGrid.setGridHeight("280px");
-        secondFunctionGrid.setGridHeight("280px");
-        resultGrid.setGridHeight("280px");
+        // Уменьшаем размер таблиц и делаем панели более компактными
+        firstFunctionGrid.setGridHeight("200px");
+        secondFunctionGrid.setGridHeight("200px");
+        resultGrid.setGridHeight("200px");
 
         // Уменьшаем высоту кнопок управления
-        firstFunctionGrid.setButtonLayoutHeight("60px");
-        secondFunctionGrid.setButtonLayoutHeight("60px");
+        firstFunctionGrid.setButtonLayoutHeight("52px");
+        secondFunctionGrid.setButtonLayoutHeight("52px");
 
         functionsLayout.add(firstFunctionGrid, secondFunctionGrid, resultGrid);
         functionsLayout.setFlexGrow(1, firstFunctionGrid, secondFunctionGrid, resultGrid);
-        functionsLayout.setMaxHeight("500px");
-
         add(functionsLayout);
     }
 

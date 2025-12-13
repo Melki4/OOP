@@ -33,7 +33,7 @@ public class FunctionGridComponent extends VerticalLayout {
 
         addClassName("function-panel");
         setWidth("100%");
-        setHeight("100%");
+        setMaxWidth("480px");
         setPadding(true);
         setSpacing(true);
         getStyle().set("border", "1px solid var(--lumo-contrast-20pct)")
@@ -43,7 +43,7 @@ public class FunctionGridComponent extends VerticalLayout {
 
         grid = new Grid<>(Point.class);
         grid.setWidth("100%");
-        grid.setHeight("350px");
+        grid.setHeight("200px");
         grid.setColumns();
 
         grid.addColumn(new NumberRenderer<>(Point::getX, "%.4f"))
@@ -65,7 +65,6 @@ public class FunctionGridComponent extends VerticalLayout {
                         Notification.show("Введите корректное число", 3000, Notification.Position.MIDDLE);
                     }
                 });
-                addControlButtons();
                 return field;
             }).setHeader("Y").setResizable(true).setWidth("50%");
         } else {
@@ -92,7 +91,7 @@ public class FunctionGridComponent extends VerticalLayout {
         buttonLayout.setWidth("100%");
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setSpacing(true);
-        buttonLayout.setHeight("60px"); // Фиксированная высота
+        buttonLayout.setHeight("52px"); // Фиксированная высота
 
         saveToDatabaseButton = new Button("Сохранить в базу");
         saveToDatabaseButton.addClickListener(e -> {
