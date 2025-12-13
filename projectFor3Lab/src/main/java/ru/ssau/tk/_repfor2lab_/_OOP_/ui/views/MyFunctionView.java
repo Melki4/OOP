@@ -87,6 +87,20 @@ public class MyFunctionView extends VerticalLayout {
     }
 
     private void deleteFunction(MathFunctionsDTO func) {
+        Dialog confirmDialog = new Dialog();
+        confirmDialog.setHeaderTitle("Удалить функцию?");
+        confirmDialog.add(new Span("Вы уверены, что хотите удалить \"" + func.getFunctionName() + "\"?"));
+
+        Button confirmBtn = new Button("Да", e -> {
+            confirmDialog.close();
+            performDelete(func);
+        });
+        Button cancelBtn = new Button("Нет", e -> confirmDialog.close());
+        confirmDialog.add(new HorizontalLayout(confirmBtn, cancelBtn));
+        confirmDialog.open();
+    }
+
+    private void performDelete(MathFunctionsDTO func) {
         try {
             var response = BasicAuthClient.sendDelete("/math-functions/delete-by-function-id/" + func.getFunctionId());
             if (response.statusCode() == 200) {

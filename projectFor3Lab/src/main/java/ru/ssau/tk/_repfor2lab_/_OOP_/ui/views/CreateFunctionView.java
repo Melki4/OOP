@@ -335,12 +335,10 @@ public class CreateFunctionView extends VerticalLayout {
             String json = new ObjectMapper().writeValueAsString(dto);
             var response = BasicAuthClient.sendPost("/math-functions/create/" + userId, json);
 
-            if (response.statusCode() == 201) {
-                Notification.show("Функция успешно создана!", 4000, Notification.Position.MIDDLE);
-                getUI().ifPresent(ui -> ui.navigate("my-functions"));
-            } else {
+            if (response.statusCode() != 201) {
                 String error = BasicAuthClient.extractErrorMessage(response.body());
                 Notification.show("Ошибка: " + error, 5000, Notification.Position.MIDDLE);
+                return;
             }
 
             //!!!
