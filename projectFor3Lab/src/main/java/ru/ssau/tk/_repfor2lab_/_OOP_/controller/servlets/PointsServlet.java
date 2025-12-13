@@ -176,8 +176,8 @@ public class PointsServlet extends HttpServlet {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
-                double xValue = jsonNode.get("x_value").asDouble();
-                double yValue = jsonNode.get("y_value").asDouble();
+                double xValue = jsonNode.get("xvalue").asDouble();
+                double yValue = jsonNode.get("yvalue").asDouble();
 
                 MathFunctionsDTO function = mathFunctionService.findMathFunctionByFunctionId(function_id);
 
@@ -222,14 +222,20 @@ public class PointsServlet extends HttpServlet {
                     return;
                 }
 
-                List<Point> points = mapper.readValue(
+                List<PointsDTO> points = mapper.readValue(
                         jsonNode.get("points").toString(),
                         new TypeReference<>(){}
                 );
 
+                List<Point> pointS = new java.util.ArrayList<>(List.of());
+
+                for (var el : points){
+                    pointS.add(new Point(el.getXValue(), el.getYValue()));
+                }
+
                 logger.info("POST запрос: создание " + points.size() + " точек для функции ID: " + function_id);
 
-                pointService.createManyPoints(points, function_id);
+                pointService.createManyPoints(pointS, function_id);
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 response.getWriter().write("{\"status\": \"Точки успешно созданы\"}");
                 logger.info("Успешно создано " + points.size() + " точек для функции ID: " + function_id);

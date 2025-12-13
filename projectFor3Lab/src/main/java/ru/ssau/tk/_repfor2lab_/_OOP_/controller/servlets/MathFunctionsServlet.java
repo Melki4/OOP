@@ -219,11 +219,11 @@ public class MathFunctionsServlet extends HttpServlet {
                 String requestBody = request.getReader().lines().reduce("", String::concat);
                 var jsonNode = mapper.readTree(requestBody);
 
-                String functionName = jsonNode.get("function_name").asText();
-                int amountOfDots = jsonNode.get("amount_of_dots").asInt();
-                double leftBorder = jsonNode.get("left_border").asDouble();
-                double rightBorder = jsonNode.get("right_border").asDouble();
-                String functionType = jsonNode.get("function_type").asText();
+                String functionName = jsonNode.get("functionName").asText();
+                int amountOfDots = jsonNode.get("amountOfDots").asInt();
+                double leftBorder = jsonNode.get("leftBorder").asDouble();
+                double rightBorder = jsonNode.get("rightBorder").asDouble();
+                String functionType = jsonNode.get("functionType").asText();
 
                 if(!ownerId.equals(currentUser.getUserId())) {
                     logger.severe("Попытка создания функции для другого пользователя");
