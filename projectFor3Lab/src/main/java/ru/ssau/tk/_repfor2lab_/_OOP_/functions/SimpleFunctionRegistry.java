@@ -38,8 +38,17 @@ public class SimpleFunctionRegistry {
                 .toList();
     }
 
-    public static List<PointsDTO> CreatePoints(String localizedName, double left, double right, int amount, String type, int functionId) {
-        MathFunction mathFunction = REGISTRY.get(localizedName);
+    public static List<PointsDTO> CreatePoints(String localizedName, double left, double right, int amount, String type, int functionId, Double constantValue) {
+        MathFunction mathFunction;
+
+        if ("Константная функция".equals(localizedName)) {
+            if (constantValue == null) {
+                throw new IllegalArgumentException("Не указано значение константы");
+            }
+            mathFunction = new ConstantFunction(constantValue);
+        } else {
+            mathFunction = REGISTRY.get(localizedName);
+        }
 
         List<PointsDTO> pointsDTOS = new java.util.ArrayList<>(List.of());
 

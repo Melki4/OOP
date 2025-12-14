@@ -13,6 +13,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.server.VaadinSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -54,6 +55,10 @@ public class CreateFunctionView extends VerticalLayout {
     private String selectedMode = "points";
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private Dialog constantDialog;
+    private NumberField constantValueField;
+    private Double constantValue;
+
     public CreateFunctionView() {
         addClassName("create-function-view");
         setSpacing(true);
@@ -73,7 +78,7 @@ public class CreateFunctionView extends VerticalLayout {
             updateForm();
         });
 
-        Button createButton = new Button("Создать функцию", this::handleCreate);
+        Button createButton = new Button("Создать функцию", e -> handleCreate());
         Button backButton = new Button("Назад", e -> getUI().ifPresent(ui -> ui.navigate("main")));
 
         add(new H2("Создание табулированной функции"));
@@ -87,6 +92,7 @@ public class CreateFunctionView extends VerticalLayout {
         formContainer.removeAll();
         xFields.clear();
         yFields.clear();
+        constantValue = null;
 
         // === Имя функции — обязательно для обоих способов ===
         functionNameField = new TextField("Имя функции");
@@ -121,6 +127,11 @@ public class CreateFunctionView extends VerticalLayout {
             // === Способ 2: простая функция ===
             simpleFunctionSelect = new ComboBox<>("Простая функция");
             loadSimpleFunctions();
+            simpleFunctionSelect.addValueChangeListener(e -> {
+                if ("Константная функция".equals(e.getValue())) {
+                    openConstantDialog();
+                }
+            });
 
             leftBorderField = new NumberField("Левая граница");
             rightBorderField = new NumberField("Правая граница");
@@ -191,8 +202,52 @@ public class CreateFunctionView extends VerticalLayout {
         }
     }
 
+    private void openConstantDialog() {
+        if (constantDialog == null) {
+            constantDialog = new Dialog();
+            constantDialog.setCloseOnOutsideClick(false);
+            constantDialog.setHeaderTitle("Константная функция");
+
+            constantValueField = new NumberField("Значение константы");
+            constantValueField.setPlaceholder("Введите значение");
+            constantValueField.setWidth("240px");
+
+            VerticalLayout content = new VerticalLayout(constantValueField);
+            content.setSpacing(true);
+            content.setPadding(false);
+            content.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+
+            Button createBtn = new Button("Создать", e -> {
+                Double value = constantValueField.getValue();
+                if (value == null) {
+                    Notification.show("Введите значение константы", 3000, Notification.Position.MIDDLE);
+                    return;
+                }
+                constantValue = value;
+                constantDialog.close();
+                handleCreate();
+            });
+
+            Button backBtn = new Button("Назад", e -> constantDialog.close());
+
+            HorizontalLayout actions = new HorizontalLayout(backBtn, createBtn);
+            actions.setJustifyContentMode(JustifyContentMode.CENTER);
+            actions.setWidthFull();
+
+            content.add(actions);
+            constantDialog.add(content);
+        }
+
+        if (constantValue != null) {
+            constantValueField.setValue(constantValue);
+        } else {
+            constantValueField.clear();
+        }
+
+        constantDialog.open();
+    }
+
     private void autoFillPoints() {
-        // (реализация как в предыдущей версии)
         Double x0 = xFields.get(0).getValue();
         Double y0 = yFields.get(0).getValue();
         Double xN = xFields.get(xFields.size() - 1).getValue();
@@ -229,6 +284,10 @@ public class CreateFunctionView extends VerticalLayout {
                 List<String> names = functions.stream()
                         .map(SimpleFunctionsDTO::getLocalName)
                         .collect(Collectors.toList());
+                if (!names.contains("Константная функция")) {
+                    names.add("Константная функция");
+                }
+                names = names.stream().sorted().toList();
                 simpleFunctionSelect.setItems(names);
             }
         } catch (Exception e) {
@@ -236,7 +295,7 @@ public class CreateFunctionView extends VerticalLayout {
         }
     }
 
-    private void handleCreate(ClickEvent<Button> event) {
+    private void handleCreate() {
         String userProvidedName = functionNameField.getValue();
         if (userProvidedName == null || userProvidedName.trim().isEmpty()) {
             Notification.show("Укажите имя функции", 3000, Notification.Position.MIDDLE);
@@ -369,6 +428,11 @@ public class CreateFunctionView extends VerticalLayout {
                 Notification.show("Левая граница должна быть < правой", 3000, Notification.Position.MIDDLE);
                 return;
             }
+            if ("Константная функция".equals(localizedFuncName) && constantValue == null) {
+                Notification.show("Укажите значение константы", 3000, Notification.Position.MIDDLE);
+                openConstantDialog();
+                return;
+            }
 
             String login = (String) VaadinSession.getCurrent().getAttribute("login");
             int userId = getUserIdByLogin(login);
@@ -380,7 +444,6 @@ public class CreateFunctionView extends VerticalLayout {
             dto.setRightBorder(right);
             dto.setFunctionType("tabulated");
             dto.setOwnerId(userId);
-//            dto.setLocalizedName(localizedFuncName); // ← КЛЮЧЕВОЕ ПОЛЕ!
 
             String json = new ObjectMapper().writeValueAsString(dto);
             var response = BasicAuthClient.sendPost("/math-functions/create/" + userId, json);
@@ -417,7 +480,7 @@ public class CreateFunctionView extends VerticalLayout {
             }
 
             List<PointsDTO> points = SimpleFunctionRegistry.CreatePoints(localizedFuncName, left, right, dots,
-                    f_type, functionId);
+                    f_type, functionId, constantValue);
 
             Map<String, List<PointsDTO>> payload = new HashMap<>();
             payload.put("points", points);
@@ -442,6 +505,4 @@ public class CreateFunctionView extends VerticalLayout {
         var response = BasicAuthClient.sendGet("/users/get-id-by-login/" + login);
         return new ObjectMapper().readValue(response.body(), Integer.class);
     }
-
-    // createFromPoints() — оставьте как есть (с отправкой x/y)
 }
