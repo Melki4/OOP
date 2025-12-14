@@ -70,7 +70,7 @@ public class FunctionVisualizationView extends VerticalLayout {
         content.setSizeFull();
         content.setSpacing(true);
 
-        functionGrid = new FunctionGridComponent("Точки функции", true, 1, this::handlePanelAction);
+        functionGrid = new FunctionGridComponent("Точки функции", true, 1, this::handlePanelAction, false);
         functionGrid.setPointHandlers(this::handlePointInsert, this::handlePointDelete);
         functionGrid.setUpdatePointHandler(this::handlePointUpdate);
         functionGrid.setWidth("40%");
@@ -125,6 +125,7 @@ public class FunctionVisualizationView extends VerticalLayout {
         applyLayout.setDefaultVerticalComponentAlignment(Alignment.END);
         applyLayout.setSpacing(true);
         applyLayout.setWidthFull();
+        applyLayout.getStyle().set("margin-bottom", "16px");
 
         xInputField.setWidth("200px");
 

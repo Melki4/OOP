@@ -34,11 +34,18 @@ public class FunctionGridComponent extends VerticalLayout {
     private Button saveToFileButton;
     private NumberField insertXField;
     private NumberField insertYField;
+    private final boolean showActionButtons;
 
     public FunctionGridComponent(String title, boolean isEditable, int panelNumber, BiConsumer<Integer, String> actionHandler) {
+        this(title, isEditable, panelNumber, actionHandler, true);
+    }
+
+    public FunctionGridComponent(String title, boolean isEditable, int panelNumber, BiConsumer<Integer, String> actionHandler,
+                                 boolean showActionButtons) {
         this.isEditable = isEditable;
         this.panelNumber = panelNumber;
         this.actionHandler = actionHandler;
+        this.showActionButtons = showActionButtons;
 
         addClassName("function-panel");
         setWidth("100%");
@@ -109,7 +116,9 @@ public class FunctionGridComponent extends VerticalLayout {
 
         if (isEditable) {
             addInsertControls();
-            addControlButtons();
+            if (showActionButtons) {
+                addControlButtons();
+            }
         } else {
             addResultControlButtons();
         }

@@ -19,14 +19,12 @@ public class MainView extends VerticalLayout {
         H2 title = new H2("Добро пожаловать!");
         Button createBtn = new Button("Создать функцию");
         Button myFuncBtn = new Button("Мои функции");
-        Button diffBtn = new Button("Дифференцирование");
         Button settingsBtn = new Button("Настройки");
 
         createBtn.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("create-function")));
         myFuncBtn.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("my-functions")));
-        diffBtn.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("function-differentiation")));
         settingsBtn.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("settings")));
 
-        add(title, createBtn, myFuncBtn, diffBtn, settingsBtn);
+        add(title, createBtn, myFuncBtn, settingsBtn);
     }
 }

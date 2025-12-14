@@ -4,6 +4,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
@@ -28,9 +30,15 @@ public class SettingsView extends VerticalLayout {
     public SettingsView() {
         addClassName("settings-view");
         setPadding(true);
+        setJustifyContentMode(JustifyContentMode.CENTER);
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         factorySelect.setItems("array", "list");
         factorySelect.setPlaceholder("Выберите");
+        factorySelect.setWidth("320px");
+        factorySelect.getStyle().set("text-align", "center");
+
+        saveBtn.getStyle().set("margin-top", "8px");
 
         add(new H2("Настройки"), factorySelect, saveBtn);
         loadSettings();

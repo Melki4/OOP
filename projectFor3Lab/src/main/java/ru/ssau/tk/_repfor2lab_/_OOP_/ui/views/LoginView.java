@@ -5,8 +5,13 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -30,6 +35,7 @@ public class LoginView extends VerticalLayout {
     private final TextField loginField = new TextField("Логин");
     private final PasswordField passwordField = new PasswordField("Пароль");
     private final Button loginButton = new Button("Войти");
+    private final Button registerButton = new Button("Регистрация");
 
     public LoginView() {
         // Настройки основного контейнера
@@ -67,6 +73,10 @@ public class LoginView extends VerticalLayout {
         loginButton.setWidth("100%");
         loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
+        registerButton.setWidth("100%");
+        registerButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("register")));
+        registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
         FormLayout form = new FormLayout();
         form.add(loginField, passwordField);
         form.setWidth("100%");
@@ -76,7 +86,7 @@ public class LoginView extends VerticalLayout {
         );
 
         // Вертикальный контейнер для всех элементов формы
-        VerticalLayout formContent = new VerticalLayout(title, form, loginButton);
+        VerticalLayout formContent = new VerticalLayout(title, form, loginButton, registerButton);
         formContent.setSpacing(true);
         formContent.setPadding(false);
         formContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
@@ -125,7 +135,7 @@ public class LoginView extends VerticalLayout {
                 VaadinSession.getCurrent().setAttribute("password", password);
 
                 Notification.show("Добро пожаловать, " + login + "!", 3000, Notification.Position.MIDDLE);
-                getUI().ifPresent(ui -> ui.navigate("main"));
+                showFundingNotice(() -> getUI().ifPresent(ui -> ui.navigate("main")));
             } else if (response.statusCode() == 401) {
                 Notification.show("Неверный логин или пароль", 3000, Notification.Position.MIDDLE);
             } else {
@@ -137,5 +147,32 @@ public class LoginView extends VerticalLayout {
         } catch (IOException | InterruptedException e) {
             Notification.show("Ошибка подключения", 5000, Notification.Position.MIDDLE);
         }
+    }
+
+    private void showFundingNotice(Runnable onConfirm) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Важно!");
+        dialog.setCloseOnEsc(false);
+        dialog.setCloseOnOutsideClick(false);
+
+        Paragraph message = new Paragraph("Ваши данные будут использованы для привлечения средств в этот проект.");
+        message.getStyle().set("max-width", "420px");
+
+        Button noButton = new Button("Нет", e -> dialog.close());
+        Button okButton = new Button("Ок", e -> {
+            dialog.close();
+            if (onConfirm != null) {
+                onConfirm.run();
+            }
+        });
+        okButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        HorizontalLayout actions = new HorizontalLayout(noButton, okButton);
+        actions.setJustifyContentMode(JustifyContentMode.END);
+        actions.setWidthFull();
+
+        dialog.add(message);
+        dialog.getFooter().add(actions);
+        dialog.open();
     }
 }
