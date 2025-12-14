@@ -1,5 +1,7 @@
 package ru.ssau.tk._repfor2lab_._OOP_.ui.views;
 
+import com.vaadin.flow.component.HasSize;
+import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
@@ -20,22 +22,19 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.Removable;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.io.FunctionsIO;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.MainLayout;
-import ru.ssau.tk._repfor2lab_._OOP_.ui.utils.FunctionUtils;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionCreationDialog;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionFileUploadDialog;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionGridComponent;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionSelectionDialog;
 
-import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import elemental.json.Json;
+import elemental.json.JsonArray;
+import elemental.json.JsonObject;
 
 @Route(value = "function-visualization", layout = MainLayout.class)
 @PageTitle("Графики функций | MathFunction App")
@@ -48,10 +47,10 @@ public class FunctionVisualizationView extends VerticalLayout {
 
     private TabulatedFunction currentFunction;
     private final Div chartContainer;
-    private final Canvas chartCanvas;
+    private final CanvasElement chartCanvas;
 
-    private final NumberField xInputField;
-    private final Span applyResult;
+    private final NumberField xInputField = new NumberField("x для вычисления");
+    private final Span applyResult = new Span("Значение: —");
 
     public FunctionVisualizationView() {
         String login = (String) VaadinSession.getCurrent().getAttribute("login");
@@ -85,7 +84,7 @@ public class FunctionVisualizationView extends VerticalLayout {
         chartContainer = new Div();
         chartContainer.setWidth("100%");
         chartContainer.setHeight("420px");
-        chartCanvas = new Canvas();
+        chartCanvas = new CanvasElement();
         chartCanvas.setWidthFull();
         chartCanvas.setHeight("420px");
         chartContainer.add(chartCanvas);
@@ -127,13 +126,11 @@ public class FunctionVisualizationView extends VerticalLayout {
         applyLayout.setSpacing(true);
         applyLayout.setWidthFull();
 
-        xInputField = new NumberField("x для вычисления");
         xInputField.setWidth("200px");
 
         Button applyButton = new Button("Вычислить f(x)", e -> calculateApply());
         applyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        applyResult = new Span("Значение: —");
 
         applyLayout.add(xInputField, applyButton, applyResult);
         applyLayout.expand(applyResult);
@@ -253,7 +250,7 @@ public class FunctionVisualizationView extends VerticalLayout {
             return;
         }
 
-        List<Map<String, Double>> points = buildPointMap();
+        JsonArray points = buildPointMap();
         ui.getPage().executeJs(
                 "(function(canvas, points){" +
                         " if (!canvas) return;" +
@@ -283,18 +280,19 @@ public class FunctionVisualizationView extends VerticalLayout {
                         " });" +
                         "})(arguments[0], arguments[1]);",
                 chartCanvas.getElement(), points);
+
     }
 
-    private List<Map<String, Double>> buildPointMap() {
-        List<Map<String, Double>> points = new ArrayList<>();
+    private JsonArray buildPointMap() {
+        JsonArray points = Json.createArray();
         if (currentFunction == null) {
             return points;
         }
         for (int i = 0; i < currentFunction.getCount(); i++) {
-            Map<String, Double> point = new HashMap<>();
+            JsonObject point = Json.createObject();
             point.put("x", currentFunction.getX(i));
             point.put("y", currentFunction.getY(i));
-            points.add(point);
+            points.set(i, point);
         }
         return points;
     }
@@ -407,6 +405,13 @@ public class FunctionVisualizationView extends VerticalLayout {
             applyResult.setText(String.format("Значение: f(%.3f) = %.6f", x, y));
         } catch (Exception ex) {
             Notification.show("Ошибка вычисления: " + ex.getMessage(), 4000, Notification.Position.MIDDLE);
+        }
+    }
+
+    @Tag("canvas")
+    private static class CanvasElement extends com.vaadin.flow.component.Component implements HasSize {
+        CanvasElement() {
+            getElement().getStyle().set("display", "block");
         }
     }
 }
