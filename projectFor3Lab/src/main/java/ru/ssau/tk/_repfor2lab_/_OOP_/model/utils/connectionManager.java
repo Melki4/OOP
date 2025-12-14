@@ -22,9 +22,12 @@ public class connectionManager {
     }
 
     public static Connection open(){
-        String url = "jdbc:postgresql://localhost:5432/postgres";
-        String user = "postgres";
-        String password = "4sfl8gpassword";
+        String host = getEnvOrDefault("DB_HOST", "localhost");
+        String port = getEnvOrDefault("DB_PORT", "5432");
+        String database = getEnvOrDefault("DB_NAME", "postgres");
+        String user = getEnvOrDefault("DB_USER", "postgres");
+        String password = getEnvOrDefault("DB_PASSWORD", "4sfl8gpassword");
+        String url = String.format("jdbc:postgresql://%s:%s/%s", host, port, database);
 
         try {
             LOGGER.info("Подключаемся к: {}", url);
@@ -38,5 +41,13 @@ public class connectionManager {
             LOGGER.error("Ошибка при подключении к бд: {}", e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getEnvOrDefault(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+        return value;
     }
 }
