@@ -121,20 +121,35 @@
             <version>24.9.6</version>
         </dependency>
 
-        <!-- Визуализация табулированных функций -->
-        <dependency>
-            <groupId>com.github.appreciated</groupId>
-            <artifactId>apexcharts</artifactId>
-            <version>24.0.0</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-javax -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-fileupload2-javax</artifactId>
             <version>2.0.0-M4</version>
         </dependency>
+
+        <!-- Визуализация табулированных функций -->
+        <dependency>
+            <groupId>com.github.appreciated</groupId>
+            <artifactId>apexcharts</artifactId>
+            <version>24.0.0</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <!-- Ensure artifacts such as com.github.appreciated:apexcharts resolve even if a previous lookup was cached as a miss -->
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <finalName>projectFor3Lab</finalName>
