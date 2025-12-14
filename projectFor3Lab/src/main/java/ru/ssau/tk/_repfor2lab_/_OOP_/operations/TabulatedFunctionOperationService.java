@@ -48,6 +48,9 @@ public class TabulatedFunctionOperationService {
         if (a.getCount()!=b.getCount()) {
             LOGGER.warn("Разное кол-во элементов в функциях");
             throw new InconsistentFunctionsException("Разное кол-во элементов в функциях");
+        } else if (a.leftBound()!= b.leftBound() || a.rightBound() != b.rightBound()){
+            LOGGER.warn("Разные элементы икс в массивах");
+            throw new InconsistentFunctionsException("Разные элементы икс в массивах");
         }
 
         Point[] aArray = asPoints(a);
@@ -57,10 +60,6 @@ public class TabulatedFunctionOperationService {
         double[] yValues = new double[aArray.length];
 
         for (int i=0; i< aArray.length; ++i){
-            if (aArray[i].x!=bArray[i].x){
-                LOGGER.warn("Разные элементы икс в массивах");
-                throw new InconsistentFunctionsException("Разные элементы икс в массивах");
-            }
             xValues[i] = aArray[i].x;
             yValues[i] = operation.apply(aArray[i].y, bArray[i].y);
         }

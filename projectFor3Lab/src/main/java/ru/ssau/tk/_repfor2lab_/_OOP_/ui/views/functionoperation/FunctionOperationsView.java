@@ -16,8 +16,7 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.*;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.io.FunctionsIO;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.MainLayout;
@@ -106,7 +105,7 @@ public class FunctionOperationsView extends VerticalLayout {
         // Три области для функций
         HorizontalLayout functionsLayout = new HorizontalLayout();
         functionsLayout.setWidth("100%");
-        functionsLayout.setHeight("520px");
+        functionsLayout.setHeight("720px");
         functionsLayout.setSpacing(true);
         functionsLayout.setPadding(true);
         functionsLayout.setDefaultVerticalComponentAlignment(Alignment.START);
@@ -117,10 +116,13 @@ public class FunctionOperationsView extends VerticalLayout {
         secondFunctionGrid = new FunctionGridComponent("Вторая функция", true, 2, this::handlePanelAction);
         resultGrid = new FunctionGridComponent("Результат", false, 3, this::handlePanelAction);
 
+        firstFunctionGrid.setPointHandlers(this::handlePointInsert, this::handlePointDelete);
+        secondFunctionGrid.setPointHandlers(this::handlePointInsert, this::handlePointDelete);
+
         // Уменьшаем размер таблиц и делаем панели более компактными
-        firstFunctionGrid.setGridHeight("200px");
-        secondFunctionGrid.setGridHeight("200px");
-        resultGrid.setGridHeight("200px");
+        firstFunctionGrid.setGridHeight("420px");
+        secondFunctionGrid.setGridHeight("420px");
+        resultGrid.setGridHeight("420px");
 
         // Уменьшаем высоту кнопок управления
         firstFunctionGrid.setButtonLayoutHeight("52px");
@@ -153,6 +155,101 @@ public class FunctionOperationsView extends VerticalLayout {
             case "saveToFile":
                 saveResultToFile();
                 break;
+        }
+    }
+
+    private void handlePointInsert(int panelNumber, Point newPoint) {
+        if (panelNumber == 3) {
+            return;
+        }
+
+        TabulatedFunction targetFunction = getFunctionByPanel(panelNumber);
+
+        if (targetFunction == null) {
+            Notification.show("Сначала выберите или создайте функцию", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
+        try {
+            TabulatedFunction editableFunction = ensureEditableFunction(targetFunction, panelNumber);
+
+            if (editableFunction.indexOfX(newPoint.getX()) != -1) {
+                throw new IllegalArgumentException("Точка с таким x уже существует");
+            }
+
+            if (editableFunction instanceof Insertable) {
+                ((Insertable) editableFunction).insert(newPoint.getX(), newPoint.getY());
+                setFunctionForPanel(editableFunction, panelNumber);
+            } else {
+                Notification.show("Эта функция не поддерживает добавление точек", 4000, Notification.Position.MIDDLE);
+            }
+        } catch (IllegalArgumentException e) {
+            Notification.show(e.getMessage(), 4000, Notification.Position.MIDDLE);
+        } catch (Exception e) {
+            Notification.show("Ошибка при добавлении точки: " + e.getMessage(), 4000, Notification.Position.MIDDLE);
+        }
+    }
+
+    private void handlePointDelete(int panelNumber, Double xValue) {
+        if (panelNumber == 3) {
+            return;
+        }
+
+        TabulatedFunction targetFunction = getFunctionByPanel(panelNumber);
+
+        if (targetFunction == null) {
+            Notification.show("Сначала выберите или создайте функцию", 3000, Notification.Position.MIDDLE);
+            return;
+        }
+
+        try {
+            TabulatedFunction editableFunction = ensureEditableFunction(targetFunction, panelNumber);
+            int index = editableFunction.indexOfX(xValue);
+
+            if (index == -1) {
+                Notification.show("Точка не найдена", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+
+            if (editableFunction instanceof Removable) {
+                ((Removable) editableFunction).remove(index);
+                setFunctionForPanel(editableFunction, panelNumber);
+            } else {
+                Notification.show("Эта функция не поддерживает удаление точек", 4000, Notification.Position.MIDDLE);
+            }
+        } catch (Exception e) {
+            Notification.show("Ошибка при удалении точки: " + e.getMessage(), 4000, Notification.Position.MIDDLE);
+        }
+    }
+
+    private TabulatedFunction ensureEditableFunction(TabulatedFunction function, int panelNumber) {
+        if (function instanceof Insertable && function instanceof Removable) {
+            return function;
+        }
+
+        double[] xValues = new double[function.getCount()];
+        double[] yValues = new double[function.getCount()];
+
+        for (int i = 0; i < function.getCount(); i++) {
+            xValues[i] = function.getX(i);
+            yValues[i] = function.getY(i);
+        }
+
+        TabulatedFunction editableCopy = new ArrayTabulatedFunction(xValues, yValues);
+        setFunctionForPanel(editableCopy, panelNumber);
+        return editableCopy;
+    }
+
+    private TabulatedFunction getFunctionByPanel(int panelNumber) {
+        switch (panelNumber) {
+            case 1:
+                return firstFunction;
+            case 2:
+                return secondFunction;
+            case 3:
+                return resultFunction;
+            default:
+                return null;
         }
     }
 
@@ -385,24 +482,31 @@ public class FunctionOperationsView extends VerticalLayout {
 
                 byte[] data = outputStream.toByteArray();
                 String finalFileName = fileName;
-                DownloadHandler handler = downloadEvent -> {
-                    downloadEvent.setFileName(finalFileName);
-                    downloadEvent.setContentType("json".equals(format)
-                            ? "application/json"
-                            : "application/xml");
-                    try (var os = downloadEvent.getOutputStream()) {
-                        os.write(data);
-                    }
-                };
 
-                Anchor download = new Anchor(handler, "Скачать");
-                download.getElement().setAttribute("download", true);
-                download.getStyle().set("display", "none");
-                dialogLayout.add(download);
-                download.getElement().callJsFunction("click");
+                String contentType = "json".equals(format)
+                        ? "application/json"
+                        : "application/xml";
+
+                String base64Data = Base64.getEncoder().encodeToString(data);
+                String safeFileName = finalFileName.replace("\"", "");
+
+                getUI().ifPresent(ui -> ui.getPage().executeJs(
+                        "const data = atob($0);" +
+                                "const len = data.length;" +
+                                "const bytes = new Uint8Array(len);" +
+                                "for (let i = 0; i < len; i++) { bytes[i] = data.charCodeAt(i); }" +
+                                "const blob = new Blob([bytes], { type: $1 });" +
+                                "const url = URL.createObjectURL(blob);" +
+                                "const a = document.createElement('a');" +
+                                "a.style.display = 'none';" +
+                                "a.href = url;" +
+                                "a.download = $2;" +
+                                "document.body.appendChild(a);" +
+                                "a.click();" +
+                                "setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);",
+                        base64Data, contentType, safeFileName));
 
                 dialog.close();
-
 
                 Notification.show("Выберите место для сохранения файла " + fileName,
                         3000, Notification.Position.MIDDLE);

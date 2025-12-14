@@ -2,6 +2,7 @@ package ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.NumberRenderer;
@@ -24,9 +26,13 @@ public class FunctionGridComponent extends VerticalLayout {
     private final boolean isEditable;
     private final int panelNumber;
     private final BiConsumer<Integer, String> actionHandler;
+    private BiConsumer<Integer, Point> addPointHandler;
+    private BiConsumer<Integer, Double> deletePointHandler;
 
     private Button saveToDatabaseButton;
     private Button saveToFileButton;
+    private NumberField insertXField;
+    private NumberField insertYField;
 
     public FunctionGridComponent(String title, boolean isEditable, int panelNumber, BiConsumer<Integer, String> actionHandler) {
         this.isEditable = isEditable;
@@ -35,7 +41,7 @@ public class FunctionGridComponent extends VerticalLayout {
 
         addClassName("function-panel");
         setWidth("100%");
-        setMaxWidth("480px");
+        setMaxWidth("520px");
         setPadding(true);
         setSpacing(true);
         getStyle().set("border", "1px solid var(--lumo-contrast-20pct)")
@@ -45,20 +51,21 @@ public class FunctionGridComponent extends VerticalLayout {
 
         grid = new Grid<>(Point.class);
         grid.setWidth("100%");
-        grid.setHeight("200px");
+        grid.setHeight("360px");
         grid.setColumns();
 
         grid.addColumn(new NumberRenderer<>(Point::getX, "%.4f"))
                 .setHeader("X")
                 .setResizable(true)
                 .setSortable(true)
-                .setWidth("50%");
+                .setWidth("120px")
+                .setFlexGrow(1);
 
         if (isEditable) {
             grid.addComponentColumn(point -> {
                 TextField field = new TextField();
                 field.setValue(String.format("%.4f", point.getY()));
-                field.setWidth("100%");
+                field.setWidth("120px");
                 field.addValueChangeListener(e -> {
                     try {
                         double newY = Double.parseDouble(e.getValue());
@@ -68,13 +75,35 @@ public class FunctionGridComponent extends VerticalLayout {
                     }
                 });
                 return field;
-            }).setHeader("Y").setResizable(true).setWidth("50%");
+            }).setHeader("Y").setResizable(true).setWidth("120px").setFlexGrow(1);
+
+            grid.addComponentColumn(point -> {
+                Button deleteButton = new Button("Удалить", event -> {
+                    if (deletePointHandler != null) {
+                        deletePointHandler.accept(panelNumber, point.getX());
+                    }
+                });
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY_INLINE);
+                return deleteButton;
+            }).setHeader("Действие").setWidth("110px").setFlexGrow(0);
+
+            grid.addComponentColumn(point -> {
+                Button deleteButton = new Button("Удалить", event -> {
+                    if (deletePointHandler != null) {
+                        deletePointHandler.accept(panelNumber, point.getX());
+                    }
+                });
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY_INLINE);
+                return deleteButton;
+            }).setHeader("Действие").setWidth("120px").setFlexGrow(0);
+
         } else {
             grid.addColumn(new NumberRenderer<>(Point::getY, "%.4f"))
                     .setHeader("Y")
                     .setResizable(true)
                     .setSortable(true)
-                    .setWidth("50%");
+                    .setWidth("120px")
+                    .setFlexGrow(1);
         }
 
         dataProvider = new ListDataProvider<>(new ArrayList<>());
@@ -83,10 +112,44 @@ public class FunctionGridComponent extends VerticalLayout {
         add(grid);
 
         if (isEditable) {
+            addInsertControls();
             addControlButtons();
         } else {
             addResultControlButtons();
         }
+    }
+
+    private void addInsertControls() {
+        insertXField = new NumberField("x");
+        insertYField = new NumberField("y");
+        insertXField.setWidth("120px");
+        insertYField.setWidth("120px");
+
+        Button insertButton = new Button("Вставить", event -> {
+            if (addPointHandler == null) {
+                return;
+            }
+
+            Double x = insertXField.getValue();
+            Double y = insertYField.getValue();
+
+            if (x == null || y == null) {
+                Notification.show("Укажите x и y", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+
+            addPointHandler.accept(panelNumber, new Point(x, y));
+        });
+        insertButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        HorizontalLayout insertLayout = new HorizontalLayout(insertXField, insertYField, insertButton);
+        insertLayout.setDefaultVerticalComponentAlignment(Alignment.END);
+        insertLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        insertLayout.setSpacing(true);
+        insertLayout.setWidthFull();
+        insertLayout.getStyle().set("flex-wrap", "wrap");
+
+        add(insertLayout);
     }
 
     private void addResultControlButtons() {
@@ -118,6 +181,11 @@ public class FunctionGridComponent extends VerticalLayout {
     // Методы для установки высоты компонентов
     public void setGridHeight(String height) {
         grid.setHeight(height);
+    }
+
+    public void setPointHandlers(BiConsumer<Integer, Point> addHandler, BiConsumer<Integer, Double> deleteHandler) {
+        this.addPointHandler = addHandler;
+        this.deletePointHandler = deleteHandler;
     }
 
     public void setButtonLayoutHeight(String height) {

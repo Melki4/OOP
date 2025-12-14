@@ -61,6 +61,10 @@ public class CreateFunctionView extends VerticalLayout {
         setSizeFull();
         // === ВСЁ ПО ЦЕНТРУ ===
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        formContainer.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        formContainer.setWidthFull();
+        formContainer.setSpacing(true);
+        formContainer.setPadding(false);
 
         creationMode.setItems("Ввести точки вручную", "Создать из простой функции");
         creationMode.setWidth("300px");
@@ -88,7 +92,9 @@ public class CreateFunctionView extends VerticalLayout {
         functionNameField = new TextField("Имя функции");
         functionNameField.setRequiredIndicatorVisible(true);
         functionNameField.setPlaceholder("Введите имя...");
+        functionNameField.setWidth("320px");
         formContainer.add(functionNameField);
+
 
         if ("points".equals(selectedMode)) {
             // === Способ 1: ручной ввод ===
@@ -102,7 +108,14 @@ public class CreateFunctionView extends VerticalLayout {
                     createPointInputs(val);
                 }
             });
-            formContainer.add(new FormLayout(pointCountField));
+            pointCountField.setWidth("200px");
+
+            VerticalLayout manualSettings = new VerticalLayout(pointCountField);
+            manualSettings.setSpacing(false);
+            manualSettings.setPadding(false);
+            manualSettings.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+
+            formContainer.add(manualSettings);
 
         } else {
             // === Способ 2: простая функция ===
@@ -116,10 +129,32 @@ public class CreateFunctionView extends VerticalLayout {
             amountOfDotsField.setMax(1000);
             amountOfDotsField.setValue(10);
 
-            FormLayout form = new FormLayout();
-            form.add(simpleFunctionSelect, leftBorderField, rightBorderField, amountOfDotsField);
-            form.setMaxWidth("500px");
-            formContainer.add(form);
+            simpleFunctionSelect.setWidth("320px");
+            leftBorderField.setWidth("220px");
+            rightBorderField.setWidth("220px");
+            amountOfDotsField.setWidth("220px");
+
+            VerticalLayout generatedSettings = new VerticalLayout();
+            generatedSettings.setSpacing(false);
+            generatedSettings.setPadding(false);
+            generatedSettings.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+
+            generatedSettings.add(simpleFunctionSelect);
+
+            HorizontalLayout bordersRow = new HorizontalLayout(leftBorderField, rightBorderField);
+            bordersRow.setDefaultVerticalComponentAlignment(Alignment.END);
+            bordersRow.setSpacing(true);
+            bordersRow.setPadding(false);
+            bordersRow.setJustifyContentMode(JustifyContentMode.CENTER);
+
+            HorizontalLayout amountRow = new HorizontalLayout(amountOfDotsField);
+            amountRow.setDefaultVerticalComponentAlignment(Alignment.END);
+            amountRow.setSpacing(true);
+            amountRow.setPadding(false);
+            amountRow.setJustifyContentMode(JustifyContentMode.CENTER);
+
+            generatedSettings.add(bordersRow, amountRow);
+            formContainer.add(generatedSettings);
         }
     }
 
@@ -138,6 +173,8 @@ public class CreateFunctionView extends VerticalLayout {
         for (int i = 0; i < count; i++) {
             NumberField xField = new NumberField("x" + (i + 1));
             NumberField yField = new NumberField("y" + (i + 1));
+            xField.setWidth("160px");
+            yField.setWidth("160px");
             xFields.add(xField);
             yFields.add(yField);
             pointsLayout.add(new HorizontalLayout(xField, yField));
