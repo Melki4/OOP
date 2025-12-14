@@ -28,6 +28,7 @@ public class FunctionGridComponent extends VerticalLayout {
     private final BiConsumer<Integer, String> actionHandler;
     private BiConsumer<Integer, Point> addPointHandler;
     private BiConsumer<Integer, Double> deletePointHandler;
+    private BiConsumer<Integer, Point> updatePointHandler;
 
     private Button saveToDatabaseButton;
     private Button saveToFileButton;
@@ -61,6 +62,8 @@ public class FunctionGridComponent extends VerticalLayout {
                 .setWidth("120px")
                 .setFlexGrow(1);
 
+        dataProvider = new ListDataProvider<>(new ArrayList<>());
+
         if (isEditable) {
             grid.addComponentColumn(point -> {
                 TextField field = new TextField();
@@ -70,6 +73,10 @@ public class FunctionGridComponent extends VerticalLayout {
                     try {
                         double newY = Double.parseDouble(e.getValue());
                         point.setY(newY);
+                        if (updatePointHandler != null) {
+                            updatePointHandler.accept(panelNumber, point);
+                        }
+                        dataProvider.refreshItem(point);
                     } catch (NumberFormatException ex) {
                         Notification.show("Введите корректное число", 3000, Notification.Position.MIDDLE);
                     }
@@ -96,7 +103,6 @@ public class FunctionGridComponent extends VerticalLayout {
                     .setFlexGrow(1);
         }
 
-        dataProvider = new ListDataProvider<>(new ArrayList<>());
         grid.setDataProvider(dataProvider);
 
         add(grid);
@@ -176,6 +182,10 @@ public class FunctionGridComponent extends VerticalLayout {
     public void setPointHandlers(BiConsumer<Integer, Point> addHandler, BiConsumer<Integer, Double> deleteHandler) {
         this.addPointHandler = addHandler;
         this.deletePointHandler = deleteHandler;
+    }
+
+    public void setUpdatePointHandler(BiConsumer<Integer, Point> updateHandler) {
+        this.updatePointHandler = updateHandler;
     }
 
     public void setButtonLayoutHeight(String height) {

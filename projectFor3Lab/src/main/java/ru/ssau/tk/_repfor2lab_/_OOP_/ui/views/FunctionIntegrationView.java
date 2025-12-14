@@ -62,7 +62,7 @@ public class FunctionIntegrationView extends VerticalLayout {
         threadField = new NumberField("Количество потоков");
         threadField.setMin(1);
         threadField.setStep(1);
-        threadField.setHasControls(true);
+        threadField.setStepButtonsVisible(true);
         threadField.setWidth("180px");
         threadField.setValue(4d);
 

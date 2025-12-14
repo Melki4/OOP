@@ -121,6 +121,13 @@
             <version>24.9.6</version>
         </dependency>
 
+        <!-- Визуализация табулированных функций -->
+        <dependency>
+            <groupId>com.github.appreciated</groupId>
+            <artifactId>apexcharts</artifactId>
+            <version>24.0.0</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-javax -->
         <dependency>
             <groupId>org.apache.commons</groupId>
