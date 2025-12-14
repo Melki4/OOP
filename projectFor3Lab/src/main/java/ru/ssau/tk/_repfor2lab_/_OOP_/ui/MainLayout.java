@@ -52,6 +52,8 @@ public class MainLayout extends AppLayout {
         addTab(tabs, "Создать функцию", "create-function");
         addTab(tabs, "Мои функции", "my-functions");
         addTab(tabs, "Операции с функциями", "function-operations"); // Новая вкладка
+        addTab(tabs, "Дифференцирование", "function-differentiation");
+        addTab(tabs, "Интегрирование", "function-integration");
         addTab(tabs, "Настройки", "settings");
         addTab(tabs, "Выйти", "logout");
 

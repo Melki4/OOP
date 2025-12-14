@@ -87,16 +87,6 @@ public class FunctionGridComponent extends VerticalLayout {
                 return deleteButton;
             }).setHeader("Действие").setWidth("110px").setFlexGrow(0);
 
-            grid.addComponentColumn(point -> {
-                Button deleteButton = new Button("Удалить", event -> {
-                    if (deletePointHandler != null) {
-                        deletePointHandler.accept(panelNumber, point.getX());
-                    }
-                });
-                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY_INLINE);
-                return deleteButton;
-            }).setHeader("Действие").setWidth("120px").setFlexGrow(0);
-
         } else {
             grid.addColumn(new NumberRenderer<>(Point::getY, "%.4f"))
                     .setHeader("Y")
