@@ -1,12 +1,16 @@
 package ru.ssau.tk._repfor2lab_._OOP_.ui.views;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,29 +32,74 @@ public class RegistrationView extends VerticalLayout {
     private final PasswordField passwordField = new PasswordField("Пароль");
     private final PasswordField confirmPasswordField = new PasswordField("Подтвердите пароль");
     private final Button registerButton = new Button("Зарегистрироваться");
+    private final Button backButton = new Button("Вернуться ко входу");
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     public RegistrationView() {
         addClassName("registration-view");
+        setWidth("100%");
+        setHeight("100vh");
         setJustifyContentMode(JustifyContentMode.CENTER);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        setSizeFull();
+        setPadding(false);
+        setSpacing(false);
+        getStyle().set("background-color", "var(--lumo-contrast-5pct)");
 
         H2 title = new H2("Регистрация");
-        title.getStyle().set("margin-bottom", "1.5rem");
+        title.getStyle()
+                .set("margin", "0 0 var(--lumo-space-m) 0")
+                .set("text-align", "center")
+                .set("color", "var(--lumo-header-text-color)");
 
         loginField.setRequiredIndicatorVisible(true);
         passwordField.setRequiredIndicatorVisible(true);
         confirmPasswordField.setRequiredIndicatorVisible(true);
 
+        loginField.setWidth("100%");
+        passwordField.setWidth("100%");
+        confirmPasswordField.setWidth("100%");
+
+        registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        registerButton.setWidth("100%");
+
         registerButton.addClickListener(e -> registerUser());
+
+        backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        backButton.setWidth("100%");
+        backButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("login")));
 
         FormLayout form = new FormLayout();
         form.add(loginField, passwordField, confirmPasswordField);
+        form.setWidth("100%");
         form.setMaxWidth("400px");
 
-        add(title, form, registerButton);
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+
+        Div formContainer = new Div();
+        formContainer.getStyle()
+                .set("background", "var(--lumo-base-color)")
+                .set("border-radius", "var(--lumo-border-radius-l)")
+                .set("box-shadow", "var(--lumo-box-shadow-s)")
+                .set("padding", "var(--lumo-space-l)")
+                .set("width", "100%")
+                .set("max-width", "420px");
+
+        VerticalLayout formContent = new VerticalLayout(title, form, registerButton, backButton);
+        formContent.setSpacing(true);
+        formContent.setPadding(false);
+        formContent.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        formContent.getStyle().set("width", "100%");
+
+        formContainer.add(formContent);
+
+        VerticalLayout centerWrapper = new VerticalLayout(formContainer);
+        centerWrapper.setJustifyContentMode(JustifyContentMode.CENTER);
+        centerWrapper.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        centerWrapper.setWidth("100%");
+        centerWrapper.setPadding(true);
+
+        add(centerWrapper);
     }
 
     private void registerUser() {

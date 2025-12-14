@@ -252,12 +252,25 @@ public class CreateFunctionView extends VerticalLayout {
 
     private void createFromPoints(String functionName) {
         try {
-            List<Double> xList = xFields.stream()
-                    .map(f -> f.getValue() != null ? f.getValue() : 0.0)
-                    .collect(Collectors.toList());
-            List<Double> yList = yFields.stream()
-                    .map(f -> f.getValue() != null ? f.getValue() : 0.0)
-                    .collect(Collectors.toList());
+            List<Double> xList = new ArrayList<>();
+            for (NumberField field : xFields) {
+                Double value = field.getValue();
+                if (value == null) {
+                    Notification.show("Заполните все значения X", 3000, Notification.Position.MIDDLE);
+                    return;
+                }
+                xList.add(value);
+            }
+
+            List<Double> yList = new ArrayList<>();
+            for (NumberField field : yFields) {
+                Double value = field.getValue();
+                if (value == null) {
+                    Notification.show("Заполните все значения Y", 3000, Notification.Position.MIDDLE);
+                    return;
+                }
+                yList.add(value);
+            }
 
             if (xList.size() < 2) {
                 Notification.show("Нужно минимум 2 точки", 3000, Notification.Position.MIDDLE);
