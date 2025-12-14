@@ -13,7 +13,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.MathFunctionsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.controller.databaseDTO.PointsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
@@ -28,6 +28,7 @@ import com.vaadin.flow.component.textfield.TextField;
 
 import com.vaadin.flow.component.dialog.Dialog;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -372,7 +373,8 @@ public class FunctionOperationsView extends VerticalLayout {
             try {
                 // Определяем директорию для сохранения
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                try (BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
                     if ("json".equals(format)) {
                         FunctionsIO.serializeJson(writer, arrayFunction);
                     } else {
@@ -380,18 +382,28 @@ public class FunctionOperationsView extends VerticalLayout {
                     }
                     writer.flush();
                 }
-                byte[] data = outputStream.toByteArray();
-                StreamResource resource = new StreamResource(fileName, () -> new ByteArrayInputStream(data));
-                resource.setContentType("json".equals(format) ? "application/json" : "application/xml");
-                resource.setCacheTime(0);
 
-                Anchor download = new Anchor(resource, "Скачать");
+                byte[] data = outputStream.toByteArray();
+                String finalFileName = fileName;
+                DownloadHandler handler = downloadEvent -> {
+                    downloadEvent.setFileName(finalFileName);
+                    downloadEvent.setContentType("json".equals(format)
+                            ? "application/json"
+                            : "application/xml");
+                    try (var os = downloadEvent.getOutputStream()) {
+                        os.write(data);
+                    }
+                };
+
+                Anchor download = new Anchor(handler, "Скачать");
                 download.getElement().setAttribute("download", true);
                 download.getStyle().set("display", "none");
                 dialogLayout.add(download);
                 download.getElement().callJsFunction("click");
 
                 dialog.close();
+
+
                 Notification.show("Выберите место для сохранения файла " + fileName,
                         3000, Notification.Position.MIDDLE);
             } catch (Exception ex) {

@@ -18,6 +18,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.io.FunctionsIO;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.utils.FunctionUtils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -86,7 +87,7 @@ public class FunctionFileUploadDialog {
         return upload;
     }
 
-    private void handleUploadedFile(InputStream inputStream, String fileName) {
+    private void handleUploadedFile(byte[] data, String fileName) {
 
         try {
             // Получаем фабрику пользователя
@@ -95,7 +96,7 @@ public class FunctionFileUploadDialog {
 
             TabulatedFunction loadedFunction = null;
 
-           try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data), StandardCharsets.UTF_8))) {
                 if ("json".equals(currentFormat)) {
                     // Загрузка из JSON
                     ArrayTabulatedFunction arrayFunc = FunctionsIO.deserializeJson(reader);
