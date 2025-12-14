@@ -83,6 +83,9 @@ public class MyFunctionView extends VerticalLayout {
             if (response.statusCode() == 200) {
                 List<MathFunctionsDTO> funcs = mapper.readValue(response.body(), new TypeReference<List<MathFunctionsDTO>>() {});
                 grid.setItems(funcs);
+            } else if (response.statusCode() == 404) {
+                grid.setItems(List.of());
+                Notification.show("Не найдены ваши функции", 4000, Notification.Position.MIDDLE);
             } else {
                 Notification.show("Ошибка загрузки: " + response.statusCode(), 4000, Notification.Position.MIDDLE);
             }
