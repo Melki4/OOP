@@ -1,16 +1,5 @@
 package ru.ssau.tk._repfor2lab_._OOP_.ui.views;
 
-import com.github.appreciated.apexcharts.ApexCharts;
-import com.github.appreciated.apexcharts.ApexChartsBuilder;
-import com.github.appreciated.apexcharts.config.chart.Type;
-import com.github.appreciated.apexcharts.config.builder.ChartBuilder;
-import com.github.appreciated.apexcharts.config.builder.MarkersBuilder;
-import com.github.appreciated.apexcharts.config.builder.StrokeBuilder;
-import com.github.appreciated.apexcharts.config.builder.XAxisBuilder;
-import com.github.appreciated.apexcharts.config.chart.Zoom;
-import com.github.appreciated.apexcharts.config.stroke.Curve;
-import com.github.appreciated.apexcharts.config.xaxis.AxisType;
-import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
@@ -23,6 +12,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.component.UI;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Insertable;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.Point;
@@ -36,13 +26,16 @@ import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionFileUplo
 import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionGridComponent;
 import ru.ssau.tk._repfor2lab_._OOP_.ui.views.functionoperation.FunctionSelectionDialog;
 
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Route(value = "function-visualization", layout = MainLayout.class)
 @PageTitle("Графики функций | MathFunction App")
@@ -55,6 +48,7 @@ public class FunctionVisualizationView extends VerticalLayout {
 
     private TabulatedFunction currentFunction;
     private final Div chartContainer;
+    private final Canvas chartCanvas;
 
     private final NumberField xInputField;
     private final Span applyResult;
@@ -91,6 +85,11 @@ public class FunctionVisualizationView extends VerticalLayout {
         chartContainer = new Div();
         chartContainer.setWidth("100%");
         chartContainer.setHeight("420px");
+        chartCanvas = new Canvas();
+        chartCanvas.setWidthFull();
+        chartCanvas.setHeight("420px");
+        chartContainer.add(chartCanvas);
+        loadChartJsOnce();
         renderChart();
 
         HorizontalLayout applyLayout = createApplyLayout();
@@ -238,51 +237,66 @@ public class FunctionVisualizationView extends VerticalLayout {
     }
 
     private void renderChart() {
-        chartContainer.removeAll();
-
-        Series<Double> series = buildSeries();
-        String[] labels = buildLabels();
-
-        ApexCharts chart = ApexChartsBuilder.get()
-                .withChart(ChartBuilder.get()
-                        .withType(Type.line)
-                        .withZoom(new Zoom().setEnabled(true))
-                        .build())
-                .withStroke(StrokeBuilder.get().withCurve(Curve.straight).build())
-                .withMarkers(MarkersBuilder.get().withSize(5.0).build())
-                .withXaxis(XAxisBuilder.get()
-                        .withType(AxisType.numeric)
-                        .withCategories(labels)
-                        .build())
-                .withSeries(series)
-                .build();
-
-        chart.setWidth("100%");
-        chart.setHeight("380px");
-        chartContainer.add(chart);
+        updateChartData();
     }
 
-    private Series<Double> buildSeries() {
-        if (currentFunction == null || currentFunction.getCount() == 0) {
-            return new Series<>("f(x)", new Double[]{});
+    private void loadChartJsOnce() {
+        UI ui = UI.getCurrent();
+        if (ui != null) {
+            ui.getPage().addJavaScript("https://cdn.jsdelivr.net/npm/chart.js");
         }
-
-        List<Double> yValues = new ArrayList<>();
-        for (int i = 0; i < currentFunction.getCount(); i++) {
-            yValues.add(currentFunction.getY(i));
-        }
-        return new Series<>("f(x)", yValues.toArray(new Double[0]));
     }
 
-    private String[] buildLabels() {
-        if (currentFunction == null || currentFunction.getCount() == 0) {
-            return new String[]{};
+    private void updateChartData() {
+        UI ui = UI.getCurrent();
+        if (ui == null) {
+            return;
         }
-        String[] labels = new String[currentFunction.getCount()];
+
+        List<Map<String, Double>> points = buildPointMap();
+        ui.getPage().executeJs(
+                "(function(canvas, points){" +
+                        " if (!canvas) return;" +
+                        " const ctx = canvas.getContext('2d');" +
+                        " if (!window.Chart) { return; }" +
+                        " if (window.functionChart) { window.functionChart.destroy(); }" +
+                        " window.functionChart = new Chart(ctx, {" +
+                        "   type: 'line'," +
+                        "   data: { datasets: [{" +
+                        "     label: 'f(x)'," +
+                        "     data: points," +
+                        "     borderColor: '#1f77b4'," +
+                        "     fill: false," +
+                        "     tension: 0.25," +
+                        "     pointRadius: 4" +
+                        "   }]}," +
+                        "   options: {" +
+                        "     responsive: true," +
+                        "     maintainAspectRatio: false," +
+                        "     parsing: false," +
+                        "     scales: {" +
+                        "       x: { type: 'linear', title: { display: true, text: 'x' } }," +
+                        "       y: { title: { display: true, text: 'f(x)' } }" +
+                        "     }," +
+                        "     plugins: { legend: { display: true } }" +
+                        "   }" +
+                        " });" +
+                        "})(arguments[0], arguments[1]);",
+                chartCanvas.getElement(), points);
+    }
+
+    private List<Map<String, Double>> buildPointMap() {
+        List<Map<String, Double>> points = new ArrayList<>();
+        if (currentFunction == null) {
+            return points;
+        }
         for (int i = 0; i < currentFunction.getCount(); i++) {
-            labels[i] = String.format("%.3f", currentFunction.getX(i));
+            Map<String, Double> point = new HashMap<>();
+            point.put("x", currentFunction.getX(i));
+            point.put("y", currentFunction.getY(i));
+            points.add(point);
         }
-        return labels;
+        return points;
     }
 
     private void saveCurrentFunction() {
