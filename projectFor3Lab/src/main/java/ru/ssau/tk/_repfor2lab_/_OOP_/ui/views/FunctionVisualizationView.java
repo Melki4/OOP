@@ -52,6 +52,13 @@ public class FunctionVisualizationView extends VerticalLayout {
     private final NumberField xInputField = new NumberField("x для вычисления");
     private final Span applyResult = new Span("Значение: —");
 
+    private final NumberField xMinField = new NumberField("Мин. X");
+    private final NumberField xMaxField = new NumberField("Макс. X");
+    private final NumberField yMinField = new NumberField("Мин. Y");
+    private final NumberField yMaxField = new NumberField("Макс. Y");
+    private boolean userAdjustedScale = false;
+    private boolean updatingScaleFields = false;
+
     public FunctionVisualizationView() {
         String login = (String) VaadinSession.getCurrent().getAttribute("login");
         creationDialog = new FunctionCreationDialog();
@@ -93,7 +100,7 @@ public class FunctionVisualizationView extends VerticalLayout {
 
         HorizontalLayout applyLayout = createApplyLayout();
 
-        rightSide.add(chartContainer, applyLayout);
+        rightSide.add(createScaleControls(), chartContainer, applyLayout);
         rightSide.setFlexGrow(1, chartContainer);
 
         content.add(functionGrid, rightSide);
@@ -136,6 +143,46 @@ public class FunctionVisualizationView extends VerticalLayout {
         applyLayout.add(xInputField, applyButton, applyResult);
         applyLayout.expand(applyResult);
         return applyLayout;
+    }
+
+    private VerticalLayout createScaleControls() {
+        configureScaleField(xMinField);
+        configureScaleField(xMaxField);
+        configureScaleField(yMinField);
+        configureScaleField(yMaxField);
+
+        HorizontalLayout xScale = new HorizontalLayout(xMinField, xMaxField);
+        xScale.setSpacing(true);
+        xScale.setDefaultVerticalComponentAlignment(Alignment.END);
+
+        HorizontalLayout yScale = new HorizontalLayout(yMinField, yMaxField);
+        yScale.setSpacing(true);
+        yScale.setDefaultVerticalComponentAlignment(Alignment.END);
+
+        Button applyScaleButton = new Button("Применить масштаб", e -> applyScaleSettings());
+        applyScaleButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        Button resetScaleButton = new Button("Сбросить", e -> resetScale());
+
+        HorizontalLayout actions = new HorizontalLayout(applyScaleButton, resetScaleButton);
+        actions.setSpacing(true);
+
+        VerticalLayout scaleLayout = new VerticalLayout(new Span("Масштабирование графика"), xScale, yScale, actions);
+        scaleLayout.setPadding(false);
+        scaleLayout.setSpacing(true);
+
+        return scaleLayout;
+    }
+
+    private void configureScaleField(NumberField field) {
+        field.setPlaceholder("авто");
+        field.setWidth("140px");
+        field.setStep(0.1);
+        field.addValueChangeListener(event -> {
+            if (!updatingScaleFields) {
+                userAdjustedScale = true;
+            }
+        });
     }
 
     private void handlePanelAction(int panel, String action) {
@@ -205,6 +252,9 @@ public class FunctionVisualizationView extends VerticalLayout {
         int index = currentFunction.indexOfX(point.getX());
         if (index != -1) {
             currentFunction.setY(index, point.getY());
+            if (!userAdjustedScale) {
+                updateScaleFields();
+            }
             renderChart();
         }
     }
@@ -226,11 +276,16 @@ public class FunctionVisualizationView extends VerticalLayout {
         if (function == null) {
             currentFunction = null;
             functionGrid.setFunction(null);
+            resetScaleFields();
+            userAdjustedScale = false;
             renderChart();
             return;
         }
         currentFunction = ensureEditableFunction(function);
         functionGrid.setFunction(currentFunction);
+        if (!userAdjustedScale) {
+            updateScaleFields();
+        }
         renderChart();
     }
 
@@ -251,13 +306,27 @@ public class FunctionVisualizationView extends VerticalLayout {
             return;
         }
 
+        if (!validateScaleRanges()) {
+            return;
+        }
+
+        Double xMin = xMinField.getValue();
+        Double xMax = xMaxField.getValue();
+        Double yMin = yMinField.getValue();
+        Double yMax = yMaxField.getValue();
+
         JsonArray points = buildPointMap();
         ui.getPage().executeJs(
-                "(function(canvas, points){" +
+                "(function(canvas, points, xMin, xMax, yMin, yMax){" +
                         " if (!canvas) return;" +
                         " const ctx = canvas.getContext('2d');" +
                         " if (!window.Chart) { return; }" +
                         " if (window.functionChart) { window.functionChart.destroy(); }" +
+                        " const normalize = (value) => (typeof value === 'number' && !Number.isNaN(value) ? value : undefined);" +
+                        " const resolvedXMin = normalize(xMin);" +
+                        " const resolvedXMax = normalize(xMax);" +
+                        " const resolvedYMin = normalize(yMin);" +
+                        " const resolvedYMax = normalize(yMax);" +
                         " window.functionChart = new Chart(ctx, {" +
                         "   type: 'line'," +
                         "   data: { datasets: [{" +
@@ -273,15 +342,29 @@ public class FunctionVisualizationView extends VerticalLayout {
                         "     maintainAspectRatio: false," +
                         "     parsing: false," +
                         "     scales: {" +
-                        "       x: { type: 'linear', title: { display: true, text: 'x' } }," +
-                        "       y: { title: { display: true, text: 'f(x)' } }" +
+                        "       x: { type: 'linear', title: { display: true, text: 'x' }, min: resolvedXMin, max: resolvedXMax }," +
+                        "       y: { title: { display: true, text: 'f(x)' }, min: resolvedYMin, max: resolvedYMax }" +
                         "     }," +
                         "     plugins: { legend: { display: true } }" +
                         "   }" +
                         " });" +
-                        "})(arguments[0], arguments[1]);",
-                chartCanvas.getElement(), points);
+                        "})(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);",
+                chartCanvas.getElement(), points, xMin, xMax, yMin, yMax);
 
+    }
+
+    private boolean validateScaleRanges() {
+        return validateAxisRange(xMinField, xMaxField, "X") && validateAxisRange(yMinField, yMaxField, "Y");
+    }
+
+    private boolean validateAxisRange(NumberField minField, NumberField maxField, String axisName) {
+        Double min = minField.getValue();
+        Double max = maxField.getValue();
+        if (min != null && max != null && min >= max) {
+            Notification.show(String.format("Минимальное значение оси %s должно быть меньше максимального", axisName), 3000, Notification.Position.MIDDLE);
+            return false;
+        }
+        return true;
     }
 
     private JsonArray buildPointMap() {
@@ -407,6 +490,60 @@ public class FunctionVisualizationView extends VerticalLayout {
         } catch (Exception ex) {
             Notification.show("Ошибка вычисления: " + ex.getMessage(), 4000, Notification.Position.MIDDLE);
         }
+    }
+
+    private void applyScaleSettings() {
+        if (!validateScaleRanges()) {
+            return;
+        }
+        userAdjustedScale = true;
+        renderChart();
+    }
+
+    private void resetScale() {
+        userAdjustedScale = false;
+        updateScaleFields();
+        renderChart();
+    }
+
+    private void updateScaleFields() {
+        if (currentFunction == null || currentFunction.getCount() == 0) {
+            resetScaleFields();
+            return;
+        }
+
+        double minX = currentFunction.getX(0);
+        double maxX = currentFunction.getX(0);
+        double minY = currentFunction.getY(0);
+        double maxY = currentFunction.getY(0);
+
+        for (int i = 1; i < currentFunction.getCount(); i++) {
+            double x = currentFunction.getX(i);
+            double y = currentFunction.getY(i);
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+
+        double xPadding = Math.max((maxX - minX) * 0.1, 1e-3);
+        double yPadding = Math.max((maxY - minY) * 0.1, 1e-3);
+
+        updatingScaleFields = true;
+        xMinField.setValue(minX - xPadding);
+        xMaxField.setValue(maxX + xPadding);
+        yMinField.setValue(minY - yPadding);
+        yMaxField.setValue(maxY + yPadding);
+        updatingScaleFields = false;
+    }
+
+    private void resetScaleFields() {
+        updatingScaleFields = true;
+        xMinField.clear();
+        xMaxField.clear();
+        yMinField.clear();
+        yMaxField.clear();
+        updatingScaleFields = false;
     }
 
     @Tag("canvas")
