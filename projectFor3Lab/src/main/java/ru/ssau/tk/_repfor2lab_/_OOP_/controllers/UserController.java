@@ -95,11 +95,16 @@ public class UserController {
     }
 
     @PostMapping("/auth/register")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDTO> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<?> createUser(@RequestBody CreateUserRequest request) {
         logger.info("Создание пользователя с логином: {}", request.getLogin());
 
+        if (usersRepository.existsByLogin(request.getLogin())) {
+            return ResponseEntity.badRequest()
+                    .body("{\"error\": \"Пользователь с таким логином уже существует\"}");
+        }
         String role = "USER";
+        String factoryType = request.getFactoryType() != null ?
+                request.getFactoryType() : "array";
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
@@ -108,15 +113,14 @@ public class UserController {
         if (isAdmin && "ADMIN".equals(request.getRole())) {
             role = "ADMIN";
         }
-        Users user = new Users(request.getLogin(), request.getPassword(), role);
-        user.setFactoryType(request.getFactoryType());
+        Users user = new Users(request.getLogin(), request.getPassword(), role, factoryType);
 
         Users saved = usersRepository.save(user);
         logger.info("Пользователь ID {} создан с ролью {}", saved.getUserID(), role);
         return ResponseEntity.ok(toDto(saved));
     }
 
-    @GetMapping("/check/{id}")
+    @GetMapping("/check/id/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> existsById(@PathVariable Long id) {
         logger.info("Проверка существования пользователя по айди");
@@ -136,7 +140,7 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
-    @GetMapping("/check/{login}")
+    @GetMapping("/check/login/{login}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> existsByLogin(@PathVariable String login) {
         logger.info("Проверка существования пользователя по логину");
@@ -163,7 +167,7 @@ public class UserController {
     @PutMapping("/update/factory-type/{id}")
     @PreAuthorize("#id == authentication.principal.userId")
     public ResponseEntity<String> updateFactoryType(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String newValue = body.get("value");
+        String newValue = body.get("factory-type");
         logger.info("Запрос на обновление factoryType");
         if (newValue == null || newValue.isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -178,10 +182,10 @@ public class UserController {
         return ResponseEntity.ok("{\"status\": \"Пользователь успешно обновлен\"}");
     }
 
-    @PutMapping("/update/password/{password}")
+    @PutMapping("/update/password/{id}")
     @PreAuthorize("#id == authentication.principal.userId")
     public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String newValue = body.get("value");
+        String newValue = body.get("password");
         logger.info("Запрос на обновление пароля");
         if (newValue == null || newValue.isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -199,7 +203,7 @@ public class UserController {
     @PreAuthorize("#id == authentication.principal.userId")
     public ResponseEntity<String> updateLogin(@PathVariable Long id, @RequestBody Map<String, String> body) {
         logger.info("Запрос на обновление логина");
-        String newValue = body.get("value");
+        String newValue = body.get("login");
         if (newValue == null || newValue.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
@@ -216,7 +220,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
         logger.info("Запрос на обновление роли");
-        String newValue = body.get("value");
+        String newValue = body.get("role");
         if (newValue == null || !("USER".equals(newValue) || "ADMIN".equals(newValue))) {
             return ResponseEntity.badRequest().build();
         }

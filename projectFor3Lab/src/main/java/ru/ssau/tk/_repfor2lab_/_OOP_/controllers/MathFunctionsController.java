@@ -12,9 +12,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import ru.ssau.tk._repfor2lab_._OOP_.DTO.MathFunctionsDTO;
+import ru.ssau.tk._repfor2lab_._OOP_.DTO.PointsDTO;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.MathFunctions;
+import ru.ssau.tk._repfor2lab_._OOP_.entities.Points;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.Users;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
+import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFactory;
+import ru.ssau.tk._repfor2lab_._OOP_.operations.TabulatedDifferentialOperator;
 import ru.ssau.tk._repfor2lab_._OOP_.repositories.MathFunctionsRepositories;
+import ru.ssau.tk._repfor2lab_._OOP_.repositories.PointsRepositories;
 import ru.ssau.tk._repfor2lab_._OOP_.repositories.UsersRepositories;
 import ru.ssau.tk._repfor2lab_._OOP_.service.CustomUserDetails;
 
@@ -35,6 +41,8 @@ public class MathFunctionsController {
 
     @Autowired
     private UsersRepositories usersRepository;
+    @Autowired
+    private PointsRepositories pointsRepository;
 
     @GetMapping("/get-by-user-id/{userId}")
     @PreAuthorize("#userId == authentication.principal.userId")
@@ -50,7 +58,7 @@ public class MathFunctionsController {
     @PreAuthorize("isAuthenticated()") //for users functions
     public ResponseEntity<List<MathFunctionsDTO>> findMathFunctionsByName(@PathVariable String functionName) {
         logger.info("Поиск функций по имени: {}", functionName);
-        Optional<MathFunctions> functions = mathFunctionsRepository.findByNameOfFunction(functionName);
+        List<MathFunctions> functions = mathFunctionsRepository.findByFunctionName(functionName);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentRole = auth.getAuthorities().stream()
@@ -76,7 +84,7 @@ public class MathFunctionsController {
         logger.info("Запрос на поиск по параметрам");
 
         MathFunctions function = mathFunctionsRepository
-                .findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndNameOfFunction(
+                .findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndFunctionName(
                         leftBoard, rightBoard, amountOfDots, functionName)
                 .stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("Function not found"));
@@ -97,7 +105,7 @@ public class MathFunctionsController {
         logger.info("Запрос на проверку существования функции по параметрам");
 
         List<MathFunctions> functions = mathFunctionsRepository
-                .findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndNameOfFunction(
+                .findByLeftBoarderGreaterThanEqualAndRightBoarderLessThanEqualAndAmountOfDotsAndFunctionName(
                         leftBoard, rightBoard, amountOfDots, functionName);
 
         boolean exists = false;
@@ -114,16 +122,17 @@ public class MathFunctionsController {
     }
 
 
-    @PostMapping("/create/id")
+    @PostMapping("/create/{id}")
     @PreAuthorize("isAuthenticated()") //айди хозяина через путь
     public ResponseEntity<String> createMathFunction(
-            @RequestBody JsonNode body,
-            @PathVariable Long id) {
-        String functionName = body.get("function_name").asText();
-        long amountOfDots = body.get("amount_of_dots").asLong();
-        double leftBorder = body.get("left_border").asDouble();
-        double rightBorder = body.get("right_border").asDouble();
-        String functionType = body.get("function_type").asText();
+            @PathVariable Long id,
+            @RequestBody JsonNode body
+            ) {
+        String functionName = body.get("functionName").asText();
+        long amountOfDots = body.get("amountOfDots").asLong();
+        double leftBorder = body.get("leftBoarder").asDouble();
+        double rightBorder = body.get("rightBoarder").asDouble();
+        String functionType = body.get("functionType").asText();
         logger.info("Запрос на создание функции");
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -133,15 +142,14 @@ public class MathFunctionsController {
         }
 
         MathFunctions function = new MathFunctions();
-        function.setNameOfFunction(functionName);
+        function.setFunctionName(functionName);
         function.setAmountOfDots(amountOfDots);
         function.setLeftBoarder(leftBorder);
         function.setRightBoarder(rightBorder);
+        function.setFunctionType(functionType);
         function.setUsers(new Users());
         function.getUsers().setUserID(id);
 
-        function.setSimpleFunctions(new ru.ssau.tk._repfor2lab_._OOP_.entities.SimpleFunctions());
-        function.getSimpleFunctions().setLocalName(functionType);
 
         mathFunctionsRepository.save(function);
 
@@ -160,8 +168,8 @@ public class MathFunctionsController {
 
         checkAccess(function);
 
-        String newName = body.get("function_name").asText();
-        function.setNameOfFunction(newName);
+        String newName = body.get("function-name").asText();
+        function.setFunctionName(newName);
         mathFunctionsRepository.save(function);
 
         return ResponseEntity.ok("{\"status\": \"Имя функции успешно обновлено\"}");
@@ -196,12 +204,11 @@ public class MathFunctionsController {
 
     private MathFunctionsDTO toDto(MathFunctions f) {
         MathFunctionsDTO dto = new MathFunctionsDTO();
-        dto.setMathFunctionsID(f.getMathFunctionsID());
-        dto.setNameOfFunction(f.getNameOfFunction());
+        dto.setFunctionID(f.getMathFunctionsID());
+        dto.setFunctionName(f.getFunctionName());
         dto.setAmountOfDots(f.getAmountOfDots());
         dto.setLeftBoarder(f.getLeftBoarder());
         dto.setRightBoarder(f.getRightBoarder());
-        dto.setFunctionType(f.getSimpleFunctions().getLocalName());
         dto.setOwnerID(f.getUsers().getUserID());
         return dto;
     }

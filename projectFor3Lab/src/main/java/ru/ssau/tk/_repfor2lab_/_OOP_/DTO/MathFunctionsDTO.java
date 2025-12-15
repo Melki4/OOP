@@ -3,8 +3,8 @@ package ru.ssau.tk._repfor2lab_._OOP_.DTO;
 import ru.ssau.tk._repfor2lab_._OOP_.entities.Users;
 
 public class MathFunctionsDTO {
-    private Long mathFunctionsID;
-    private String nameOfFunction;
+    private Long FunctionID;
+    private String functionName;
     private Long amountOfDots;
     private Double leftBoarder;
     private Double rightBoarder;
@@ -13,10 +13,10 @@ public class MathFunctionsDTO {
 
     public MathFunctionsDTO(){}
 
-    public MathFunctionsDTO(Long mathFunctionsID, String nameOfFunction, Long amountOfDots,
+    public MathFunctionsDTO(Long FunctionID, String functionName, Long amountOfDots,
                             Double leftBoarder, Double rightBoarder, String functionType, Long ownerID) {
-        this.mathFunctionsID = mathFunctionsID;
-        this.nameOfFunction = nameOfFunction;
+        this.FunctionID = FunctionID;
+        this.functionName = functionName;
         this.amountOfDots = amountOfDots;
         this.leftBoarder = leftBoarder;
         this.rightBoarder = rightBoarder;
@@ -24,20 +24,20 @@ public class MathFunctionsDTO {
         this.ownerID = ownerID;
     }
 
-    public Long getMathFunctionsID() {
-        return mathFunctionsID;
+    public Long getFunctionID() {
+        return FunctionID;
     }
 
-    public void setMathFunctionsID(Long mathFunctionsID) {
-        this.mathFunctionsID = mathFunctionsID;
+    public void setFunctionID(Long mathFunctionsID) {
+        this.FunctionID = mathFunctionsID;
     }
 
-    public String getNameOfFunction() {
-        return nameOfFunction;
+    public String getFunctionName() {
+        return functionName;
     }
 
-    public void setNameOfFunction(String nameOfFunction) {
-        this.nameOfFunction = nameOfFunction;
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
     }
 
     public Long getAmountOfDots() {

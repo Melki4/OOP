@@ -7,13 +7,15 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.ArrayTabulatedFunctionFac
 import ru.ssau.tk._repfor2lab_._OOP_.functions.factory.TabulatedFunctionFactory;
 import ru.ssau.tk._repfor2lab_._OOP_.functions.*;
 
+import static java.lang.Math.abs;
+
 public class TabulatedFunctionOperationService {
 
     TabulatedFunctionFactory factory;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TabulatedFunctionOperationService.class);
 
-    TabulatedFunctionOperationService(TabulatedFunctionFactory factory){
+    public TabulatedFunctionOperationService(TabulatedFunctionFactory factory){
         this.factory = factory;
     }
 
@@ -57,8 +59,8 @@ public class TabulatedFunctionOperationService {
         double[] yValues = new double[aArray.length];
 
         for (int i=0; i< aArray.length; ++i){
-            if (aArray[i].x!=bArray[i].x){
-                LOGGER.warn("Разные элементы икс в массивах");
+            if (abs(aArray[i].getX() - bArray[i].getX()) > 0.0001){
+                LOGGER.warn("Разные элементы икс в массивах ");
                 throw new InconsistentFunctionsException("Разные элементы икс в массивах");
             }
             xValues[i] = aArray[i].x;

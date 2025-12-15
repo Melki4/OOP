@@ -12,7 +12,7 @@ public class CreateUserRequest {
         this.login = login;
         this.password = password;
         this.role = role;
-        this.factoryType = factoryType;
+        this.factoryType = factoryType != null ? factoryType : "array";
     }
 
     public String getLogin() {

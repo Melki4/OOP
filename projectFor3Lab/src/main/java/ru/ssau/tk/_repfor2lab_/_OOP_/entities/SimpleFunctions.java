@@ -9,8 +9,6 @@ public class SimpleFunctions {
     @Id
     @Column(name = "local_name", length = 128, nullable = false)
     private String localName;
-    @OneToMany(mappedBy = "simpleFunctions")
-    private List<MathFunctions> mathFunctions;
 
     public SimpleFunctions(){}
     public SimpleFunctions(String localName){

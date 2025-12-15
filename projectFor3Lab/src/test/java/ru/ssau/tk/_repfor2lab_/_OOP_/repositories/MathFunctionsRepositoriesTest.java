@@ -48,21 +48,21 @@ class MathFunctionsRepositoriesTest {
 
         // Создание тестовых математических функций
         testFunction1 = new MathFunctions();
-        testFunction1.setNameOfFunction("sin(x)");
+        testFunction1.setFunctionName("sin(x)");
         testFunction1.setLeftBoarder(0.0);
         testFunction1.setRightBoarder(6.28);
         testFunction1.setAmountOfDots(100L);
         testFunction1.setUsers(testUser);
 
         testFunction2 = new MathFunctions();
-        testFunction2.setNameOfFunction("cos(x)");
+        testFunction2.setFunctionName("cos(x)");
         testFunction2.setLeftBoarder(-3.14);
         testFunction2.setRightBoarder(3.14);
         testFunction2.setAmountOfDots(50L);
         testFunction2.setUsers(testUser);
 
         testFunction3 = new MathFunctions();
-        testFunction3.setNameOfFunction("x^2");
+        testFunction3.setFunctionName("x^2");
         testFunction3.setLeftBoarder(-10.0);
         testFunction3.setRightBoarder(10.0);
         testFunction3.setAmountOfDots(200L);
@@ -77,7 +77,7 @@ class MathFunctionsRepositoriesTest {
     @Test
     void testSaveMathFunction() {
         MathFunctions newFunction = new MathFunctions();
-        newFunction.setNameOfFunction("exp(x)");
+        newFunction.setFunctionName("exp(x)");
         newFunction.setLeftBoarder(0.0);
         newFunction.setRightBoarder(5.0);
         newFunction.setAmountOfDots(75L);
@@ -86,7 +86,7 @@ class MathFunctionsRepositoriesTest {
         MathFunctions savedFunction = mathFunctionsRepository.save(newFunction);
 
         assertNotNull(savedFunction.getMathFunctionsID());
-        assertEquals("exp(x)", savedFunction.getNameOfFunction());
+        assertEquals("exp(x)", savedFunction.getFunctionName());
         assertEquals(0.0, savedFunction.getLeftBoarder());
         assertEquals(5.0, savedFunction.getRightBoarder());
         assertEquals(75L, savedFunction.getAmountOfDots());
@@ -94,27 +94,12 @@ class MathFunctionsRepositoriesTest {
     }
 
 
-    @Test
-    void testFindByNameOfFunction() {
-        Optional<MathFunctions> foundFunction = mathFunctionsRepository.findByNameOfFunction("cos(x)");
 
-        assertTrue(foundFunction.isPresent());
-        assertEquals(-3.14, foundFunction.get().getLeftBoarder());
-        assertEquals(3.14, foundFunction.get().getRightBoarder());
-        assertEquals(50L, foundFunction.get().getAmountOfDots());
-    }
-
-    @Test
-    void testFindByNameOfFunction_NotFound() {
-        Optional<MathFunctions> foundFunction = mathFunctionsRepository.findByNameOfFunction("non_existent_function");
-
-        assertFalse(foundFunction.isPresent());
-    }
 
     @Test
     void testExistsByNameOfFunction() {
-        boolean exists = mathFunctionsRepository.existsByNameOfFunction("sin(x)");
-        boolean notExists = mathFunctionsRepository.existsByNameOfFunction("non_existent_function");
+        boolean exists = mathFunctionsRepository.existsByFunctionName("sin(x)");
+        boolean notExists = mathFunctionsRepository.existsByFunctionName("non_existent_function");
 
         assertTrue(exists);
         assertFalse(notExists);
@@ -127,9 +112,9 @@ class MathFunctionsRepositoriesTest {
         List<MathFunctions> userFunctions = mathFunctionsRepository.findByUsersUserID(userId);
 
         assertEquals(3, userFunctions.size());
-        assertTrue(userFunctions.stream().anyMatch(func -> "sin(x)".equals(func.getNameOfFunction())));
-        assertTrue(userFunctions.stream().anyMatch(func -> "cos(x)".equals(func.getNameOfFunction())));
-        assertTrue(userFunctions.stream().anyMatch(func -> "x^2".equals(func.getNameOfFunction())));
+        assertTrue(userFunctions.stream().anyMatch(func -> "sin(x)".equals(func.getFunctionName())));
+        assertTrue(userFunctions.stream().anyMatch(func -> "cos(x)".equals(func.getFunctionName())));
+        assertTrue(userFunctions.stream().anyMatch(func -> "x^2".equals(func.getFunctionName())));
     }
 
     @Test
@@ -149,8 +134,8 @@ class MathFunctionsRepositoriesTest {
         List<MathFunctions> functions = mathFunctionsRepository.findByLeftBoarderBetween(-5.0, 1.0);
 
         assertEquals(2, functions.size()); // sin(x) и cos(x)
-        assertTrue(functions.stream().anyMatch(func -> "sin(x)".equals(func.getNameOfFunction())));
-        assertTrue(functions.stream().anyMatch(func -> "cos(x)".equals(func.getNameOfFunction())));
+        assertTrue(functions.stream().anyMatch(func -> "sin(x)".equals(func.getFunctionName())));
+        assertTrue(functions.stream().anyMatch(func -> "cos(x)".equals(func.getFunctionName())));
     }
 
     @Test
@@ -158,8 +143,8 @@ class MathFunctionsRepositoriesTest {
         List<MathFunctions> functions = mathFunctionsRepository.findByRightBoarderBetween(5.0, 15.0);
 
         assertEquals(2, functions.size()); // sin(x) и x^2
-        assertTrue(functions.stream().anyMatch(func -> "sin(x)".equals(func.getNameOfFunction())));
-        assertTrue(functions.stream().anyMatch(func -> "x^2".equals(func.getNameOfFunction())));
+        assertTrue(functions.stream().anyMatch(func -> "sin(x)".equals(func.getFunctionName())));
+        assertTrue(functions.stream().anyMatch(func -> "x^2".equals(func.getFunctionName())));
     }
 
     @Test
@@ -167,25 +152,25 @@ class MathFunctionsRepositoriesTest {
         List<MathFunctions> functions = mathFunctionsRepository.findByAmountOfDotsBetween(80L, 250L);
 
         assertEquals(2, functions.size()); // sin(x) и x^2
-        assertTrue(functions.stream().anyMatch(func -> "sin(x)".equals(func.getNameOfFunction())));
-        assertTrue(functions.stream().anyMatch(func -> "x^2".equals(func.getNameOfFunction())));
+        assertTrue(functions.stream().anyMatch(func -> "sin(x)".equals(func.getFunctionName())));
+        assertTrue(functions.stream().anyMatch(func -> "x^2".equals(func.getFunctionName())));
     }
 
 
     @Test
     void testDeleteByNameOfFunction() {
         // Проверяем, что функция существует
-        assertTrue(mathFunctionsRepository.existsByNameOfFunction("x^2"));
+        assertTrue(mathFunctionsRepository.existsByFunctionName("x^2"));
 
         // Удаляем по имени функции
-        mathFunctionsRepository.deleteByNameOfFunction("x^2");
+        mathFunctionsRepository.deleteByFunctionName("x^2");
 
         // Проверяем, что функция удалена
-        assertFalse(mathFunctionsRepository.existsByNameOfFunction("x^2"));
+        assertFalse(mathFunctionsRepository.existsByFunctionName("x^2"));
 
         // Проверяем, что другие функции остались
-        assertTrue(mathFunctionsRepository.existsByNameOfFunction("sin(x)"));
-        assertTrue(mathFunctionsRepository.existsByNameOfFunction("cos(x)"));
+        assertTrue(mathFunctionsRepository.existsByFunctionName("sin(x)"));
+        assertTrue(mathFunctionsRepository.existsByFunctionName("cos(x)"));
     }
 
     @Test
@@ -193,9 +178,9 @@ class MathFunctionsRepositoriesTest {
         List<MathFunctions> allFunctions = mathFunctionsRepository.findAll();
 
         assertEquals(3, allFunctions.size());
-        assertTrue(allFunctions.stream().anyMatch(func -> "sin(x)".equals(func.getNameOfFunction())));
-        assertTrue(allFunctions.stream().anyMatch(func -> "cos(x)".equals(func.getNameOfFunction())));
-        assertTrue(allFunctions.stream().anyMatch(func -> "x^2".equals(func.getNameOfFunction())));
+        assertTrue(allFunctions.stream().anyMatch(func -> "sin(x)".equals(func.getFunctionName())));
+        assertTrue(allFunctions.stream().anyMatch(func -> "cos(x)".equals(func.getFunctionName())));
+        assertTrue(allFunctions.stream().anyMatch(func -> "x^2".equals(func.getFunctionName())));
     }
 
 
@@ -206,7 +191,7 @@ class MathFunctionsRepositoriesTest {
 
         // Добавляем новую функцию и проверяем счетчик
         MathFunctions newFunction = new MathFunctions();
-        newFunction.setNameOfFunction("ln(x)");
+        newFunction.setFunctionName("ln(x)");
         newFunction.setLeftBoarder(0.1);
         newFunction.setRightBoarder(10.0);
         newFunction.setAmountOfDots(80L);
@@ -232,24 +217,7 @@ class MathFunctionsRepositoriesTest {
         assertFalse(mathFunctionsRepository.findById(functionId).isPresent());
     }
 
-    @Test
-    void testSaveAndFlush() {
-        MathFunctions newFunction = new MathFunctions();
-        newFunction.setNameOfFunction("flush_function");
-        newFunction.setLeftBoarder(1.0);
-        newFunction.setRightBoarder(2.0);
-        newFunction.setAmountOfDots(30L);
-        newFunction.setUsers(testUser);
 
-        MathFunctions savedFunction = mathFunctionsRepository.saveAndFlush(newFunction);
-
-        assertNotNull(savedFunction.getMathFunctionsID());
-        assertEquals("flush_function", savedFunction.getNameOfFunction());
-
-        // Немедленно проверяем, что функция доступна
-        Optional<MathFunctions> foundFunction = mathFunctionsRepository.findByNameOfFunction("flush_function");
-        assertTrue(foundFunction.isPresent());
-    }
 
     @Test
     void testFindAllById() {

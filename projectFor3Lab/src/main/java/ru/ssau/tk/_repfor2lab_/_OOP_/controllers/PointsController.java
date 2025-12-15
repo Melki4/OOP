@@ -68,8 +68,8 @@ public class PointsController {
             @PathVariable Long id,
             @RequestBody JsonNode body) {
 
-        double xValue = body.get("x_value").asDouble();
-        double yValue = body.get("y_value").asDouble();
+        double xValue = body.get("xvalue").asDouble();
+        double yValue = body.get("yvalue").asDouble();
         logger.info("Запрос на создание одной точки для функции с ID: {}", id);
 
         checkFunctionAccess(id);
@@ -121,10 +121,10 @@ public class PointsController {
     @PutMapping("/update-x/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updateXValue(
-            @RequestBody JsonNode body,
-            @PathVariable Long id) {
-        double oldValue = body.get("oldValue").asDouble();
-        double newValue = body.get("newValue").asDouble();
+            @PathVariable Long id,
+            @RequestBody JsonNode body) {
+        double oldValue = body.get("old-value").asDouble();
+        double newValue = body.get("new-value").asDouble();
         logger.info("Запрос на обновление x_value");
 
         checkFunctionAccess(id);
@@ -141,10 +141,11 @@ public class PointsController {
     @PutMapping("/update-y/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updateYValue(
-            @RequestBody JsonNode body,
-            @PathVariable Long id) {
-        double oldValue = body.get("oldValue").asDouble();
-        double newValue = body.get("newValue").asDouble();
+            @PathVariable Long id,
+            @RequestBody JsonNode body
+            ) {
+        double oldValue = body.get("old-value").asDouble();
+        double newValue = body.get("new-value").asDouble();
         logger.info("Запрос на обновление y_value");
 
         checkFunctionAccess(id);

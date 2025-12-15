@@ -28,10 +28,11 @@ public class Users {
     private List<MathFunctions> mathFunctions;
 
     public Users(){}
-    public Users(String login, String password, String role){
+    public Users(String login, String password, String role, String factoryType){
         this.login = login;
         this.password = password;
         this.role = role;
+        this.factoryType = factoryType != null ? factoryType : "array";
     }
 
     public Long getUserID() {

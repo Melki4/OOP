@@ -6,6 +6,7 @@ import ru.ssau.tk._repfor2lab_._OOP_.functions.TabulatedFunction;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 import static java.lang.Math.max;
+import static java.lang.Math.ceil;
 
 public class Integrate extends RecursiveTask<Double> {
 
@@ -19,7 +20,8 @@ public class Integrate extends RecursiveTask<Double> {
         function = f;
         this.interval = interval;
         this.params = params;
-        params.maxInterval = max(params.maxInterval, (interval.length())/100);
+        int intervalBasedMax = (int) ceil(interval.length() / 100.0);
+        params.maxInterval = max(params.maxInterval, max(2000, intervalBasedMax));
     }
 
     @Override

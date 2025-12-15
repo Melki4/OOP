@@ -14,7 +14,7 @@ public class MathFunctions {
     private Long mathFunctionsID;
 
     @Column(name = "function_name", length = 128, nullable = false)
-    private String nameOfFunction;
+    private String functionName;
 
     @Column(name = "amount_of_dots", nullable = false)
     private Long amountOfDots;
@@ -25,9 +25,9 @@ public class MathFunctions {
     @Column(name = "right_boarder", nullable = false)
     private Double rightBoarder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "function_type")
-    private SimpleFunctions simpleFunctions;
+    @Column(name = "function_type", length = 64, nullable = false)
+    private String functionType;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
@@ -41,7 +41,7 @@ public class MathFunctions {
     public MathFunctions(Long mathFunctionsID, String nameOfFunction, Long amountOfDots,
                          Double leftBoarder, Double rightBoarder, Users users){
         this.mathFunctionsID = mathFunctionsID;
-        this.nameOfFunction = nameOfFunction;
+        this.functionName = nameOfFunction;
         this.amountOfDots = amountOfDots;
         this.leftBoarder = leftBoarder;
         this.rightBoarder = rightBoarder;
@@ -56,12 +56,12 @@ public class MathFunctions {
         this.mathFunctionsID = mathFunctionsID;
     }
 
-    public String getNameOfFunction() {
-        return nameOfFunction;
+    public String getFunctionName() {
+        return functionName;
     }
 
-    public void setNameOfFunction(String nameOfFunction) {
-        this.nameOfFunction = nameOfFunction;
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
     }
 
     public Long getAmountOfDots() {
@@ -88,12 +88,12 @@ public class MathFunctions {
         this.rightBoarder = rightBoarder;
     }
 
-    public SimpleFunctions getSimpleFunctions() {
-        return simpleFunctions;
+    public String getFunctionType() {
+        return functionType;
     }
 
-    public void setSimpleFunctions(SimpleFunctions simpleFunctions) {
-        this.simpleFunctions = simpleFunctions;
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
     }
 
     public Users getUsers() {

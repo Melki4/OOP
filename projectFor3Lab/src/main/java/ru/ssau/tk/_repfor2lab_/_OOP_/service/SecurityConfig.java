@@ -24,9 +24,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/users").permitAll()          // регистрация
-                        .requestMatchers("/users/check/**").permitAll() // проверка логина
-                        .anyRequest().authenticated()                       // всё остальное — только авторизованные
+                        //.requestMatchers("/users/auth/register").permitAll()          // регистрация
+                        //.requestMatchers("/users/check/**").permitAll() // проверка логина
+                        //.anyRequest().authenticated()                       // всё остальное — только авторизованные
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // включаем Basic Auth
         return http.build();

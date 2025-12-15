@@ -4,17 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PointsDTO {
     private Long pointsID;
-    @JsonProperty("x")
+    @JsonProperty("xvalue")
     private Double xValue;
 
-    @JsonProperty("y")
+    @JsonProperty("yvalue")
     private Double yValue;
     private Long functionID;
 
     public PointsDTO(){}
 
-    public PointsDTO(Long pointsID, Double xValue, Double yValue, Long functionID) {
-        this.pointsID = pointsID;
+    public PointsDTO(Double xValue, Double yValue, Long functionID) {
         this.xValue = xValue;
         this.yValue = yValue;
         this.functionID = functionID;

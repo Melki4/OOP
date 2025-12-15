@@ -57,7 +57,7 @@ public class SimpleFunctionController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> createFunction(@RequestBody JsonNode body) {
-        String localName = body.get("value").asText();
+        String localName = body.get("local-name").asText();
         logger.info("Создание простой функции: {}", localName);
 
         SimpleFunctions function = new SimpleFunctions();
