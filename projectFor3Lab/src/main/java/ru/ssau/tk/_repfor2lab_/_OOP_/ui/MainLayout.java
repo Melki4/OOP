@@ -26,7 +26,8 @@ public class MainLayout extends AppLayout {
         H1 title = new H1("MathFunction App");
         title.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
-                .set("margin", "0");
+                .set("margin", "0")
+                .set("margin-left", "var(--lumo-space-m)");
 
         darkThemeEnabled = Boolean.TRUE.equals(VaadinSession.getCurrent().getAttribute("darkThemeEnabled"));
 
@@ -82,6 +83,7 @@ public class MainLayout extends AppLayout {
         topBar.expand(menu);
         topBar.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         topBar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        themeToggleButton.getStyle().set("margin-right", "var(--lumo-space-m)");
         return topBar;
     }
 

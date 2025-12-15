@@ -52,6 +52,7 @@ public class FunctionGridComponent extends VerticalLayout {
         setMaxWidth("520px");
         setPadding(true);
         setSpacing(true);
+        setAlignItems(Alignment.STRETCH);
         getStyle().set("border", "1px solid var(--lumo-contrast-20pct)")
                 .set("border-radius", "var(--lumo-border-radius-m)");
 
@@ -213,6 +214,10 @@ public class FunctionGridComponent extends VerticalLayout {
         buttonLayout.setSpacing(true);
         buttonLayout.getStyle().set("flex-wrap", "wrap");
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        buttonLayout.getStyle()
+                .set("padding", "0 var(--lumo-space-m) var(--lumo-space-m)")
+                .set("box-sizing", "border-box");
+
 
         Button createFunctionButton = new Button("Создать функцию");
         createFunctionButton.addClickListener(e -> actionHandler.accept(panelNumber, "create"));

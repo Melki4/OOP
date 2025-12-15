@@ -85,8 +85,9 @@ public class FunctionVisualizationView extends VerticalLayout {
 
         VerticalLayout rightSide = new VerticalLayout();
         rightSide.setSizeFull();
-        rightSide.setPadding(false);
+        rightSide.setPadding(true);
         rightSide.setSpacing(true);
+        rightSide.getStyle().set("padding-bottom", "var(--lumo-space-l)");
 
         chartContainer = new Div();
         chartContainer.setWidth("100%");
