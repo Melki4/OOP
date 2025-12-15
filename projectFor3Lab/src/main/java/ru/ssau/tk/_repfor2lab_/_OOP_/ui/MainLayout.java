@@ -1,6 +1,8 @@
 package ru.ssau.tk._repfor2lab_._OOP_.ui;
 
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -17,12 +19,16 @@ import java.util.Map;
 public class MainLayout extends AppLayout {
     private final Tabs menu;
     private final Map<Tab, String> tabToRoute = new HashMap<>();
+    private final Button themeToggleButton;
+    private boolean darkThemeEnabled;
 
     public MainLayout() {
         H1 title = new H1("MathFunction App");
         title.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
+
+        darkThemeEnabled = Boolean.TRUE.equals(VaadinSession.getCurrent().getAttribute("darkThemeEnabled"));
 
         menu = createMenuTabs();
         menu.addSelectedChangeListener(event -> {
@@ -40,7 +46,10 @@ public class MainLayout extends AppLayout {
             }
         });
 
-        addToNavbar(createTopBar(title, menu));
+        themeToggleButton = createThemeToggleButton();
+        applyTheme(darkThemeEnabled);
+
+        addToNavbar(createTopBar(title, menu, themeToggleButton));
     }
 
     private Tabs createMenuTabs() {
@@ -67,12 +76,44 @@ public class MainLayout extends AppLayout {
         tabs.add(tab);
     }
 
-    private HorizontalLayout createTopBar(H1 title, Tabs menu) {
-        HorizontalLayout topBar = new HorizontalLayout(title, menu);
+    private HorizontalLayout createTopBar(H1 title, Tabs menu, Button themeToggleButton) {
+        HorizontalLayout topBar = new HorizontalLayout(title, menu, themeToggleButton);
         topBar.setWidth("100%");
         topBar.expand(menu);
         topBar.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        topBar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         return topBar;
+    }
+
+    private Button createThemeToggleButton() {
+        Button toggle = new Button();
+        toggle.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        updateThemeButtonText(darkThemeEnabled);
+        toggle.addClickListener(event -> toggleTheme());
+        return toggle;
+    }
+
+    private void toggleTheme() {
+        darkThemeEnabled = !darkThemeEnabled;
+        VaadinSession.getCurrent().setAttribute("darkThemeEnabled", darkThemeEnabled);
+        applyTheme(darkThemeEnabled);
+    }
+
+    private void applyTheme(boolean enableDark) {
+        getUI().ifPresent(ui -> {
+            if (enableDark) {
+                ui.getElement().getThemeList().add("dark");
+            } else {
+                ui.getElement().getThemeList().remove("dark");
+            }
+        });
+        updateThemeButtonText(enableDark);
+    }
+
+    private void updateThemeButtonText(boolean isDarkEnabled) {
+        if (themeToggleButton != null) {
+            themeToggleButton.setText(isDarkEnabled ? "Светлая тема" : "Тёмная тема");
+        }
     }
 
     @Override

@@ -3,7 +3,6 @@ package ru.ssau.tk._repfor2lab_._OOP_.ui.views;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -42,7 +41,6 @@ public class FunctionIntegrationView extends VerticalLayout {
     private FunctionGridComponent sourceGrid;
     private final NumberField threadField;
     private final TextField resultField;
-    private final Span maxIntervalInfo;
 
     public FunctionIntegrationView() {
         String login = (String) VaadinSession.getCurrent().getAttribute("login");
@@ -70,8 +68,6 @@ public class FunctionIntegrationView extends VerticalLayout {
         resultField.setReadOnly(true);
         resultField.setWidth("280px");
 
-        maxIntervalInfo = new Span("Макс. разбиений: —");
-
         createUI();
     }
 
@@ -81,10 +77,10 @@ public class FunctionIntegrationView extends VerticalLayout {
         Button integrateButton = new Button("Вычислить интеграл", e -> calculateIntegral());
         integrateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        HorizontalLayout controls = new HorizontalLayout(threadField, integrateButton, maxIntervalInfo);
+        HorizontalLayout controls = new HorizontalLayout(threadField, integrateButton);
         controls.setWidthFull();
         controls.setJustifyContentMode(JustifyContentMode.CENTER);
-        controls.setDefaultVerticalComponentAlignment(Alignment.END);
+        controls.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         controls.setSpacing(true);
         add(controls, resultField);
 
@@ -130,7 +126,6 @@ public class FunctionIntegrationView extends VerticalLayout {
         sourceFunction = function;
         sourceGrid.setFunction(function);
         resultField.clear();
-        maxIntervalInfo.setText("Макс. разбиений: —");
     }
 
     private void calculateIntegral() {
@@ -150,7 +145,6 @@ public class FunctionIntegrationView extends VerticalLayout {
 
         int intervalLength = sourceFunction.getCount();
         int maxInterval = Math.max(2000, (int) Math.ceil(intervalLength / 100.0));
-        maxIntervalInfo.setText("Макс. разбиений: " + maxInterval);
 
         Params params = new Params(threads, maxInterval);
         Interval interval = new Interval(0, sourceFunction.getCount() - 1);
