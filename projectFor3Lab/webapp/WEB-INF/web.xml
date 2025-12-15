@@ -19,7 +19,4 @@
         <url-pattern>/math-functions/*</url-pattern>
     </filter-mapping>
 
-    <listener>
-        <listener-class>ru.ssau.tk._repfor2lab_._OOP_.listeners.AppContextCleanupListener</listener-class>
-    </listener>
 </web-app>
