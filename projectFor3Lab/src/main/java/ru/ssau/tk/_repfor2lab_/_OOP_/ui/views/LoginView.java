@@ -151,11 +151,11 @@ public class LoginView extends VerticalLayout {
 
     private void showFundingNotice(Runnable onConfirm) {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Важно!");
+        dialog.setHeaderTitle("Пользовательское соглашение");
         dialog.setCloseOnEsc(false);
         dialog.setCloseOnOutsideClick(false);
 
-        Paragraph message = new Paragraph("Ваши данные будут использованы для привлечения средств в этот проект.");
+        Paragraph message = new Paragraph("Ваши данные будут использованы для улучшения работы сервиса");
         message.getStyle().set("max-width", "420px");
 
         Button noButton = new Button("Нет", e -> dialog.close());
