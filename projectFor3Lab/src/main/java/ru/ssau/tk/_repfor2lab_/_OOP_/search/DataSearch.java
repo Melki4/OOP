@@ -38,16 +38,7 @@ public class DataSearch {
     }
 
 
-    public Optional<MathFunctions> findSingleMathFunctionByName(String name) {
-        logger.info("Одиночный поиск математической функции по имени: {}", name);
-        Optional<MathFunctions> function = mathFunctionsRepository.findByNameOfFunction(name);
-        if (function.isPresent()) {
-            logger.info("Математическая функция '{}' найдена", name);
-        } else {
-            logger.warn("Математическая функция '{}' не найдена", name);
-        }
-        return function;
-    }
+
 
     public List<MathFunctions> findMultipleMathFunctionsByUser(Long userId) {
         logger.info("Множественный поиск математических функций пользователя ID: {}", userId);
@@ -108,7 +99,7 @@ public class DataSearch {
     private List<MathFunctions> searchMathFunctionsWithSort(String field, String value, Sort sort) {
         switch (field.toUpperCase()) {
             case "NAME":
-                return mathFunctionsRepository.findByNameOfFunctionContainingIgnoreCase(value, sort);
+                return mathFunctionsRepository.findByFunctionNameContainingIgnoreCase(value, sort);
             case "USER_ID":
                 Long userId = Long.parseLong(value);
                 return mathFunctionsRepository.findByUsersUserID(userId, sort);

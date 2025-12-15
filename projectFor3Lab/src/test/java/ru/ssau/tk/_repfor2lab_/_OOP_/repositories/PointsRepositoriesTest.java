@@ -56,7 +56,7 @@ class PointsRepositoriesTest {
 
         // Создание тестовых математических функций
         testFunction1 = new MathFunctions();
-        testFunction1.setNameOfFunction("sin(x)");
+        testFunction1.setFunctionName("sin(x)");
         testFunction1.setLeftBoarder(0.0);
         testFunction1.setRightBoarder(6.28);
         testFunction1.setAmountOfDots(100L);
@@ -64,7 +64,7 @@ class PointsRepositoriesTest {
         testFunction1 = mathFunctionsRepository.save(testFunction1);
 
         testFunction2 = new MathFunctions();
-        testFunction2.setNameOfFunction("cos(x)");
+        testFunction2.setFunctionName("cos(x)");
         testFunction2.setLeftBoarder(-3.14);
         testFunction2.setRightBoarder(3.14);
         testFunction2.setAmountOfDots(50L);
@@ -321,7 +321,7 @@ class PointsRepositoriesTest {
     void testFindByMathFunctionsMathFunctionsID_NoPoints() {
         // Создаем новую функцию без точек
         MathFunctions newFunction = new MathFunctions();
-        newFunction.setNameOfFunction("new_function");
+        newFunction.setFunctionName("new_function");
         newFunction.setLeftBoarder(0.0);
         newFunction.setRightBoarder(10.0);
         newFunction.setAmountOfDots(10L);

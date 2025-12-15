@@ -56,7 +56,7 @@ class DataSearchTest {
 
         testFunction = new MathFunctions();
         testFunction.setMathFunctionsID(1L);
-        testFunction.setNameOfFunction("test_function");
+        testFunction.setFunctionName("test_function");
         testFunction.setAmountOfDots(100L);
         testFunction.setLeftBoarder(0.0);
         testFunction.setRightBoarder(10.0);
@@ -93,28 +93,9 @@ class DataSearchTest {
         verify(usersRepository, times(1)).findByLogin("unknown_user");
     }
 
-    @Test
-    void testFindSingleMathFunctionByName_FunctionExists() {
-        when(mathFunctionsRepository.findByNameOfFunction("test_function"))
-                .thenReturn(Optional.of(testFunction));
 
-        Optional<MathFunctions> result = dataSearch.findSingleMathFunctionByName("test_function");
 
-        assertTrue(result.isPresent());
-        assertEquals("test_function", result.get().getNameOfFunction());
-        verify(mathFunctionsRepository, times(1)).findByNameOfFunction("test_function");
-    }
 
-    @Test
-    void testFindSingleMathFunctionByName_FunctionNotExists() {
-        when(mathFunctionsRepository.findByNameOfFunction("unknown_function"))
-                .thenReturn(Optional.empty());
-
-        Optional<MathFunctions> result = dataSearch.findSingleMathFunctionByName("unknown_function");
-
-        assertFalse(result.isPresent());
-        verify(mathFunctionsRepository, times(1)).findByNameOfFunction("unknown_function");
-    }
 
     @Test
     void testFindMultipleMathFunctionsByUser_WithFunctions() {
@@ -212,7 +193,7 @@ class DataSearchTest {
     @Test
     void testSearchWithSorting_MathFunctionByName() {
         List<MathFunctions> functions = Arrays.asList(testFunction);
-        when(mathFunctionsRepository.findByNameOfFunctionContainingIgnoreCase(
+        when(mathFunctionsRepository.findByFunctionNameContainingIgnoreCase(
                 eq("test"), any(Sort.class))).thenReturn(functions);
 
         List<Object> result = dataSearch.searchWithSorting(
@@ -220,7 +201,7 @@ class DataSearchTest {
 
         assertEquals(1, result.size());
         verify(mathFunctionsRepository, times(1))
-                .findByNameOfFunctionContainingIgnoreCase(eq("test"), any(Sort.class));
+                .findByFunctionNameContainingIgnoreCase(eq("test"), any(Sort.class));
     }
 
     @Test
