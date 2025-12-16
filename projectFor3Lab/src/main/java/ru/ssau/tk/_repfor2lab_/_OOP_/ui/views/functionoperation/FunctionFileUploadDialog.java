@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
 public class FunctionFileUploadDialog {
@@ -135,6 +136,11 @@ public class FunctionFileUploadDialog {
                     );
                 }
             }
+            if (loadedFunction != null && hasDuplicateX(loadedFunction)) {
+                Notification.show("Значения X в загруженной функции должны быть уникальными", 4000, Notification.Position.MIDDLE);
+                return;
+            }
+
 
             if (loadedFunction != null && loadHandler != null) {
                 loadHandler.accept(loadedFunction);
@@ -146,5 +152,15 @@ public class FunctionFileUploadDialog {
             Notification.show("Ошибка загрузки: " + ex.getMessage(), 5000, Notification.Position.MIDDLE);
             ex.printStackTrace();
         }
+    }
+    private boolean hasDuplicateX(TabulatedFunction function) {
+        HashSet<Double> xValues = new HashSet<>();
+        for (int i = 0; i < function.getCount(); i++) {
+            double x = function.getX(i);
+            if (!xValues.add(x)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

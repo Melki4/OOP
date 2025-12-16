@@ -106,7 +106,7 @@ public class CreateFunctionView extends VerticalLayout {
             // === Способ 1: ручной ввод ===
             pointCountField = new IntegerField("Количество точек");
             pointCountField.setMin(2);
-            pointCountField.setMax(1000);
+            pointCountField.setMax(10000);
             pointCountField.setValue(2);
             pointCountField.addValueChangeListener(e -> {
                 Integer val = e.getValue();
@@ -137,7 +137,7 @@ public class CreateFunctionView extends VerticalLayout {
             rightBorderField = new NumberField("Правая граница");
             amountOfDotsField = new IntegerField("Количество точек");
             amountOfDotsField.setMin(2);
-            amountOfDotsField.setMax(1000);
+            amountOfDotsField.setMax(10000);
             amountOfDotsField.setValue(10);
 
             simpleFunctionSelect.setWidth("320px");
@@ -335,6 +335,11 @@ public class CreateFunctionView extends VerticalLayout {
                 Notification.show("Нужно минимум 2 точки", 3000, Notification.Position.MIDDLE);
                 return;
             }
+            if (hasDuplicateX(xList)) {
+                Notification.show("Значения X должны быть уникальными", 4000, Notification.Position.MIDDLE);
+                return;
+            }
+
 
             // Проверка: x строго возрастает
             for (int i = 0; i < xList.size() - 1; i++) {
@@ -481,6 +486,11 @@ public class CreateFunctionView extends VerticalLayout {
 
             List<PointsDTO> points = SimpleFunctionRegistry.CreatePoints(localizedFuncName, left, right, dots,
                     f_type, functionId, constantValue);
+            if (hasDuplicateX(points.stream().map(PointsDTO::getxValue).toList())) {
+                Notification.show("Сгенерированные значения X должны быть уникальными", 4000, Notification.Position.MIDDLE);
+                return;
+            }
+
 
             Map<String, List<PointsDTO>> payload = new HashMap<>();
             payload.put("points", points);
@@ -500,6 +510,10 @@ public class CreateFunctionView extends VerticalLayout {
             Notification.show("Ошибка: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
         }
     }
+    private boolean hasDuplicateX(List<Double> xValues) {
+        return xValues.size() != new HashSet<>(xValues).size();
+    }
+
 
     private int getUserIdByLogin(String login) throws IOException, InterruptedException, URISyntaxException {
         var response = BasicAuthClient.sendGet("/users/get-id-by-login/" + login);

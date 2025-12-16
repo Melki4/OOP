@@ -209,6 +209,7 @@ public class MathFunctionsController {
         dto.setAmountOfDots(f.getAmountOfDots());
         dto.setLeftBoarder(f.getLeftBoarder());
         dto.setRightBoarder(f.getRightBoarder());
+        dto.setFunctionType(f.getFunctionType());
         dto.setOwnerID(f.getUsers().getUserID());
         return dto;
     }
