@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -254,9 +255,15 @@ public class PointsServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\": \"Неверный формат\"}");
         } catch (DaoException e) {
-            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+            if (isUniqueConstraintViolation(e)) {
+                logger.warning("Попытка добавить точку с уже существующим X: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.getWriter().write("{\"error\": \"Точка с таким значением X уже существует\"}");
+            } else {
+                logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+            }
         } catch (Exception e) {
             logger.severe("Ошибка создания точек: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -361,9 +368,15 @@ public class PointsServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write("{\"error\": \"Точки не найдены\"}");
         } catch (DaoException e) {
-            logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+            if (isUniqueConstraintViolation(e)) {
+                logger.warning("Попытка задать существующее значение X: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.getWriter().write("{\"error\": \"Точка с таким значением X уже существует\"}");
+            } else {
+                logger.severe("Произошла ошибка на стороне дао: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                response.getWriter().write("{\"error\": \"Произошла ошибка на стороне дао\"}");
+            }
         } catch (NumberFormatException e) {
             logger.severe("Ошибка формата числа в PUT запросе точек: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -373,6 +386,21 @@ public class PointsServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\": \"Неверный запрос: " + e.getMessage() + "\"}");
         }
+    }
+
+    private boolean isUniqueConstraintViolation(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause != null) {
+            if (cause instanceof SQLException sqlException) {
+                String sqlState = sqlException.getSQLState();
+                String message = sqlException.getMessage();
+                if ("23505".equals(sqlState) || (message != null && message.contains("unique_function_xvalue"))) {
+                    return true;
+                }
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     @Override
